@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test("homepage loads", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Safe Lagoon UI" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Browse components" })).toBeVisible();
 });
 
 test("docs page loads", async ({ page }) => {
