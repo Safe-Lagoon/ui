@@ -182,6 +182,17 @@ export default function AppShellDemo() {
               show a red dot on the bell.
             </p>
           </div>
+          {Array.from({ length: 6 }, (_, index) => (
+            <div
+              key={index}
+              className="rounded-[10px] border border-border-soft bg-muted/20 p-6 md:col-span-2"
+            >
+              <p className="text-body-14 text-muted-foreground">Scrollable work area</p>
+              <p className="mt-2 text-body-16 text-foreground">
+                Main content scrolls independently from the sidebar. Section {index + 1}.
+              </p>
+            </div>
+          ))}
         </div>
       </AppShellLayout>
     </div>

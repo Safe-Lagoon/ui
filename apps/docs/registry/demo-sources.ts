@@ -18,10 +18,12 @@ import inputDemo from "./demos/input-demo.tsx?raw";
 import inputSizesDemo from "./demos/input-sizes-demo.tsx?raw";
 import inputStatesDemo from "./demos/input-states-demo.tsx?raw";
 import inputTypesDemo from "./demos/input-types-demo.tsx?raw";
+import kpiCardDemo from "./demos/kpi-card-demo.tsx?raw";
 import layoutsDemo from "./demos/layouts-demo.tsx?raw";
 import logCardBlockedDemo from "./demos/log-card-blocked-demo.tsx?raw";
 import logCardDemo from "./demos/log-card-demo.tsx?raw";
 import mapMarkerDemo from "./demos/map-marker-demo.tsx?raw";
+import notificationsPanelDemo from "./demos/notifications-panel-demo.tsx?raw";
 import profileCardDemo from "./demos/profile-card-demo.tsx?raw";
 import ruleCardEditDemo from "./demos/rule-card-edit-demo.tsx?raw";
 import ruleCardViewDemo from "./demos/rule-card-view-demo.tsx?raw";
@@ -32,6 +34,7 @@ import signInFormDemo from "./demos/sign-in-form-demo.tsx?raw";
 import signInFormErrorsDemo from "./demos/sign-in-form-errors-demo.tsx?raw";
 import tableDemo from "./demos/table-demo.tsx?raw";
 import tabsDemo from "./demos/tabs-demo.tsx?raw";
+import toggleDemo from "./demos/toggle-demo.tsx?raw";
 
 export const demoSources: Record<DemoName, string> = {
   "ai-chat-demo": aiChatDemo,
@@ -52,10 +55,12 @@ export const demoSources: Record<DemoName, string> = {
   "input-sizes-demo": inputSizesDemo,
   "input-states-demo": inputStatesDemo,
   "input-types-demo": inputTypesDemo,
+  "kpi-card-demo": kpiCardDemo,
   "layouts-demo": layoutsDemo,
   "log-card-blocked-demo": logCardBlockedDemo,
   "log-card-demo": logCardDemo,
   "map-marker-demo": mapMarkerDemo,
+  "notifications-panel-demo": notificationsPanelDemo,
   "profile-card-demo": profileCardDemo,
   "rule-card-edit-demo": ruleCardEditDemo,
   "rule-card-view-demo": ruleCardViewDemo,
@@ -66,4 +71,5 @@ export const demoSources: Record<DemoName, string> = {
   "sign-in-form-errors-demo": signInFormErrorsDemo,
   "table-demo": tableDemo,
   "tabs-demo": tabsDemo,
+  "toggle-demo": toggleDemo,
 };

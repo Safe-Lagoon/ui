@@ -24,6 +24,10 @@ export const docsNavSections: DocsNavSection[] = [
     items: [{ href: "/docs/components/ai-chat", label: "AI Chat" }],
   },
   {
+    title: "Notifications",
+    items: [{ href: "/docs/components/notifications", label: "Notifications Panel" }],
+  },
+  {
     title: "Layout & navigation",
     items: [
       { href: "/docs/components/layouts", label: "Layouts" },
@@ -40,6 +44,7 @@ export const docsNavSections: DocsNavSection[] = [
       { href: "/docs/components/button", label: "Button" },
       { href: "/docs/components/input", label: "Input" },
       { href: "/docs/components/checkbox", label: "Checkbox" },
+      { href: "/docs/components/toggle", label: "Toggle" },
       { href: "/docs/components/date-picker", label: "Date Picker" },
       { href: "/docs/components/dialog", label: "Dialog" },
       { href: "/docs/components/tabs", label: "Tabs" },
@@ -59,6 +64,7 @@ export const docsNavSections: DocsNavSection[] = [
       { href: "/docs/components/screen-mirror", label: "Screen Mirror" },
       { href: "/docs/components/event-timeline", label: "Event Timeline" },
       { href: "/docs/components/log-card", label: "Log Card" },
+      { href: "/docs/components/kpi-card", label: "KPI Card" },
       { href: "/docs/components/profile-card", label: "Profile Card" },
       { href: "/docs/components/rule-card", label: "Rule Card" },
       { href: "/docs/components/schedule-grid", label: "Schedule Grid" },

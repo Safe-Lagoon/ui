@@ -70,6 +70,19 @@ export const docPages: Record<string, DocPage> = {
     examples: [{ title: "Three tabs", preview: "tabs-demo" }],
     code: `import { Tabs, TabsList, TabsTrigger, TabsContent } from "@safelagoon/ui";`,
   },
+  toggle: {
+    title: "Toggle",
+    description: "Pressable toggle buttons and single-select groups for filters, view modes, and toolbar actions.",
+    examples: [{ title: "Single & group", preview: "toggle-demo" }],
+    code: `import { Toggle, ToggleGroup, ToggleGroupItem } from "@safelagoon/ui";
+
+<Toggle aria-label="Bold" variant="outline" size="sm" />
+
+<ToggleGroup type="single" value={view} onValueChange={setView} variant="outline">
+  <ToggleGroupItem value="overview">Overview</ToggleGroupItem>
+  <ToggleGroupItem value="location">Location</ToggleGroupItem>
+</ToggleGroup>`,
+  },
   table: {
     title: "Table",
     description: "Low-level table primitives plus DataTable with sortable columns and border variants.",
@@ -143,6 +156,39 @@ import { AppShellLayout } from "@safelagoon/ui/blocks";
   }
   profile={{ name: "Alex" }}
   groups={[...]}
+>
+  {children}
+</AppShellLayout>`,
+  },
+  notifications: {
+    title: "Notifications Panel",
+    description:
+      "Grouped notification list for parental-control alerts. Pair with AppShellLayout — the profile bell opens it in a dialog popup.",
+    examples: [{ title: "Grouped alerts", preview: "notifications-panel-demo" }],
+    code: `import { NotificationsPanel } from "@safelagoon/ui";
+import { AppShellLayout } from "@safelagoon/ui/blocks";
+
+<AppShellLayout
+  notifications={
+    <NotificationsPanel
+      groups={[
+        {
+          label: "Today",
+          items: [
+            {
+              id: "screen-time",
+              title: "Emma reached her daily screen time limit",
+              preview: "YouTube and TikTok are paused until tomorrow.",
+              category: "Screen time",
+              timestamp: "6:42 PM",
+              icon: <ClockIcon />,
+            },
+          ],
+        },
+      ]}
+    />
+  }
+  profile={{ name: "Alex", notificationCount: 3, actions: [...] }}
 >
   {children}
 </AppShellLayout>`,
@@ -227,13 +273,42 @@ const [date, setDate] = useState<Date>();
 
 <LogCard title="Blocked website" description="example.com" timestamp="Today, 14:32" blocked />`,
   },
+  "kpi-card": {
+    title: "KPI Card",
+    description: "Dashboard metric tile with icon, value, label, and optional trend line for portal home screens.",
+    examples: [{ title: "Dashboard grid", preview: "kpi-card-demo" }],
+    code: `import { KpiCard } from "@safelagoon/ui";
+
+<KpiCard
+  icon={<ClockIcon />}
+  value="4h 12m"
+  label="Screen time today"
+  trendLabel="↓ 18% vs yesterday"
+  trendDirection="down"
+/>`,
+  },
   "profile-card": {
     title: "Profile Card",
-    description: "Child profile with OS badge, battery, PIN.",
+    description: "Child profile with OS badge, battery, PIN, and optional avatar upload with crop.",
     examples: [{ title: "Android profile", preview: "profile-card-demo" }],
     code: `import { ProfileCard } from "@safelagoon/ui";
 
-<ProfileCard name="Alex" os="android" batteryPercent={78} pin="1234" />`,
+<ProfileCard
+  name="Alex"
+  os="android"
+  osLabel="Android"
+  batteryPercent={78}
+  batteryLabel="Battery"
+  avatarFallback="A"
+  avatarSrc={avatarSrc}
+  avatarUploadLabel="Upload profile photo"
+  avatarCropTitle="Crop profile photo"
+  avatarCropLabel="Save photo"
+  avatarCropCancelLabel="Cancel"
+  avatarCropZoomLabel="Zoom"
+  onAvatarUpload={handleFile}
+  onAvatarCropComplete={setAvatarSrc}
+/>`,
   },
   "rule-card": {
     title: "Rule Card",

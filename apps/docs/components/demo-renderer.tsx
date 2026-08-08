@@ -44,6 +44,9 @@ const loaders: Record<DemoName, ComponentType> = {
   "event-timeline-demo": loadDemo(() => import("@/registry/demos/event-timeline-demo")),
   "app-shell-demo": loadDemo(() => import("@/registry/demos/app-shell-demo")),
   "ai-chat-demo": loadDemo(() => import("@/registry/demos/ai-chat-demo")),
+  "toggle-demo": loadDemo(() => import("@/registry/demos/toggle-demo")),
+  "notifications-panel-demo": loadDemo(() => import("@/registry/demos/notifications-panel-demo")),
+  "kpi-card-demo": loadDemo(() => import("@/registry/demos/kpi-card-demo")),
 };
 
 function PreviewFallback() {

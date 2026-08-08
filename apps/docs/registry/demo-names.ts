@@ -31,6 +31,9 @@ export const demoNames = [
   "event-timeline-demo",
   "app-shell-demo",
   "ai-chat-demo",
+  "toggle-demo",
+  "notifications-panel-demo",
+  "kpi-card-demo",
 ] as const;
 
 export type DemoName = (typeof demoNames)[number];

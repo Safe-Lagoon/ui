@@ -303,7 +303,7 @@ export function AppSidebar({
   return (
     <aside
       className={cn(
-        "flex h-full w-[280px] shrink-0 flex-col bg-muted",
+        "flex h-full min-h-0 w-[280px] shrink-0 flex-col bg-muted",
         className,
       )}
     >
@@ -338,7 +338,7 @@ export function AppSidebar({
         ) : null}
       </div>
 
-      <ScrollArea className="flex-1">
+      <ScrollArea className="min-h-0 flex-1">
         <div className="space-y-4 p-3">
           {topItems.length > 0 ? (
             <nav className="space-y-0.5" aria-label="Primary">

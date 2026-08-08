@@ -39,45 +39,47 @@ export function ScheduleGrid({
   };
 
   return (
-    <div className={cn("overflow-x-auto", className)}>
-      <div className="inline-block min-w-full">
-        <div className="grid grid-cols-[auto_repeat(24,minmax(0,1fr))] gap-px rounded-[10px] border border-border-soft bg-border-soft">
-          <div className="bg-background p-1" />
-          {Array.from({ length: 24 }, (_, hour) => (
-            <div
-              key={hour}
-              className="bg-background px-0.5 py-1 text-center text-body-12 text-muted-foreground"
-            >
-              {hour}
-            </div>
-          ))}
-          {dayLabels.map((label, day) => (
-            <React.Fragment key={day}>
-              <div className="sticky start-0 z-10 bg-background px-2 py-1 text-body-14 text-foreground">
-                {label}
+    <div className={cn("overflow-hidden rounded-[10px] border border-border-soft", className)}>
+      <div className="overflow-x-auto">
+        <div className="inline-block min-w-full">
+          <div className="grid grid-cols-[auto_repeat(24,minmax(0,1fr))] gap-px bg-border-soft">
+            <div className="bg-background p-1" />
+            {Array.from({ length: 24 }, (_, hour) => (
+              <div
+                key={hour}
+                className="bg-background px-0.5 py-1 text-center text-body-12 text-muted-foreground"
+              >
+                {hour}
               </div>
-              {Array.from({ length: 24 }, (_, hour) => {
-                const active = activeSet.has(cellKey(day, hour));
-                return (
-                  <button
-                    key={hour}
-                    type="button"
-                    aria-pressed={active}
-                    aria-label={`${label} ${hour}:00`}
-                    onClick={() => toggle(day, hour)}
-                    className={cn(
-                      "aspect-square min-h-6 w-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
-                      active ? "bg-lilac hover:bg-lilac-hover" : "bg-background hover:bg-brand-blue-100",
-                    )}
-                  />
-                );
-              })}
-            </React.Fragment>
-          ))}
+            ))}
+            {dayLabels.map((label, day) => (
+              <React.Fragment key={day}>
+                <div className="sticky start-0 z-10 bg-background px-2 py-1 text-body-14 text-foreground">
+                  {label}
+                </div>
+                {Array.from({ length: 24 }, (_, hour) => {
+                  const active = activeSet.has(cellKey(day, hour));
+                  return (
+                    <button
+                      key={hour}
+                      type="button"
+                      aria-pressed={active}
+                      aria-label={`${label} ${hour}:00`}
+                      onClick={() => toggle(day, hour)}
+                      className={cn(
+                        "aspect-square min-h-6 w-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
+                        active ? "bg-lilac hover:bg-lilac-hover" : "bg-background hover:bg-brand-blue-100",
+                      )}
+                    />
+                  );
+                })}
+              </React.Fragment>
+            ))}
+          </div>
+          {hourLabel ? (
+            <p className="mt-2 text-center text-body-14 text-muted-foreground">{hourLabel}</p>
+          ) : null}
         </div>
-        {hourLabel ? (
-          <p className="mt-2 text-center text-body-14 text-muted-foreground">{hourLabel}</p>
-        ) : null}
       </div>
     </div>
   );

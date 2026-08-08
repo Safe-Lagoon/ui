@@ -158,8 +158,10 @@ export function AppShellLayout({
   const overlayOpen = aiChatOpen && aiChat;
 
   return (
-    <div className={cn("flex min-h-svh bg-muted", className)}>
-      {!collapsed ? <div className="hidden shrink-0 lg:flex">{sidebar}</div> : null}
+    <div className={cn("flex h-svh min-h-0 overflow-hidden bg-muted", className)}>
+      {!collapsed ? (
+        <div className="hidden h-full min-h-0 shrink-0 overflow-hidden lg:flex">{sidebar}</div>
+      ) : null}
 
       {mobileOpen ? (
         <div className="fixed inset-0 z-50 lg:hidden">
@@ -195,10 +197,17 @@ export function AppShellLayout({
           ) : null}
 
           <main
+            data-shell-collapsed={collapsed ? "" : undefined}
             className={cn(
-              "flex min-h-0 flex-1 flex-col",
-              overlayOpen ? "overflow-hidden p-0" : "overflow-auto p-6 max-lg:pt-16",
-              !overlayOpen && collapsed && "lg:pt-16",
+              "group/shell flex min-h-0 flex-1 flex-col",
+              overlayOpen
+                ? "overflow-hidden p-0"
+                : cn(
+                    "overflow-auto px-6 pb-6",
+                    "[&:not(:has([data-slot=app-shell-page-header]))]:max-lg:pt-12",
+                    collapsed &&
+                      "[&:not(:has([data-slot=app-shell-page-header]))]:lg:pt-12",
+                  ),
             )}
           >
             {aiChatOpen && aiChat ? renderedAiChat : children}

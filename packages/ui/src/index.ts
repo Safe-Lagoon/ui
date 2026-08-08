@@ -81,6 +81,7 @@ export * from "./components/ui/branded-preloader";
 export * from "./components/domain/log-card";
 export * from "./components/domain/timeline";
 export * from "./components/domain/stat-tile";
+export * from "./components/domain/kpi-card";
 export * from "./components/domain/profile-card";
 export * from "./components/domain/profile-carousel";
 export * from "./components/domain/app-tile";

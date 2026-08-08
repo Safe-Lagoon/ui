@@ -33,6 +33,12 @@ export interface NotificationsPanelProps {
   className?: string;
 }
 
+function collectReadIds(groups: NotificationGroup[]) {
+  return new Set(
+    groups.flatMap((group) => group.items.filter((item) => item.read).map((item) => item.id)),
+  );
+}
+
 export function NotificationsPanel({
   title = "Notifications",
   groups = [],
@@ -44,7 +50,26 @@ export function NotificationsPanel({
   closeLabel = "Close notifications",
   className,
 }: NotificationsPanelProps) {
+  const [readIds, setReadIds] = React.useState(() => collectReadIds(groups));
+
+  React.useEffect(() => {
+    setReadIds(collectReadIds(groups));
+  }, [groups]);
+
   const hasNotifications = groups.some((group) => group.items.length > 0);
+
+  const handleNotificationClick = (notification: AppNotification) => {
+    setReadIds((current) => {
+      if (current.has(notification.id)) return current;
+      const next = new Set(current);
+      next.add(notification.id);
+      return next;
+    });
+    onNotificationClick?.(notification);
+  };
+
+  const isRead = (notification: AppNotification) =>
+    notification.read || readIds.has(notification.id);
 
   return (
     <div className={cn("relative flex min-h-0 flex-col bg-background", className)}>
@@ -80,7 +105,7 @@ export function NotificationsPanel({
                           <button
                             type="button"
                             className="flex w-full gap-3 px-4 py-4 text-start transition-colors hover:bg-muted/30"
-                            onClick={() => onNotificationClick?.(notification)}
+                            onClick={() => handleNotificationClick(notification)}
                           >
                             {notification.icon ? (
                               <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground [&_svg]:size-4">
@@ -102,7 +127,7 @@ export function NotificationsPanel({
                                 </span>
                               ) : null}
                             </span>
-                            {!notification.read ? (
+                            {!isRead(notification) ? (
                               <span className="mt-2 size-2 shrink-0 rounded-full bg-destructive" aria-hidden />
                             ) : null}
                           </button>

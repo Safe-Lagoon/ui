@@ -234,16 +234,41 @@ const Sparkles = makeIcon(() => (
   </>
 ));
 
+const Bell = makeIcon(() => (
+  <>
+    <path d="M10.268 21a2 2 0 0 0 3.464 0" />
+    <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
+  </>
+));
+
+const BarChart3 = makeIcon(() => (
+  <>
+    <path d="M3 3v18h18" />
+    <path d="M18 17V9" />
+    <path d="M13 17V5" />
+    <path d="M8 17v-3" />
+  </>
+));
+
+const ToggleLeft = makeIcon(() => (
+  <>
+    <rect x="1" y="5" width="22" height="14" rx="7" />
+    <circle cx="8" cy="12" r="3" />
+  </>
+));
+
 export const docPageIcons: Record<string, DocIcon> = {
   button: MousePointerClick,
   input: FormInput,
   checkbox: CheckSquare,
+  toggle: ToggleLeft,
   dialog: PanelRight,
   tabs: Rows3,
   table: Table,
   layouts: LayoutGrid,
   "app-shell": LayoutPanelLeft,
   "ai-chat": Sparkles,
+  notifications: Bell,
   header: Signpost,
   "burger-menu": Menu,
   sidebar: LayoutPanelLeft,
@@ -251,6 +276,7 @@ export const docPageIcons: Record<string, DocIcon> = {
   "date-picker": Calendar,
   map: Map,
   "log-card": Shield,
+  "kpi-card": BarChart3,
   "profile-card": UserCircle,
   "rule-card": Timer,
   "schedule-grid": Grid3x3,
