@@ -1,0 +1,67 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "safelagoon",
+  "homepage": "https://ui.safelagoon.com",
+  "items": [
+    {
+      "name": "button",
+      "type": "registry:component",
+      "title": "Button",
+      "description": "Brandbook button with primary, secondary, and tertiary variants.",
+      "registryDependencies": ["utils"],
+      "dependencies": ["class-variance-authority", "@radix-ui/react-slot", "clsx", "tailwind-merge"],
+      "files": [{ "path": "packages/ui/src/components/brand/button.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "input",
+      "type": "registry:component",
+      "title": "Input",
+      "description": "Text input with hover, focus, error, and disabled states.",
+      "registryDependencies": ["utils"],
+      "files": [{ "path": "packages/ui/src/components/brand/input.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "checkbox",
+      "type": "registry:component",
+      "title": "Checkbox",
+      "description": "Brandbook-styled checkbox with lilac checked state.",
+      "registryDependencies": ["utils"],
+      "dependencies": ["@radix-ui/react-checkbox", "lucide-react"],
+      "files": [{ "path": "packages/ui/src/components/brand/checkbox.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "dialog",
+      "type": "registry:ui",
+      "title": "Dialog",
+      "description": "Modal dialog built on Radix Dialog primitives.",
+      "registryDependencies": ["utils"],
+      "dependencies": ["@radix-ui/react-dialog", "lucide-react"],
+      "files": [{ "path": "packages/ui/src/components/ui/dialog.tsx", "type": "registry:ui" }]
+    },
+    {
+      "name": "tabs",
+      "type": "registry:ui",
+      "title": "Tabs",
+      "description": "Tabbed navigation with list, trigger, and content panels.",
+      "registryDependencies": ["utils"],
+      "dependencies": ["@radix-ui/react-tabs"],
+      "files": [{ "path": "packages/ui/src/components/ui/tabs.tsx", "type": "registry:ui" }]
+    },
+    {
+      "name": "table",
+      "type": "registry:ui",
+      "title": "Table",
+      "description": "Semantic table primitives for data display.",
+      "registryDependencies": ["utils"],
+      "files": [{ "path": "packages/ui/src/components/ui/table.tsx", "type": "registry:ui" }]
+    },
+    {
+      "name": "utils",
+      "type": "registry:lib",
+      "title": "Utils",
+      "description": "cn() utility for Tailwind class merging.",
+      "dependencies": ["clsx", "tailwind-merge"],
+      "files": [{ "path": "packages/ui/src/lib/utils.ts", "type": "registry:lib" }]
+    }
+  ]
+}

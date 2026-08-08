@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand colors */
+  --color-brand-blue: #2f77ee;
+  --color-brand-blue-400: #689ffa;
+  --color-brand-blue-300: #a4c6fe;
+  --color-brand-blue-100: #d9e7ff;
+
+  --color-lilac: #b97cff;
+  --color-lilac-hover: #a357fb;
+  --color-lilac-active: #9132ff;
+  --color-lilac-300: #d9b8ff;
+
+  --color-violet: #7829d2;
+  --color-violet-active: #5909b5;
+
+  --color-green: #7fc15d;
+  --color-green-300: #beeda6;
+  --color-green-100: #e5f8db;
+  --color-success: #5fca89;
+
+  --color-ink: #2d2c32;
+  --color-fg: #333333;
+  --color-muted-fg: #546e7a;
+  --color-border: #b0bec5;
+  --color-border-soft: #dae4e9;
+  --color-surface: #eceff1;
+  --color-footer: #061e47;
+
+  /* shadcn semantic aliases */
+  --color-background: #ffffff;
+  --color-foreground: var(--color-fg);
+  --color-primary: var(--color-lilac);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: var(--color-brand-blue-100);
+  --color-secondary-foreground: var(--color-brand-blue);
+  --color-accent: var(--color-brand-blue);
+  --color-accent-foreground: #ffffff;
+  --color-muted: var(--color-surface);
+  --color-muted-foreground: var(--color-muted-fg);
+  --color-destructive: #e53935;
+  --color-destructive-foreground: #ffffff;
+  --color-ring: var(--color-brand-blue);
+  --color-input: var(--color-border);
+  --color-card: #ffffff;
+  --color-card-foreground: var(--color-fg);
+  --color-popover: #ffffff;
+  --color-popover-foreground: var(--color-fg);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "IBM Plex Serif", ui-serif, Georgia, serif;
+
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1360px;
+}
+
+.dark {
+  --color-background: #0f1729;
+  --color-foreground: #eceff1;
+  --color-card: #152238;
+  --color-card-foreground: #eceff1;
+  --color-popover: #152238;
+  --color-popover-foreground: #eceff1;
+  --color-muted: #1e3050;
+  --color-muted-foreground: #b0bec5;
+  --color-border: #2a4060;
+  --color-input: #2a4060;
+  --color-surface: #1a2840;
+}
+
+[dir="rtl"] {
+  /* RTL handled via logical properties in components */
+}

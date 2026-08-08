@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm --filter @safelagoon/ui build
+      - run: pnpm --filter @safelagoon/ui typecheck
+      - run: pnpm --filter @safelagoon/ui test
+
+      - run: pnpm --filter @safelagoon/docs build
+      - run: pnpm registry:validate
+      - run: pnpm registry:build
+
+      - name: Install Playwright browsers
+        run: pnpm --filter @safelagoon/docs exec playwright install chromium
+
+      - run: pnpm --filter @safelagoon/docs test
