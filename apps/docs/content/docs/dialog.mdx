@@ -1,0 +1,34 @@
+---
+title: Dialog
+description: Modal dialog built on Radix Dialog primitives
+---
+
+# Dialog
+
+Accessible modal overlay with header, footer, title, and description slots. Uses Radix Dialog under the hood with Safe Lagoon tokens.
+
+## Usage
+
+```tsx
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@safelagoon/ui";
+import { Button } from "@safelagoon/ui";
+
+<Dialog>
+  <DialogTrigger asChild>
+    <Button variant="primary">Open</Button>
+  </DialogTrigger>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Confirm action</DialogTitle>
+      <DialogDescription>This cannot be undone.</DialogDescription>
+    </DialogHeader>
+  </DialogContent>
+</Dialog>
+```

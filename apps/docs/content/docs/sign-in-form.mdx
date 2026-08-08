@@ -1,0 +1,23 @@
+---
+title: Sign In Form
+description: Email and password sign-in block with validation states
+---
+
+# Sign In Form
+
+Pre-built auth block combining brand `Input`, `PasswordInput`, and `Button` with label wiring and optional forgot-password link.
+
+## Usage
+
+```tsx
+import { SignInForm } from "@safelagoon/ui/blocks";
+
+<SignInForm
+  emailLabel="Email"
+  passwordLabel="Password"
+  submitLabel="Sign in"
+  forgotPasswordLabel="Forgot password?"
+  onForgotPassword={() => {}}
+  onSubmit={({ email, password }) => console.log(email, password)}
+/>
+```

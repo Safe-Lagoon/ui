@@ -1,0 +1,48 @@
+---
+title: Introduction
+description: Safe Lagoon UI — React component library for parental control portals
+---
+
+# Safe Lagoon UI
+
+`@safelagoon/ui` is a shadcn-based React component library skinned with the Safe Lagoon Figma brandbook.
+
+## Install
+
+```bash
+npm install @safelagoon/ui
+```
+
+## Setup
+
+Import styles in your app:
+
+```css
+@import "@safelagoon/ui/styles.css";
+@import "tailwindcss";
+```
+
+Wrap your app with `ThemeProvider`:
+
+```tsx
+import { ThemeProvider } from "@safelagoon/ui";
+
+export default function App({ children }) {
+  return <ThemeProvider>{children}</ThemeProvider>;
+}
+```
+
+## shadcn CLI
+
+Install components directly from the registry:
+
+```bash
+npx shadcn@latest add @Safe-Lagoon/ui/button
+```
+
+## Subpath exports
+
+- `@safelagoon/ui/icons` — brand icon set
+- `@safelagoon/ui/charts` — recharts wrappers
+- `@safelagoon/ui/map` — Google Maps geofence components
+- `@safelagoon/ui/blocks` — layouts and auth forms

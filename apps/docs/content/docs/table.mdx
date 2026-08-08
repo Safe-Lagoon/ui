@@ -1,0 +1,36 @@
+---
+title: Table
+description: Semantic table primitives for data display
+---
+
+# Table
+
+Composable table building blocks — `Table`, `TableHeader`, `TableBody`, `TableRow`, `TableHead`, and `TableCell` — styled with brand typography and borders.
+
+## Usage
+
+```tsx
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@safelagoon/ui";
+
+<Table>
+  <TableHeader>
+    <TableRow>
+      <TableHead>Name</TableHead>
+      <TableHead>Status</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    <TableRow>
+      <TableCell>Alex</TableCell>
+      <TableCell>Active</TableCell>
+    </TableRow>
+  </TableBody>
+</Table>
+```

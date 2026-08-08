@@ -1,0 +1,23 @@
+---
+title: Schedule Grid
+description: Interactive day-by-hour schedule picker grid
+---
+
+# Schedule Grid
+
+Clickable grid for selecting active time slots across days and hours. Returns an array of `{ day, hour }` cells.
+
+## Usage
+
+```tsx
+import { ScheduleGrid } from "@safelagoon/ui";
+
+const [value, setValue] = useState<{ day: number; hour: number }[]>([]);
+
+<ScheduleGrid
+  value={value}
+  onChange={setValue}
+  dayLabels={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
+  hourLabel="Hour"
+/>
+```

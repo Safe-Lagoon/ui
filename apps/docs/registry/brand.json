@@ -1,0 +1,125 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "items": [
+    {
+      "name": "button",
+      "type": "registry:component",
+      "title": "Button",
+      "description": "Brandbook button with primary, secondary, and tertiary variants.",
+      "files": [
+        {
+          "path": "packages/ui/src/components/brand/button.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "input",
+      "type": "registry:component",
+      "title": "Input",
+      "description": "Text input with hover, focus, error, and disabled states.",
+      "files": [
+        {
+          "path": "packages/ui/src/components/brand/input.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "checkbox",
+      "type": "registry:component",
+      "title": "Checkbox",
+      "description": "Brandbook-styled checkbox with lilac checked state.",
+      "files": [
+        {
+          "path": "packages/ui/src/components/brand/checkbox.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "slider",
+      "type": "registry:component",
+      "title": "Slider",
+      "description": "Range slider with brand styling.",
+      "files": [
+        {
+          "path": "packages/ui/src/components/brand/slider.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "tag",
+      "type": "registry:component",
+      "title": "Tag",
+      "description": "Pill-shaped label tag with variant styles.",
+      "files": [
+        {
+          "path": "packages/ui/src/components/brand/tag.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "header",
+      "type": "registry:component",
+      "title": "Header",
+      "description": "Marketing site header with navigation and burger menu.",
+      "files": [
+        {
+          "path": "packages/ui/src/components/brand/header.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "footer",
+      "type": "registry:component",
+      "title": "Footer",
+      "description": "Marketing site footer with collapsible sections.",
+      "files": [
+        {
+          "path": "packages/ui/src/components/brand/footer.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "card",
+      "type": "registry:component",
+      "title": "Card",
+      "description": "Brand card with image, title, and description slots.",
+      "files": [
+        {
+          "path": "packages/ui/src/components/brand/card.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "cta-block",
+      "type": "registry:component",
+      "title": "CTA Block",
+      "description": "Call-to-action section with heading and button.",
+      "files": [
+        {
+          "path": "packages/ui/src/components/brand/cta-block.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "avatar",
+      "type": "registry:component",
+      "title": "Avatar",
+      "description": "User avatar with image and fallback initials.",
+      "files": [
+        {
+          "path": "packages/ui/src/components/brand/avatar.tsx",
+          "type": "registry:component"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+---
+title: Rule Card
+description: Screen-time rule card with view, edit, create, and delete modes
+---
+
+# Rule Card
+
+Domain component for managing parental control rules. Supports view, edit, create, and delete modes with weekday picker and enable toggle.
+
+## Usage
+
+```tsx
+import { RuleCard } from "@safelagoon/ui";
+
+<RuleCard
+  mode="view"
+  name="Bedtime"
+  enabled
+  weekdays={[0, 1, 2, 3, 4]}
+  weekdaysOptions={[
+    { value: 0, label: "Mon" },
+    { value: 1, label: "Tue" },
+  ]}
+  nameLabel="Rule name"
+  enabledLabel="Enabled"
+  saveLabel="Save"
+  cancelLabel="Cancel"
+  deleteLabel="Delete"
+  editLabel="Edit"
+  confirmDeleteLabel="Confirm delete"
+/>
+```

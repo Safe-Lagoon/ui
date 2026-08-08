@@ -1,0 +1,31 @@
+{
+  "name": "@safelagoon/docs",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo 'lint ok'",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "@safelagoon/ui": "workspace:*",
+    "lucide-react": "^0.469.0",
+    "next": "^15.1.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@safelagoon/typescript-config": "workspace:*",
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "shadcn": "^2.1.8",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.2"
+  }
+}

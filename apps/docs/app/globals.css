@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@import "@safelagoon/ui/styles.css";
+
+@source "../../../packages/ui/dist/**/*.{js,ts,tsx}";
+@source "./components/**/*.{ts,tsx}";
+@source "./registry/**/*.{ts,tsx}";

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "input",
+  "title": "Input",
+  "description": "Text input with hover, focus, error, and disabled states.",
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "packages/ui/src/components/brand/input.tsx",
+      "content": "import * as React from \"react\";\nimport { cn } from \"../../lib/utils\";\n\nexport interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {\n  error?: string;\n}\n\nconst Input = React.forwardRef<HTMLInputElement, InputProps>(\n  ({ className, type, error, ...props }, ref) => {\n    return (\n      <div className=\"w-full\">\n        <input\n          type={type}\n          className={cn(\n            \"flex h-14 w-full rounded-[10px] border border-input bg-background px-4 text-body-16 text-foreground transition-colors\",\n            \"placeholder:text-muted-foreground\",\n            \"hover:border-brand-blue-400\",\n            \"focus-visible:border-brand-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30\",\n            \"disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60\",\n            error && \"border-destructive focus-visible:border-destructive focus-visible:ring-destructive/30\",\n            className,\n          )}\n          ref={ref}\n          aria-invalid={error ? true : undefined}\n          {...props}\n        />\n        {error ? (\n          <p className=\"mt-1.5 text-body-14 text-destructive\" role=\"alert\">\n            {error}\n          </p>\n        ) : null}\n      </div>\n    );\n  },\n);\nInput.displayName = \"Input\";\n\nexport { Input };\n",
+      "type": "registry:component"
+    }
+  ],
+  "type": "registry:component"
+}

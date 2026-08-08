@@ -1,0 +1,101 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "items": [
+    {
+      "name": "dialog",
+      "type": "registry:ui",
+      "title": "Dialog",
+      "description": "Modal dialog built on Radix Dialog primitives.",
+      "files": [
+        {
+          "path": "packages/ui/src/components/ui/dialog.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "tabs",
+      "type": "registry:ui",
+      "title": "Tabs",
+      "description": "Tabbed navigation with list, trigger, and content panels.",
+      "files": [
+        {
+          "path": "packages/ui/src/components/ui/tabs.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "table",
+      "type": "registry:ui",
+      "title": "Table",
+      "description": "Semantic table primitives for data display.",
+      "files": [
+        {
+          "path": "packages/ui/src/components/ui/table.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "select",
+      "type": "registry:ui",
+      "title": "Select",
+      "description": "Dropdown select built on Radix Select.",
+      "files": [
+        {
+          "path": "packages/ui/src/components/ui/select.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "switch",
+      "type": "registry:ui",
+      "title": "Switch",
+      "description": "Toggle switch for boolean settings.",
+      "files": [
+        {
+          "path": "packages/ui/src/components/ui/switch.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "accordion",
+      "type": "registry:ui",
+      "title": "Accordion",
+      "description": "Expandable accordion sections.",
+      "files": [
+        {
+          "path": "packages/ui/src/components/ui/accordion.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "alert",
+      "type": "registry:ui",
+      "title": "Alert",
+      "description": "Inline alert banner with default and destructive variants.",
+      "files": [
+        {
+          "path": "packages/ui/src/components/ui/alert.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "form",
+      "type": "registry:ui",
+      "title": "Form",
+      "description": "React Hook Form helpers with accessible labels and messages.",
+      "files": [
+        {
+          "path": "packages/ui/src/components/ui/form.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    }
+  ]
+}

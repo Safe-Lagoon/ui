@@ -1,0 +1,27 @@
+{
+  "extends": "@safelagoon/typescript-config/nextjs.json",
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./*"
+      ],
+      "@/.source": [
+        "./.source"
+      ]
+    },
+    "jsx": "preserve"
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
