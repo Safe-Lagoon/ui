@@ -1,0 +1,179 @@
+import type { ReactNode } from "react";
+
+export type DocProp = {
+  name: string;
+  type: string;
+  default?: string;
+  description: string;
+  required?: boolean;
+};
+
+export const docPropsBySlug: Record<string, DocProp[]> = {
+  button: [
+    { name: "variant", type: `"primary" | "primary-long" | "secondary-lilac" | "secondary-blue" | "tertiary" | "destructive" | "outline" | "ghost" | "link"`, default: "primary", description: "Visual style. Primary CTAs use lilac." },
+    { name: "size", type: `"default" | "sm" | "lg" | "icon"`, default: "default", description: "Height and typography scale." },
+    { name: "asChild", type: "boolean", default: "false", description: "Merge props onto a child element (e.g. Next.js Link)." },
+    { name: "disabled", type: "boolean", default: "false", description: "Disables interaction and applies muted styling." },
+    { name: "className", type: "string", description: "Additional Tailwind classes merged via cn()." },
+  ],
+  input: [
+    { name: "inputSize", type: `"sm" | "default" | "lg"`, default: "default", description: "Field height and font size." },
+    { name: "error", type: "string", description: "Error message; applies error border and shows text below." },
+    { name: "disabled", type: "boolean", default: "false", description: "Prevents editing." },
+    { name: "readOnly", type: "boolean", default: "false", description: "Read-only styling without disabled opacity." },
+    { name: "type", type: "string", default: "text", description: "Native input type (text, email, number, etc.)." },
+    { name: "placeholder", type: "string", description: "Placeholder copy — pass from i18n." },
+    { name: "className", type: "string", description: "Additional classes on the wrapper or input." },
+  ],
+  checkbox: [
+    { name: "checked", type: "boolean", description: "Controlled checked state." },
+    { name: "defaultChecked", type: "boolean", description: "Uncontrolled initial checked state." },
+    { name: "onCheckedChange", type: "(checked: boolean) => void", description: "Called when the value changes." },
+    { name: "disabled", type: "boolean", default: "false", description: "Disables interaction." },
+    { name: "id", type: "string", description: "Pair with Label htmlFor for accessibility." },
+  ],
+  dialog: [
+    { name: "open", type: "boolean", description: "Controlled open state." },
+    { name: "onOpenChange", type: "(open: boolean) => void", description: "Called when open state changes." },
+    { name: "defaultOpen", type: "boolean", description: "Initial open state (uncontrolled)." },
+  ],
+  tabs: [
+    { name: "defaultValue", type: "string", description: "Initially active tab value (uncontrolled)." },
+    { name: "value", type: "string", description: "Controlled active tab value." },
+    { name: "onValueChange", type: "(value: string) => void", description: "Called when the active tab changes." },
+  ],
+  table: [
+    { name: "columns", type: "DataTableColumn<T>[]", required: true, description: "Column definitions with header, cell renderer, and optional sortValue." },
+    { name: "data", type: "T[]", required: true, description: "Row data array." },
+    { name: "getRowKey", type: "(row: T) => string", required: true, description: "Stable unique key per row." },
+    { name: "border", type: `"none" | "row" | "striped"`, default: "row", description: "Row border variant." },
+    { name: "sortable", type: "boolean", default: "true", description: "Enable column header sorting." },
+  ],
+  layouts: [
+    { name: "children", type: "ReactNode", required: true, description: "Page content rendered inside the layout shell." },
+    { name: "headerLinks", type: "NavLink[]", description: "MarketingLayout — top navigation links." },
+    { name: "navItems", type: "CabinetNavItem[]", description: "CabinetLayout — sidebar navigation items." },
+    { name: "activeHref", type: "string", description: "CabinetLayout — highlights the active nav item." },
+  ],
+  "app-shell": [
+    { name: "logo", type: "ReactNode", description: "Brand mark in the sidebar header." },
+    { name: "topItems", type: "AppSidebarLink[]", description: "Primary nav links above collapsible groups." },
+    { name: "groups", type: "AppSidebarGroup[]", description: "Collapsible sidebar sections with nested links." },
+    { name: "profile", type: "AppSidebarProfile", required: true, description: "Bottom profile menu with avatar and actions." },
+    { name: "collapsed", type: "boolean", description: "Controlled sidebar collapsed state." },
+    { name: "onCollapsedChange", type: "(collapsed: boolean) => void", description: "Called when sidebar is collapsed or expanded." },
+    { name: "LinkComponent", type: "Component", description: "Custom link component (e.g. Next.js Link)." },
+    { name: "title", type: "string", description: "AppShellPageHeader — page heading inside the work area." },
+    { name: "icon", type: "ReactNode", description: "AppShellPageHeader — icon shown in the colored square before the title." },
+    { name: "showDivider", type: "boolean", default: "false", description: "AppShellPageHeader — light gray divider below the header." },
+    { name: "actions", type: "ReactNode", description: "AppShellPageHeader — trailing actions (filters, buttons)." },
+  ],
+  header: [
+    { name: "logo", type: "ReactNode", description: "Logo or brand element." },
+    { name: "links", type: "{ label: string; href: string }[]", description: "Desktop navigation links." },
+    { name: "actions", type: "ReactNode", description: "Right-side actions (CTA buttons)." },
+    { name: "menuItems", type: "BurgerMenuItem[]", description: "Mobile fullscreen menu items." },
+    { name: "sticky", type: "boolean", default: "true", description: "Stick header to top on scroll." },
+  ],
+  "burger-menu": [
+    { name: "items", type: "BurgerMenuItem[]", required: true, description: "Navigation items shown in the overlay." },
+    { name: "triggerLabel", type: "string", description: "Accessible label for the menu button." },
+    { name: "closeLabel", type: "string", description: "Accessible label for the close button." },
+  ],
+  sidebar: [
+    { name: "items", type: "SidebarItem[]", required: true, description: "Navigation items with optional icons." },
+    { name: "header", type: "ReactNode", description: "Slot above nav items." },
+    { name: "footer", type: "ReactNode", description: "Slot below nav items." },
+    { name: "className", type: "string", description: "Additional classes on the aside element." },
+  ],
+  drawer: [
+    { name: "open", type: "boolean", description: "Controlled open state." },
+    { name: "onOpenChange", type: "(open: boolean) => void", description: "Called when open state changes." },
+    { name: "side", type: `"top" | "right" | "bottom" | "left"`, default: "right", description: "Edge the panel slides from." },
+  ],
+  "date-picker": [
+    { name: "value", type: "Date | undefined", description: "Selected date (controlled)." },
+    { name: "onChange", type: "(date: Date | undefined) => void", description: "Called when the user picks a date." },
+    { name: "label", type: "string", description: "Field label — pass from i18n." },
+    { name: "placeholder", type: "string", description: "Placeholder when no date is selected." },
+    { name: "disabled", type: "boolean", default: "false", description: "Disables the trigger." },
+    { name: "error", type: "string", description: "Validation error message." },
+  ],
+  map: [
+    { name: "apiKey", type: "string", required: true, description: "Google Maps JavaScript API key with Maps API enabled." },
+    { name: "center", type: "{ lat: number; lng: number }", required: true, description: "Map center coordinates." },
+    { name: "radius", type: "number", required: true, description: "GeofenceMap — circle radius in meters." },
+    { name: "onRadiusChange", type: "(radius: number) => void", description: "GeofenceMap — called when the user resizes the circle." },
+    { name: "onCenterChange", type: "(center: LatLngLiteral) => void", description: "GeofenceMap — called when the circle center moves." },
+    { name: "editable", type: "boolean", default: "false", description: "GeofenceMap — allow dragging/resizing the geofence." },
+    { name: "height", type: "number | string", description: "Map container height in pixels or CSS value." },
+    { name: "showPin", type: "boolean", default: "true", description: "MiniMap — show LocationPin at center." },
+  ],
+  "log-card": [
+    { name: "icon", type: "ReactNode", required: true, description: "Leading icon (brand icon recommended)." },
+    { name: "title", type: "string", required: true, description: "Event title." },
+    { name: "description", type: "string", required: true, description: "Event detail or URL." },
+    { name: "timestamp", type: "string", required: true, description: "Formatted time string from app i18n." },
+    { name: "blocked", type: "boolean", default: "false", description: "Shows blocked badge styling." },
+    { name: "blockedLabel", type: "string", default: "Blocked", description: "Badge text when blocked." },
+    { name: "screenshot", type: "string", description: "Optional screenshot thumbnail URL." },
+  ],
+  "profile-card": [
+    { name: "name", type: "string", required: true, description: "Child profile display name." },
+    { name: "os", type: `"android" | "ios"`, required: true, description: "Device OS for badge icon." },
+    { name: "batteryPercent", type: "number", description: "Battery level 0–100." },
+    { name: "pin", type: "string", description: "Device PIN code display." },
+    { name: "avatarSrc", type: "string", description: "Profile photo URL." },
+    { name: "selected", type: "boolean", default: "false", description: "Highlighted selection state." },
+  ],
+  "rule-card": [
+    { name: "title", type: "string", required: true, description: "Rule name." },
+    { name: "mode", type: `"view" | "edit"`, default: "view", description: "Read-only or editable layout." },
+    { name: "enabled", type: "boolean", description: "Whether the rule is active." },
+    { name: "onEnabledChange", type: "(enabled: boolean) => void", description: "Toggle handler in edit mode." },
+    { name: "scheduleLabel", type: "string", description: "Schedule section heading." },
+    { name: "children", type: "ReactNode", description: "Custom rule body (schedule grid, limits, etc.)." },
+  ],
+  "schedule-grid": [
+    { name: "value", type: "boolean[][]", required: true, description: "7×24 grid of allowed/blocked cells." },
+    { name: "onChange", type: "(value: boolean[][]) => void", description: "Called when cells are toggled." },
+    { name: "readOnly", type: "boolean", default: "false", description: "Disable cell interaction." },
+    { name: "weekdayLabels", type: "string[]", description: "Localized day abbreviations (Mon–Sun)." },
+  ],
+  "sign-in-form": [
+    { name: "emailLabel", type: "string", required: true, description: "Email field label." },
+    { name: "passwordLabel", type: "string", required: true, description: "Password field label." },
+    { name: "submitLabel", type: "string", required: true, description: "Submit button text." },
+    { name: "forgotPasswordLabel", type: "string", description: "Forgot password link text." },
+    { name: "onSubmit", type: "(data: { email: string; password: string }) => void", description: "Form submit handler." },
+    { name: "emailError", type: "string", description: "Email validation message." },
+    { name: "passwordError", type: "string", description: "Password validation message." },
+    { name: "isLoading", type: "boolean", default: "false", description: "Shows loading state on submit." },
+  ],
+  gallery: [
+    { name: "items", type: "MediaGalleryItem[]", required: true, description: "Photos with src, alt, optional flagged/AI Shield metadata." },
+    { name: "selectable", type: "boolean", default: "false", description: "Enable multi-select checkboxes." },
+    { name: "selectedIds", type: "string[]", description: "Controlled selection IDs." },
+    { name: "onSelectionChange", type: "(ids: string[]) => void", description: "Called when selection changes." },
+    { name: "emptyTitle", type: "string", description: "Empty state heading." },
+    { name: "emptyDescription", type: "string", description: "Empty state body copy." },
+  ],
+  "screen-mirror": [
+    { name: "frames", type: "ScreenMirrorFrame[]", required: true, description: "Captured frames with id, src, timestamp." },
+    { name: "activeFrameId", type: "string", description: "Currently displayed frame ID." },
+    { name: "onActiveFrameChange", type: "(id: string) => void", description: "Called when user navigates frames." },
+    { name: "sessionLabel", type: "string", description: "Session title above the viewer." },
+    { name: "timelineLabel", type: "string", description: "Filmstrip section label." },
+  ],
+  "event-timeline": [
+    { name: "events", type: "EventTimelineEntry[]", required: true, description: "Mixed event feed items." },
+    { name: "types", type: "EventTimelineType[]", required: true, description: "Filter chip definitions." },
+    { name: "filterLabel", type: "string", description: "Filter section label." },
+    { name: "renderEvent", type: "(event: EventTimelineEntry) => ReactNode", required: true, description: "Render function — typically returns LogCard." },
+    { name: "groupByDate", type: "boolean", default: "true", description: "Group events under date headings." },
+  ],
+};
+
+export function getDocProps(slug: string): DocProp[] {
+  return docPropsBySlug[slug] ?? [];
+}

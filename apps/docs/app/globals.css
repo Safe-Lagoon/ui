@@ -2,5 +2,6 @@
 @import "@safelagoon/ui/styles.css";
 
 @source "../../../packages/ui/dist/**/*.{js,ts,tsx}";
+@source "./app/**/*.{ts,tsx}";
 @source "./components/**/*.{ts,tsx}";
 @source "./registry/**/*.{ts,tsx}";

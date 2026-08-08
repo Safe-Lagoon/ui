@@ -16,3 +16,9 @@ test-results
 # Override global gitignore `docs` pattern — this repo's docs app must be tracked
 !apps/docs/
 !apps/docs/**
+apps/docs/.next/
+apps/docs/node_modules/
+apps/docs/.turbo/
+apps/docs/test-results/
+apps/docs/playwright-report/
+apps/docs/*.tsbuildinfo

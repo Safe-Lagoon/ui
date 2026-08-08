@@ -50,7 +50,7 @@ export function WeekdayPicker({
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
               "disabled:cursor-not-allowed disabled:opacity-50",
               selected
-                ? "border-lilac bg-lilac text-white"
+                ? "border-violet bg-violet text-white"
                 : "border-border-soft bg-background text-muted-foreground hover:border-brand-blue hover:text-foreground",
             )}
           >

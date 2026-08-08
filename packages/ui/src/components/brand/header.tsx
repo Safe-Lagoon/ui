@@ -28,7 +28,7 @@ export function Header({ logo, links = [], actions, className }: HeaderProps) {
           <nav className="hidden items-center gap-6 lg:flex" aria-label="Main">
             {links.map((link) => (
               <a
-                key={link.href}
+                key={`${link.href}-${link.label}`}
                 href={link.href}
                 className="text-body-16 text-foreground transition-colors hover:text-brand-blue"
               >
@@ -52,7 +52,7 @@ export function Header({ logo, links = [], actions, className }: HeaderProps) {
         <nav className="border-t border-border-soft px-5 py-4 lg:hidden" aria-label="Mobile">
           <ul className="flex flex-col gap-3">
             {links.map((link) => (
-              <li key={link.href}>
+              <li key={`${link.href}-${link.label}`}>
                 <a href={link.href} className="block py-2 text-body-18 text-foreground">
                   {link.label}
                 </a>
@@ -88,7 +88,7 @@ export function BurgerMenu({
           </div>
           <nav className="mt-8 flex flex-col gap-4">
             {items.map((item) => (
-              <a key={item.href} href={item.href} className="text-h3 text-white" onClick={() => setOpen(false)}>
+              <a key={`${item.href}-${item.label}`} href={item.href} className="text-h3 text-white" onClick={() => setOpen(false)}>
                 {item.label}
               </a>
             ))}

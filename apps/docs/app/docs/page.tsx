@@ -1,27 +1,46 @@
 import Link from "next/link";
+import { CodeBlock } from "@/components/code-block";
+import { DocPageHeader } from "@/components/doc-page-header";
 
 export default function DocsHomePage() {
   return (
     <article>
-      <h1>Introduction</h1>
-      <p>
-        <code>@safelagoon/ui</code> is a shadcn-based React component library skinned with the Safe Lagoon
-        Figma brandbook.
-      </p>
-      <h2>Install</h2>
-      <pre>{`npm install @safelagoon/ui`}</pre>
-      <h2>Setup</h2>
-      <pre>{`import { ThemeProvider } from "@safelagoon/ui";
-import "@safelagoon/ui/styles.css";`}</pre>
-      <h2>shadcn CLI</h2>
-      <pre>{`npx shadcn@latest add @Safe-Lagoon/ui/button`}</pre>
-      <p>
-        Browse components in the sidebar, or view the{" "}
-        <Link href="https://github.com/Safe-Lagoon/ui" className="text-brand-blue underline">
-          GitHub repository
-        </Link>
-        .
-      </p>
+      <DocPageHeader
+        title="Introduction"
+        iconSlug="introduction"
+        description={
+          <>
+            <code>@safelagoon/ui</code> is a shadcn-based React component library skinned with the Safe
+            Lagoon Figma brandbook.
+          </>
+        }
+        showDivider
+      />
+
+      <section className="space-y-6">
+        <div>
+          <h2 className="mb-3 text-h3 text-foreground">Install</h2>
+          <CodeBlock code="npm install @safelagoon/ui" />
+        </div>
+        <div>
+          <h2 className="mb-3 text-h3 text-foreground">Setup</h2>
+          <CodeBlock
+            code={`import { ThemeProvider } from "@safelagoon/ui";
+import "@safelagoon/ui/styles.css";`}
+          />
+        </div>
+        <div>
+          <h2 className="mb-3 text-h3 text-foreground">shadcn CLI</h2>
+          <CodeBlock code="npx shadcn@latest add @Safe-Lagoon/ui/button" />
+        </div>
+        <p className="text-body-16 text-muted-foreground">
+          Browse components in the sidebar, or view the{" "}
+          <Link href="https://github.com/Safe-Lagoon/ui" className="text-brand-blue underline">
+            GitHub repository
+          </Link>
+          .
+        </p>
+      </section>
     </article>
   );
 }

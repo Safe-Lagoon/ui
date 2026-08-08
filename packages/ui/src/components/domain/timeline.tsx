@@ -16,7 +16,7 @@ export function Timeline({ children, className }: TimelineProps) {
 
 export interface TimelineItemProps {
   icon?: React.ReactNode;
-  title: string;
+  title?: string;
   description?: string;
   timestamp?: string;
   isLast?: boolean;
@@ -45,12 +45,14 @@ export function TimelineItem({
         {icon}
       </div>
       <div className="min-w-0 flex-1 pt-1">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h4 className="text-body-16-semibold text-foreground">{title}</h4>
-          {timestamp ? (
-            <time className="text-body-14 text-muted-foreground">{timestamp}</time>
-          ) : null}
-        </div>
+        {title || timestamp ? (
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            {title ? <h4 className="text-body-16-semibold text-foreground">{title}</h4> : null}
+            {timestamp ? (
+              <time className="text-body-14 text-muted-foreground">{timestamp}</time>
+            ) : null}
+          </div>
+        ) : null}
         {description ? (
           <p className="mt-1 text-body-14 text-muted-foreground">{description}</p>
         ) : null}

@@ -39,6 +39,27 @@ export * from "./components/ui/scroll-area";
 export * from "./components/ui/skeleton";
 export * from "./components/ui/progress";
 export * from "./components/ui/table";
+export {
+  DataTable,
+  type DataTableBorder,
+  type DataTableColumn,
+  type DataTableProps,
+} from "./components/ui/data-table";
+export { Sidebar, type SidebarItem, type SidebarProps } from "./components/ui/sidebar";
+export { DatePicker, type DatePickerProps } from "./components/ui/date-picker";
+export {
+  Drawer,
+  DrawerPortal,
+  DrawerOverlay,
+  DrawerTrigger,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerFooter,
+  DrawerTitle,
+  DrawerDescription,
+} from "./components/ui/drawer";
+export { MoneyInput, type MoneyInputProps } from "./components/ui/money-input";
 export * from "./components/ui/breadcrumb";
 export * from "./components/ui/pagination";
 export * from "./components/ui/carousel";
@@ -72,6 +93,9 @@ export * from "./components/domain/alarm-card";
 export * from "./components/domain/app-review-card";
 export * from "./components/domain/chat-bubble";
 export * from "./components/domain/gallery-grid";
+export * from "./components/domain/media-gallery";
+export * from "./components/domain/screen-mirror-viewer";
+export * from "./components/domain/app-sidebar";
 export * from "./components/domain/empty-state";
 export * from "./components/domain/avatar-uploader";
 export * from "./components/domain/stepper";

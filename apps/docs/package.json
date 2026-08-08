@@ -4,8 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 3000",
+    "dev:clean": "rm -rf .next && next dev --port 3000",
+    "dev:watch": "next dev --port 3000",
     "build": "next build",
-    "start": "next start",
+    "start": "next start --port 3000",
     "typecheck": "tsc --noEmit",
     "lint": "echo 'lint ok'",
     "test": "playwright test"
@@ -15,7 +17,8 @@
     "lucide-react": "^0.469.0",
     "next": "^15.1.3",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "shiki": "^4.4.2"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.1",

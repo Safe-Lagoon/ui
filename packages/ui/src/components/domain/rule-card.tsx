@@ -102,22 +102,32 @@ export function RuleCard({
               ) : null}
             </div>
 
-            <div className="flex items-center justify-between gap-4">
-              <Label htmlFor={`rule-enabled-${name}`}>{enabledLabel}</Label>
-              <Switch
-                id={`rule-enabled-${name}`}
-                checked={enabled}
-                onCheckedChange={onEnabledChange}
-                disabled={!isEditing && mode === "view"}
-              />
-            </div>
+            <section
+              aria-label={enabledLabel}
+              className="rounded-[10px] border border-border-soft bg-muted/30 px-4 py-3"
+            >
+              <div className="flex items-center justify-between gap-4">
+                <Label htmlFor={`rule-enabled-${name}`} className="text-body-16-semibold">
+                  {enabledLabel}
+                </Label>
+                <Switch
+                  id={`rule-enabled-${name}`}
+                  checked={enabled}
+                  onCheckedChange={isEditing ? onEnabledChange : undefined}
+                  className={cn(mode === "view" && "pointer-events-none")}
+                  aria-readonly={mode === "view" ? true : undefined}
+                />
+              </div>
+            </section>
 
-            <WeekdayPicker
-              value={weekdays}
-              onChange={(value) => onWeekdaysChange?.(value)}
-              weekdays={weekdaysOptions}
-              disabled={mode === "view"}
-            />
+            <section aria-label="Schedule days">
+              <WeekdayPicker
+                value={weekdays}
+                onChange={(value) => onWeekdaysChange?.(value)}
+                weekdays={weekdaysOptions}
+                disabled={mode === "view"}
+              />
+            </section>
 
             {isEditing ? (
               <div className="flex flex-wrap gap-2 pt-2">

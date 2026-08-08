@@ -1,6 +1,7 @@
 "use client";
 
 import { useTheme } from "@safelagoon/ui";
+import { cn } from "@safelagoon/ui";
 import { Moon, Sun, Languages } from "lucide-react";
 
 const breakpoints = [
@@ -10,11 +11,21 @@ const breakpoints = [
   { label: "1360", width: "1360px" },
 ] as const;
 
-export function DocsControls() {
+type DocsControlsProps = {
+  variant?: "fixed" | "inline";
+};
+
+export function DocsControls({ variant = "fixed" }: DocsControlsProps) {
   const { resolvedTheme, setTheme, dir, setDir } = useTheme();
 
   return (
-    <div className="fixed bottom-4 end-4 z-50 flex flex-wrap items-center gap-2 rounded-[10px] border border-border-soft bg-background p-2 shadow-lg">
+    <div
+      className={cn(
+        "flex flex-wrap items-center gap-1 rounded-[10px] border border-border-soft bg-background p-1",
+        variant === "fixed" && "fixed bottom-4 end-4 z-50 shadow-lg",
+        variant === "inline" && "shrink-0 shadow-none",
+      )}
+    >
       <button
         type="button"
         className="rounded-md p-2 hover:bg-muted"

@@ -13,15 +13,16 @@ const buttonVariants = cva(
         "primary-long":
           "bg-lilac text-white hover:bg-lilac-hover active:bg-lilac-active disabled:bg-border-soft disabled:text-border min-w-[293px]",
         "secondary-lilac":
-          "border-2 border-lilac bg-transparent text-violet hover:border-lilac-hover hover:text-violet-active active:border-lilac-active disabled:border-border disabled:text-border",
+          "border-2 border-lilac bg-lilac-300/10 text-violet hover:border-lilac-hover hover:bg-lilac-300/20 hover:text-violet-active active:border-lilac-active disabled:border-border disabled:bg-transparent disabled:text-border",
         "secondary-blue":
-          "border-2 border-brand-blue bg-transparent text-brand-blue hover:border-brand-blue-400 active:border-brand-blue disabled:border-border disabled:text-border",
+          "border-2 border-brand-blue bg-transparent text-brand-blue hover:border-brand-blue-400 hover:bg-brand-blue-100/40 active:border-brand-blue disabled:border-border disabled:text-border",
         tertiary:
           "bg-transparent text-brand-blue underline-offset-4 hover:underline active:text-violet disabled:text-border",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border border-input bg-background hover:bg-muted hover:text-foreground",
-        ghost: "hover:bg-muted hover:text-foreground",
-        link: "text-brand-blue underline-offset-4 hover:underline",
+        destructive:
+          "bg-destructive text-white hover:bg-destructive/90 active:bg-destructive/80 disabled:bg-border-soft disabled:text-border",
+        outline: "border border-input bg-background text-foreground hover:bg-muted hover:text-foreground",
+        ghost: "text-foreground hover:bg-muted hover:text-foreground",
+        link: "bg-transparent text-brand-blue underline underline-offset-4 hover:text-brand-blue-400 active:text-violet disabled:text-border",
       },
       size: {
         default: "h-[52px] px-5 py-[15px] text-body-18",
