@@ -11,6 +11,9 @@
     "directory": "packages/ui"
   },
   "homepage": "https://ui.safelagoon.com",
+  "publishConfig": {
+    "access": "public"
+  },
   "bugs": {
     "url": "https://github.com/Safe-Lagoon/ui/issues"
   },
