@@ -35,9 +35,12 @@ export type { AppShellLayoutProps } from "./app-shell-layout";
 export { AppShellPageHeader } from "./app-shell-page-header";
 export type { AppShellPageHeaderProps } from "./app-shell-page-header";
 export type {
+  AppSidebarChildProfile,
   AppSidebarGroup,
   AppSidebarLink,
   AppSidebarLinkComponentProps,
   AppSidebarProfile,
   AppSidebarProfileAction,
 } from "../components/domain/app-sidebar";
+export { ChildProfileSwitcher } from "../components/domain/child-profile-switcher";
+export type { ChildProfileSwitcherProps } from "../components/domain/child-profile-switcher";

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { BookOpen, ExternalLink, Github, Package } from "lucide-react";
 import { AppShellLayout } from "@safelagoon/ui/blocks";
 import type { AppSidebarGroup, AppSidebarLinkComponentProps } from "@safelagoon/ui/blocks";
+import { LogoHeader } from "@safelagoon/ui/icons";
 import { docsNavSections } from "@/lib/docs-nav";
 
 function NextNavLink({ href, className, children, ...props }: AppSidebarLinkComponentProps) {
@@ -38,8 +39,8 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
       onCollapsedChange={setCollapsed}
       LinkComponent={NextNavLink}
       logo={
-        <Link href="/docs" className="text-xl font-bold text-brand-blue">
-          Safe Lagoon UI
+        <Link href="/docs" className="flex min-w-0 items-center">
+          <LogoHeader className="h-6 max-w-full" />
         </Link>
       }
       topItems={[

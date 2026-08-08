@@ -4,6 +4,7 @@ export default function HeaderDemo() {
   return (
     <div className="overflow-hidden rounded-xl border border-border-soft">
       <Header
+        className="relative rounded-t-xl"
         logo={
           <span className="text-xl font-bold text-brand-blue">
             Safe Lagoon

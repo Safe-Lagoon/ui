@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { ThemeProvider } from "@safelagoon/ui";
 import { DocsControls } from "@/components/docs-controls";
+import { DocsPreviewProvider } from "@/components/docs-preview-context";
 
 function DocsControlsGate() {
   const pathname = usePathname();
@@ -13,8 +14,10 @@ function DocsControlsGate() {
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider defaultTheme="light">
-      {children}
-      <DocsControlsGate />
+      <DocsPreviewProvider>
+        {children}
+        <DocsControlsGate />
+      </DocsPreviewProvider>
     </ThemeProvider>
   );
 }

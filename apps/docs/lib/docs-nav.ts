@@ -20,6 +20,10 @@ export const docsNavSections: DocsNavSection[] = [
     ],
   },
   {
+    title: "AI",
+    items: [{ href: "/docs/components/ai-chat", label: "AI Chat" }],
+  },
+  {
     title: "Layout & navigation",
     items: [
       { href: "/docs/components/layouts", label: "Layouts" },

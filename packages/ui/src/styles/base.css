@@ -18,3 +18,13 @@ body {
 .safelagoon-ui {
   font-family: var(--font-sans);
 }
+
+@keyframes ai-chat-border-roll {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ai-chat-trigger-ring {
+  animation: ai-chat-border-roll 2.8s linear infinite;
+}

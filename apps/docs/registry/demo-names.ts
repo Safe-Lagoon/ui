@@ -30,6 +30,7 @@ export const demoNames = [
   "screen-mirror-demo",
   "event-timeline-demo",
   "app-shell-demo",
+  "ai-chat-demo",
 ] as const;
 
 export type DemoName = (typeof demoNames)[number];

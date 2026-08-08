@@ -1,5 +1,5 @@
 export type { IconProps } from "./types";
-export { BRAND_BLUE, BRAND_LILAC } from "./types";
+export { BRAND_BLUE, BRAND_LILAC, LOGO_COLOR } from "./types";
 
 export { ChevronDown } from "./chevron-down";
 export { ChevronUp } from "./chevron-up";
@@ -19,6 +19,7 @@ export { FeatureScreenTime } from "./feature-screen-time";
 export { FeatureCalls } from "./feature-calls";
 
 export { LogoMark } from "./logo-mark";
+export { LogoHeader } from "./logo-header";
 
 export { AndroidBadge } from "./android-badge";
 export { IOSBadge } from "./ios-badge";

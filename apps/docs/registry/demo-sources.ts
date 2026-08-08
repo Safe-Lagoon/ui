@@ -1,5 +1,6 @@
 import type { DemoName } from "./demo-names";
 
+import aiChatDemo from "./demos/ai-chat-demo.tsx?raw";
 import appShellDemo from "./demos/app-shell-demo.tsx?raw";
 import burgerMenuDemo from "./demos/burger-menu-demo.tsx?raw";
 import buttonSizesDemo from "./demos/button-sizes-demo.tsx?raw";
@@ -33,6 +34,7 @@ import tableDemo from "./demos/table-demo.tsx?raw";
 import tabsDemo from "./demos/tabs-demo.tsx?raw";
 
 export const demoSources: Record<DemoName, string> = {
+  "ai-chat-demo": aiChatDemo,
   "app-shell-demo": appShellDemo,
   "burger-menu-demo": burgerMenuDemo,
   "button-sizes-demo": buttonSizesDemo,

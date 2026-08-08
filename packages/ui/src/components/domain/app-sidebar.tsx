@@ -22,7 +22,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import { ScrollArea } from "../ui/scroll-area";
+import {
+  ChildProfileSwitcher,
+  type AppSidebarChildProfile,
+} from "./child-profile-switcher";
 
 export type AppSidebarLink = {
   id: string;
@@ -31,6 +36,7 @@ export type AppSidebarLink = {
   href?: string;
   onClick?: () => void;
   active?: boolean;
+  badgeCount?: number;
 };
 
 export type AppSidebarGroup = {
@@ -58,6 +64,8 @@ export type AppSidebarProfile = {
   actions: AppSidebarProfileAction[];
 };
 
+export type { AppSidebarChildProfile };
+
 export type AppSidebarLinkComponentProps = {
   href: string;
   className?: string;
@@ -70,10 +78,18 @@ export interface AppSidebarProps {
   topItems?: AppSidebarLink[];
   groups?: AppSidebarGroup[];
   profile: AppSidebarProfile;
+  childProfiles?: AppSidebarChildProfile[];
+  activeChildProfileId?: string;
+  defaultActiveChildProfileId?: string;
+  onChildProfileChange?: (profileId: string) => void;
+  childProfileSwitchLabel?: string;
   onCollapse?: () => void;
   collapseLabel?: string;
   notificationsLabel?: string;
   profileMenuLabel?: string;
+  notifications?: React.ReactNode;
+  notificationsOpen?: boolean;
+  onNotificationsOpenChange?: (open: boolean) => void;
   LinkComponent?: React.ComponentType<AppSidebarLinkComponentProps>;
   className?: string;
 }
@@ -97,6 +113,9 @@ function NavLink({
     <>
       {item.icon ? <span className="size-5 shrink-0 [&_svg]:size-5">{item.icon}</span> : null}
       <span className="truncate">{item.label}</span>
+      {item.badgeCount && item.badgeCount > 0 ? (
+        <span className="ms-auto size-2 shrink-0 rounded-full bg-destructive" aria-hidden />
+      ) : null}
     </>
   );
 
@@ -163,13 +182,19 @@ function ProfileFooter({
   profile,
   notificationsLabel,
   profileMenuLabel,
+  notifications,
+  notificationsOpen,
+  onNotificationsOpenChange,
 }: {
   profile: AppSidebarProfile;
   notificationsLabel: string;
   profileMenuLabel: string;
+  notifications?: React.ReactNode;
+  notificationsOpen?: boolean;
+  onNotificationsOpenChange?: (open: boolean) => void;
 }) {
   return (
-    <div className="border-t border-border-soft p-3">
+    <div className="bg-muted p-3 shadow-[0_-4px_20px_rgba(45,44,50,0.08)]">
       <div className="flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -217,17 +242,26 @@ function ProfileFooter({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative shrink-0"
-          aria-label={notificationsLabel}
-        >
-          <Bell className="size-5" />
-          {profile.notificationCount && profile.notificationCount > 0 ? (
-            <span className="absolute end-1.5 top-1.5 size-2 rounded-full bg-destructive" aria-hidden />
-          ) : null}
-        </Button>
+        {notifications ? (
+          <Dialog open={notificationsOpen} onOpenChange={onNotificationsOpenChange}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative shrink-0 hover:bg-background"
+              aria-label={notificationsLabel}
+              onClick={() => onNotificationsOpenChange?.(true)}
+            >
+              <Bell className="size-5" />
+              {profile.notificationCount && profile.notificationCount > 0 ? (
+                <span className="absolute end-1.5 top-1.5 size-2 rounded-full bg-destructive" aria-hidden />
+              ) : null}
+            </Button>
+            <DialogContent className="max-w-xl gap-0 overflow-hidden p-0 sm:rounded-[10px] [&>button:last-child]:hidden">
+              <DialogTitle className="sr-only">{notificationsLabel}</DialogTitle>
+              {notifications}
+            </DialogContent>
+          </Dialog>
+        ) : null}
       </div>
     </div>
   );
@@ -238,13 +272,34 @@ export function AppSidebar({
   topItems = [],
   groups = [],
   profile,
+  childProfiles,
+  activeChildProfileId: activeChildProfileIdProp,
+  defaultActiveChildProfileId,
+  onChildProfileChange,
+  childProfileSwitchLabel,
   onCollapse,
   collapseLabel = "Collapse sidebar",
   notificationsLabel = "Notifications",
   profileMenuLabel = "Open profile menu",
+  notifications,
+  notificationsOpen,
+  onNotificationsOpenChange,
   LinkComponent,
   className,
 }: AppSidebarProps) {
+  const [internalActiveChildProfileId, setInternalActiveChildProfileId] = React.useState(
+    defaultActiveChildProfileId ?? childProfiles?.[0]?.id ?? "",
+  );
+
+  const activeChildProfileId = activeChildProfileIdProp ?? internalActiveChildProfileId;
+
+  const handleChildProfileChange = (profileId: string) => {
+    if (activeChildProfileIdProp === undefined) {
+      setInternalActiveChildProfileId(profileId);
+    }
+    onChildProfileChange?.(profileId);
+  };
+
   return (
     <aside
       className={cn(
@@ -252,18 +307,34 @@ export function AppSidebar({
         className,
       )}
     >
-      <div className="flex items-center justify-between gap-2 border-b border-border-soft px-4 py-3">
-        <div className="min-w-0 flex-1">{logo}</div>
-        {onCollapse ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onCollapse}
-            aria-label={collapseLabel}
-            className="shrink-0"
-          >
-            <PanelLeftClose className="size-5" />
-          </Button>
+      <div className="px-3 pb-3 pt-3">
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0 flex-1">{logo}</div>
+          {onCollapse ? (
+            <button
+              type="button"
+              onClick={onCollapse}
+              aria-label={collapseLabel}
+              className={cn(
+                "flex size-10 shrink-0 items-center justify-center rounded-[10px] text-muted-foreground transition-colors",
+                "hover:bg-background/70 hover:text-foreground",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+              )}
+            >
+              <PanelLeftClose className="size-5" />
+            </button>
+          ) : null}
+        </div>
+
+        {childProfiles && childProfiles.length > 0 ? (
+          <div className="mt-3">
+            <ChildProfileSwitcher
+              profiles={childProfiles}
+              activeProfileId={activeChildProfileId}
+              onProfileChange={handleChildProfileChange}
+              switchLabel={childProfileSwitchLabel}
+            />
+          </div>
         ) : null}
       </div>
 
@@ -292,6 +363,9 @@ export function AppSidebar({
         profile={profile}
         notificationsLabel={notificationsLabel}
         profileMenuLabel={profileMenuLabel}
+        notifications={notifications}
+        notificationsOpen={notificationsOpen}
+        onNotificationsOpenChange={onNotificationsOpenChange}
       />
     </aside>
   );

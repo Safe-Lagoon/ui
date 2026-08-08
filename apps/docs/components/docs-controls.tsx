@@ -3,12 +3,13 @@
 import { useTheme } from "@safelagoon/ui";
 import { cn } from "@safelagoon/ui";
 import { Moon, Sun, Languages } from "lucide-react";
+import { useDocsPreview } from "@/components/docs-preview-context";
 
 const breakpoints = [
-  { label: "360", width: "360px" },
-  { label: "768", width: "768px" },
-  { label: "1024", width: "1024px" },
-  { label: "1360", width: "1360px" },
+  { label: "360", width: 360 },
+  { label: "768", width: 768 },
+  { label: "1024", width: 1024 },
+  { label: "1360", width: 1360 },
 ] as const;
 
 type DocsControlsProps = {
@@ -17,6 +18,7 @@ type DocsControlsProps = {
 
 export function DocsControls({ variant = "fixed" }: DocsControlsProps) {
   const { resolvedTheme, setTheme, dir, setDir } = useTheme();
+  const preview = useDocsPreview();
 
   return (
     <div
@@ -38,22 +40,32 @@ export function DocsControls({ variant = "fixed" }: DocsControlsProps) {
         type="button"
         className="rounded-md p-2 hover:bg-muted"
         aria-label="Toggle direction"
+        aria-pressed={dir === "rtl"}
         onClick={() => setDir(dir === "ltr" ? "rtl" : "ltr")}
       >
         <Languages className="size-4" />
       </button>
-      {breakpoints.map((bp) => (
-        <button
-          key={bp.label}
-          type="button"
-          className="rounded-md px-2 py-1 text-body-14 hover:bg-muted"
-          onClick={() => {
-            document.documentElement.style.setProperty("--preview-width", bp.width);
-          }}
-        >
-          {bp.label}
-        </button>
-      ))}
+      {breakpoints.map((bp) => {
+        const active = preview?.previewWidth === bp.width;
+
+        return (
+          <button
+            key={bp.label}
+            type="button"
+            aria-label={`Preview at ${bp.label}px`}
+            aria-pressed={active}
+            className={cn(
+              "rounded-md px-2 py-1 text-body-14 hover:bg-muted",
+              active && "bg-muted font-medium text-foreground",
+            )}
+            onClick={() => {
+              preview?.setPreviewWidth(active ? null : bp.width);
+            }}
+          >
+            {bp.label}
+          </button>
+        );
+      })}
     </div>
   );
 }

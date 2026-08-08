@@ -33,7 +33,7 @@ export function AppShellPageHeader({
             </div>
           ) : null}
           <div className="min-w-0">
-            <h1 className="text-h2 text-foreground">{title}</h1>
+            <h1 className="text-h1 text-foreground">{title}</h1>
             {description ? (
               <div className="mt-1 text-body-16 text-muted-foreground">{description}</div>
             ) : null}

@@ -101,16 +101,49 @@ export const docPages: Record<string, DocPage> = {
   "app-shell": {
     title: "App Shell",
     description:
-      "Collapsible sidebar layout with grouped navigation, hideable panel, and bottom profile menu — for portal dashboards.",
+      "Collapsible sidebar layout with child profile switcher, grouped navigation, hideable panel, and bottom parent profile menu — for portal dashboards.",
     examples: [{ title: "Sidebar + work area", preview: "app-shell-demo" }],
     code: `import { AppShellLayout, AppShellPageHeader } from "@safelagoon/ui/blocks";
 
 <AppShellLayout
   logo={<Logo />}
+  childProfiles={[
+    { id: "emma", name: "Emma", avatarFallback: "E" },
+    { id: "noah", name: "Noah", avatarFallback: "N" },
+  ]}
+  activeChildProfileId={activeChildId}
+  onChildProfileChange={setActiveChildId}
   groups={[{ id: "personal", label: "Personal", items: [...] }]}
   profile={{ name: "Alex", actions: [...] }}
 >
   <AppShellPageHeader title="Dashboard" icon={<HomeIcon />} showDivider />
+  {children}
+</AppShellLayout>`,
+  },
+  "ai-chat": {
+    title: "AI Chat",
+    description:
+      "Full-work-area AI assistant panel with suggested prompts, reasoning, and message thread. Pair with AppShellLayout via the aiChat slot — the lagoon mark opens chat and hides until closed.",
+    examples: [{ title: "App shell + chat", preview: "ai-chat-demo" }],
+    code: `import { AiChat } from "@safelagoon/ui";
+import { AppShellLayout } from "@safelagoon/ui/blocks";
+
+<AppShellLayout
+  aiChatOpen={chatOpen}
+  onAiChatOpenChange={setChatOpen}
+  aiChat={
+    <AiChat
+      suggestedPrompts={[
+        { id: "screen-time", label: "How much screen time did Emma use today?" },
+        { id: "location", label: "Where is Mia's phone right now?" },
+        { id: "survey", label: "A work environment survey", category: "Create" },
+      ]}
+      onSend={handleAiMessage}
+    />
+  }
+  profile={{ name: "Alex" }}
+  groups={[...]}
+>
   {children}
 </AppShellLayout>`,
   },
