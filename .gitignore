@@ -22,3 +22,4 @@ apps/docs/.turbo/
 apps/docs/test-results/
 apps/docs/playwright-report/
 apps/docs/*.tsbuildinfo
+apps/docs/.source/

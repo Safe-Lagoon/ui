@@ -76,10 +76,10 @@ pnpm dev                              # docs at localhost:3000 (or -p 3002)
 
 In a sibling monorepo, reference via `"@safelagoon/ui": "workspace:*"` and build the ui package first.
 
-**Docs site (production):** https://ui.safelagoon.com — Docker container on internal port `8083`, proxied by nginx. Redeploy:
+**Docs site (production):** https://ui.safelagoon.com — see `deploy/` for Docker/nginx scripts. Redeploy on the docs host:
 
 ```bash
-ssh ubuntu@REDACTED 'cd ~/ui && git pull && bash deploy/docs-server/deploy.sh'
+cd ~/ui && git pull && bash deploy/docs-server/deploy.sh
 ```
 
 ## Tailwind v4 setup (required)
@@ -699,17 +699,17 @@ pnpm changeset                # add release notes before merging features
 - Requires GitHub secret **`NPMJS_TOKEN`** (npm automation token with publish access to `@safelagoon` scope).
 - Scoped package uses `"publishConfig": { "access": "public" }`.
 
-**Docs deployment:**
+**Docs deployment** (configure hostnames/IPs via env on your servers — do not commit them):
 
 ```bash
-# On docs server (REDACTED)
+# Docs host
 bash deploy/docs-server/deploy.sh
 
-# Load balancer nginx + certbot (REDACTED) — one-time setup
-bash deploy/load-balancer/setup-ui-nginx.sh
+# Load balancer (set DOCS_UPSTREAM to private host:port, e.g. 10.x.x.x:8083)
+DOCS_UPSTREAM=host:8083 CERTBOT_EMAIL=you@example.com bash deploy/load-balancer/setup-ui-nginx.sh
 ```
 
-Docs container listens on **8083**; nginx proxies `ui.safelagoon.com` → `REDACTED:8083`.
+Docs container listens on port **8083** inside the Docker host; nginx terminates TLS for `ui.safelagoon.com`.
 
 When adding a component to the library:
 
