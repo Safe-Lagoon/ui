@@ -2,6 +2,19 @@
   "name": "@safelagoon/ui",
   "version": "0.2.0",
   "description": "Safe Lagoon React component library — shadcn-based, brandbook-skinned",
+  "keywords": [
+    "react",
+    "ui",
+    "components",
+    "design-system",
+    "tailwindcss",
+    "shadcn",
+    "radix-ui",
+    "safelagoon",
+    "nextjs",
+    "parental-controls",
+    "component-library"
+  ],
   "license": "MIT",
   "type": "module",
   "sideEffects": [
