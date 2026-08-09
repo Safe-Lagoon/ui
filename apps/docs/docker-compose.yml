@@ -1,0 +1,10 @@
+services:
+  docs:
+    build:
+      context: ../..
+      dockerfile: apps/docs/Dockerfile
+    image: safelagoon-ui-docs:latest
+    container_name: ui-docs
+    restart: unless-stopped
+    ports:
+      - "8083:3000"

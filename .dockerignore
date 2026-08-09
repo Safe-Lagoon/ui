@@ -1,0 +1,12 @@
+**/node_modules
+**/.next
+**/dist
+.git
+.github
+**/.turbo
+**/test-results
+**/playwright-report
+apps/docs/.source
+*.md
+!apps/docs/content/**/*.md
+!apps/docs/content/**/*.mdx
