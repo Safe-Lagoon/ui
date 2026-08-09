@@ -1,6 +1,6 @@
 {
   "name": "@safelagoon/ui",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Safe Lagoon React component library — shadcn-based, brandbook-skinned",
   "keywords": [
     "react",

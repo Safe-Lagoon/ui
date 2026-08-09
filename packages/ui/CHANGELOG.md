@@ -1,5 +1,11 @@
 # @safelagoon/ui
 
+## 0.2.1
+
+### Patch Changes
+
+- f9d61b6: Add npm README and package keywords for the public registry page.
+
 ## 0.2.0
 
 ### Minor Changes
