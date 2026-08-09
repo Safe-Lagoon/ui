@@ -6,6 +6,7 @@ import {
   ChevronDown,
   ChevronRight,
   PanelLeftClose,
+  X,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../brand/avatar";
@@ -86,6 +87,7 @@ export interface AppSidebarProps {
   childProfileSwitchLabel?: string;
   onCollapse?: () => void;
   collapseLabel?: string;
+  closeVariant?: "collapse" | "close";
   notificationsLabel?: string;
   profileMenuLabel?: string;
   notifications?: React.ReactNode;
@@ -93,6 +95,7 @@ export interface AppSidebarProps {
   onNotificationsOpenChange?: (open: boolean) => void;
   onNavigate?: () => void;
   LinkComponent?: React.ComponentType<AppSidebarLinkComponentProps>;
+  surface?: "muted" | "background";
   className?: string;
 }
 
@@ -100,17 +103,25 @@ function NavLink({
   item,
   LinkComponent,
   onNavigate,
+  surface = "muted",
 }: {
   item: AppSidebarLink;
   LinkComponent?: React.ComponentType<AppSidebarLinkComponentProps>;
   onNavigate?: () => void;
+  surface?: "muted" | "background";
 }) {
   const className = cn(
     "flex w-full items-center gap-3 rounded-[10px] px-3 py-2 text-body-16 transition-colors",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
     item.active
-      ? "bg-background font-medium text-foreground shadow-sm"
-      : "text-muted-foreground hover:bg-background/70 hover:text-foreground",
+      ? cn(
+          "font-medium text-foreground shadow-sm",
+          surface === "background" ? "bg-muted" : "bg-background",
+        )
+      : cn(
+          "text-muted-foreground hover:text-foreground",
+          surface === "background" ? "hover:bg-muted/70" : "hover:bg-background/70",
+        ),
   );
 
   const content = (
@@ -170,11 +181,13 @@ function SidebarGroupSection({
   defaultOpen,
   LinkComponent,
   onNavigate,
+  surface = "muted",
 }: {
   group: AppSidebarGroup;
   defaultOpen: boolean;
   LinkComponent?: React.ComponentType<AppSidebarLinkComponentProps>;
   onNavigate?: () => void;
+  surface?: "muted" | "background";
 }) {
   const [open, setOpen] = React.useState(defaultOpen);
 
@@ -199,7 +212,13 @@ function SidebarGroupSection({
       </CollapsibleTrigger>
       <CollapsibleContent className="space-y-0.5 ps-2">
         {group.items.map((item) => (
-          <NavLink key={item.id} item={item} LinkComponent={LinkComponent} onNavigate={onNavigate} />
+          <NavLink
+            key={item.id}
+            item={item}
+            LinkComponent={LinkComponent}
+            onNavigate={onNavigate}
+            surface={surface}
+          />
         ))}
       </CollapsibleContent>
     </Collapsible>
@@ -213,6 +232,7 @@ function ProfileFooter({
   notifications,
   notificationsOpen,
   onNotificationsOpenChange,
+  surface = "muted",
 }: {
   profile: AppSidebarProfile;
   notificationsLabel: string;
@@ -220,9 +240,15 @@ function ProfileFooter({
   notifications?: React.ReactNode;
   notificationsOpen?: boolean;
   onNotificationsOpenChange?: (open: boolean) => void;
+  surface?: "muted" | "background";
 }) {
   return (
-    <div className="bg-muted p-3 shadow-[0_-4px_20px_rgba(45,44,50,0.08)]">
+    <div
+      className={cn(
+        "p-3 shadow-[0_-4px_20px_rgba(45,44,50,0.08)]",
+        surface === "background" ? "bg-background" : "bg-muted",
+      )}
+    >
       <div className="flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -307,6 +333,7 @@ export function AppSidebar({
   childProfileSwitchLabel,
   onCollapse,
   collapseLabel = "Collapse sidebar",
+  closeVariant = "collapse",
   notificationsLabel = "Notifications",
   profileMenuLabel = "Open profile menu",
   notifications,
@@ -314,6 +341,7 @@ export function AppSidebar({
   onNotificationsOpenChange,
   onNavigate,
   LinkComponent,
+  surface = "muted",
   className,
 }: AppSidebarProps) {
   const [internalActiveChildProfileId, setInternalActiveChildProfileId] = React.useState(
@@ -332,7 +360,8 @@ export function AppSidebar({
   return (
     <aside
       className={cn(
-        "flex h-full min-h-0 w-[280px] shrink-0 flex-col bg-muted",
+        "flex h-full min-h-0 w-[280px] shrink-0 flex-col",
+        surface === "background" ? "bg-background" : "bg-muted",
         className,
       )}
     >
@@ -350,7 +379,11 @@ export function AppSidebar({
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
               )}
             >
-              <PanelLeftClose className="size-5" />
+              {closeVariant === "close" ? (
+                <X className="size-5" />
+              ) : (
+                <PanelLeftClose className="size-5" />
+              )}
             </button>
           ) : null}
         </div>
@@ -372,7 +405,13 @@ export function AppSidebar({
           {topItems.length > 0 ? (
             <nav className="space-y-0.5" aria-label="Primary">
               {topItems.map((item) => (
-                <NavLink key={item.id} item={item} LinkComponent={LinkComponent} onNavigate={onNavigate} />
+                <NavLink
+                  key={item.id}
+                  item={item}
+                  LinkComponent={LinkComponent}
+                  onNavigate={onNavigate}
+                  surface={surface}
+                />
               ))}
             </nav>
           ) : null}
@@ -384,6 +423,7 @@ export function AppSidebar({
               defaultOpen={group.defaultOpen ?? true}
               LinkComponent={LinkComponent}
               onNavigate={onNavigate}
+              surface={surface}
             />
           ))}
         </div>
@@ -396,6 +436,7 @@ export function AppSidebar({
         notifications={notifications}
         notificationsOpen={notificationsOpen}
         onNotificationsOpenChange={onNotificationsOpenChange}
+        surface={surface}
       />
     </aside>
   );

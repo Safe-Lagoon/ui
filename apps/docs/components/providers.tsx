@@ -7,7 +7,7 @@ import { DocsPreviewProvider } from "@/components/docs-preview-context";
 
 function DocsControlsGate() {
   const pathname = usePathname();
-  if (pathname.startsWith("/docs")) return null;
+  if (!pathname.startsWith("/docs")) return null;
   return <DocsControls />;
 }
 

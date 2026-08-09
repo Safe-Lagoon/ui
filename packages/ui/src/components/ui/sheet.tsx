@@ -19,8 +19,7 @@ const SheetOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-black/50",
-      "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "sheet-overlay fixed inset-0 z-50 bg-black/50",
       className,
     )}
     {...props}
@@ -38,29 +37,39 @@ const sheetSideVariants = {
     "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
   ),
   left: cn(
+    "sheet-content-left inset-y-0 start-0 h-full w-full max-w-sm border-e rounded-none",
+  ),
+  "left-inset": cn(
     "start-2.5 top-2.5 bottom-2.5 h-auto w-full max-w-sm rounded-[10px] border-e",
     "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left",
   ),
   right: cn(
-    "end-2.5 top-2.5 bottom-2.5 h-auto w-full max-w-sm rounded-[10px] border-s",
-    "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
+    "sheet-content-right end-2.5 top-2.5 bottom-2.5 h-auto w-full max-w-sm rounded-[10px] border-s",
   ),
 };
 
 interface SheetContentProps extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
   side?: keyof typeof sheetSideVariants;
+  showOverlay?: boolean;
+  overlayClassName?: string;
 }
 
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   SheetContentProps
->(({ side = "right", className, children, ...props }, ref) => (
+>(({ side = "right", showOverlay = false, overlayClassName, className, children, ...props }, ref) => (
   <SheetPortal>
+    {showOverlay ? <SheetOverlay className={overlayClassName} /> : null}
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed z-50 flex flex-col border border-input bg-background shadow-lg transition ease-in-out",
-        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+        "fixed z-50 flex flex-col border border-input bg-background shadow-lg",
+        side === "left" || side === "right"
+          ? ""
+          : cn(
+              "transition ease-in-out",
+              "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+            ),
         sheetSideVariants[side],
         className,
       )}

@@ -78,12 +78,29 @@ export function BurgerMenu({
   const [open, setOpen] = React.useState(false);
   return (
     <div className={cn("relative", className)}>
-      <div onClick={() => setOpen(true)}>{trigger ?? <Button variant="ghost" size="icon"><Menu /></Button>}</div>
+      <div onClick={() => setOpen(true)}>
+        {trigger ?? (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-current hover:bg-black/5 hover:text-current dark:hover:bg-white/10"
+            aria-label="Open menu"
+          >
+            <Menu />
+          </Button>
+        )}
+      </div>
       {open ? (
         <div className="fixed inset-0 z-50 bg-footer/95 p-6 text-white">
           <div className="flex justify-end">
-            <Button variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="Close">
-              <X className="text-white" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white hover:bg-white/10 hover:text-white"
+              onClick={() => setOpen(false)}
+              aria-label="Close menu"
+            >
+              <X />
             </Button>
           </div>
           <nav className="mt-8 flex flex-col gap-4">

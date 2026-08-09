@@ -13,6 +13,8 @@ import {
   type AppSidebarLinkComponentProps,
   type AppSidebarProfile,
 } from "../components/domain/app-sidebar";
+import { Sheet, SheetContent, SheetTitle } from "../components/ui/sheet";
+import { AppShellNavigationContext } from "./app-shell-navigation-context";
 
 export interface AppShellLayoutProps {
   logo?: React.ReactNode;
@@ -42,6 +44,7 @@ export interface AppShellLayoutProps {
   collapseLabel?: string;
   expandLabel?: string;
   openMenuLabel?: string;
+  closeMenuLabel?: string;
   notificationsLabel?: string;
   profileMenuLabel?: string;
   LinkComponent?: React.ComponentType<AppSidebarLinkComponentProps>;
@@ -65,6 +68,8 @@ export function AppShellLayout({
   defaultAiChatOpen = false,
   onAiChatOpenChange,
   openAiChatLabel = "Open AI assistant",
+  openMenuLabel = "Open menu",
+  closeMenuLabel = "Close menu",
   notifications,
   notificationsOpen: notificationsOpenProp,
   defaultNotificationsOpen = false,
@@ -74,7 +79,6 @@ export function AppShellLayout({
   onCollapsedChange,
   collapseLabel = "Collapse sidebar",
   expandLabel = "Expand sidebar",
-  openMenuLabel = "Open menu",
   notificationsLabel = "Notifications",
   profileMenuLabel = "Open profile menu",
   LinkComponent,
@@ -84,11 +88,24 @@ export function AppShellLayout({
   const [internalAiChatOpen, setInternalAiChatOpen] = React.useState(defaultAiChatOpen);
   const [internalNotificationsOpen, setInternalNotificationsOpen] = React.useState(defaultNotificationsOpen);
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [inlineMenuActive, setInlineMenuActive] = React.useState(false);
+  const [compactShell, setCompactShell] = React.useState(false);
   const shellRef = React.useRef<HTMLDivElement>(null);
 
-  const isCompactShell = React.useCallback(() => {
-    const width = shellRef.current?.getBoundingClientRect().width;
-    return (width ?? (typeof window !== "undefined" ? window.innerWidth : 1024)) < 1024;
+  React.useEffect(() => {
+    const node = shellRef.current;
+    if (!node) return;
+
+    const updateCompactShell = () => {
+      setCompactShell(node.getBoundingClientRect().width < 1024);
+    };
+
+    updateCompactShell();
+
+    const resizeObserver = new ResizeObserver(updateCompactShell);
+    resizeObserver.observe(node);
+
+    return () => resizeObserver.disconnect();
   }, []);
 
   const collapsed = collapsedProp ?? internalCollapsed;
@@ -122,7 +139,7 @@ export function AppShellLayout({
         } as Record<string, unknown>)
       : notifications;
 
-  const sidebar = (
+  const renderSidebar = (mode: "desktop" | "mobile") => (
     <AppSidebar
       logo={logo}
       topItems={topItems}
@@ -134,13 +151,14 @@ export function AppShellLayout({
       onChildProfileChange={onChildProfileChange}
       childProfileSwitchLabel={childProfileSwitchLabel}
       onCollapse={() => {
-        if (isCompactShell()) {
+        if (mode === "mobile") {
           setMobileOpen(false);
           return;
         }
         setCollapsed(true);
       }}
-      collapseLabel={collapseLabel}
+      collapseLabel={mode === "mobile" ? closeMenuLabel : collapseLabel}
+      closeVariant={mode === "mobile" ? "close" : "collapse"}
       notificationsLabel={notificationsLabel}
       profileMenuLabel={profileMenuLabel}
       notifications={renderedNotifications}
@@ -148,17 +166,43 @@ export function AppShellLayout({
       onNotificationsOpenChange={notifications ? handleNotificationsOpenChange : undefined}
       onNavigate={() => setMobileOpen(false)}
       LinkComponent={LinkComponent}
+      surface={mode === "mobile" ? "background" : "muted"}
       className="h-full border-0"
     />
   );
 
   const openNavigation = () => {
-    if (isCompactShell()) {
+    if (compactShell) {
       setMobileOpen(true);
       return;
     }
     setCollapsed(false);
   };
+
+  const showMenuButton = (compactShell && !mobileOpen) || collapsed;
+
+  const menuButton = (
+    <Button
+      variant="ghost"
+      className={cn(
+        "size-10 shrink-0 rounded-lg border border-border-soft bg-background p-0 shadow-sm hover:bg-muted [&_svg]:size-5",
+        !collapsed && "@lg:hidden",
+      )}
+      aria-label={openMenuLabel}
+      aria-expanded={mobileOpen}
+      onClick={openNavigation}
+    >
+      <Menu />
+    </Button>
+  );
+
+  const navigationContextValue = React.useMemo(
+    () => ({
+      menuButton: showMenuButton ? menuButton : null,
+      setInlineMenuActive,
+    }),
+    [menuButton, showMenuButton],
+  );
 
   const renderedAiChat =
     aiChat && React.isValidElement(aiChat)
@@ -173,63 +217,61 @@ export function AppShellLayout({
   const overlayOpen = aiChatOpen && aiChat;
 
   return (
-    <div ref={shellRef} className={cn("@container flex h-svh min-h-0 overflow-hidden bg-muted", className)}>
-      {!collapsed ? (
-        <div className="hidden h-full min-h-0 shrink-0 overflow-hidden @lg:flex">{sidebar}</div>
-      ) : null}
-
-      {mobileOpen ? (
-        <div className="fixed inset-0 z-50 @lg:hidden">
-          <button
-            type="button"
-            className="absolute inset-0 bg-black/50"
-            aria-label="Close menu"
-            onClick={() => setMobileOpen(false)}
-          />
-          <div className="relative flex h-full w-[280px] flex-col bg-muted shadow-lg">{sidebar}</div>
-        </div>
-      ) : null}
-
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col p-0.5">
-        <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[10px] border border-border-soft bg-background">
-          <div className="pointer-events-none absolute start-3 top-3 z-30 flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className={cn("pointer-events-auto bg-background shadow-sm", !collapsed && "@lg:hidden")}
-              aria-label={openMenuLabel}
-              aria-expanded={mobileOpen}
-              onClick={openNavigation}
-            >
-              <Menu />
-            </Button>
-            {header}
+    <AppShellNavigationContext.Provider value={navigationContextValue}>
+      <div ref={shellRef} className={cn("@container flex h-svh min-h-0 overflow-hidden bg-muted", className)}>
+        {!collapsed ? (
+          <div className="hidden h-full min-h-0 shrink-0 overflow-hidden @lg:flex">
+            {renderSidebar("desktop")}
           </div>
+        ) : null}
 
-          {aiChat && !aiChatOpen ? (
-            <div className="absolute end-3 top-3 z-10">
-              <AiChatTrigger label={openAiChatLabel} onClick={openAiChat} />
-            </div>
-          ) : null}
-
-          <main
-            data-shell-collapsed={collapsed ? "" : undefined}
-            className={cn(
-              "group/shell flex min-h-0 flex-1 flex-col",
-              overlayOpen
-                ? "overflow-hidden p-0"
-                : cn(
-                    "overflow-auto px-6 pb-6",
-                    "[&:not(:has([data-slot=app-shell-page-header]))]:@max-lg:pt-12",
-                    collapsed &&
-                      "[&:not(:has([data-slot=app-shell-page-header]))]:@lg:pt-12",
-                  ),
-            )}
+        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+          <SheetContent
+            side="left"
+            showOverlay
+            overlayClassName="bg-foreground/5"
+            className="@lg:hidden w-[280px] max-w-[min(280px,85vw)] border-border-soft bg-background p-0 shadow-[4px_0_24px_rgba(45,44,50,0.08)]"
           >
-            {aiChatOpen && aiChat ? renderedAiChat : children}
-          </main>
+            <SheetTitle className="sr-only">{openMenuLabel}</SheetTitle>
+            {renderSidebar("mobile")}
+          </SheetContent>
+        </Sheet>
+
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col p-0.5">
+          <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[10px] border border-border-soft bg-background">
+            {showMenuButton && !inlineMenuActive ? (
+              <div className="pointer-events-none absolute start-3 top-3 z-30">
+                <div className="pointer-events-auto">{menuButton}</div>
+              </div>
+            ) : null}
+
+            {header ? <div className="pointer-events-none absolute start-3 top-3 z-20">{header}</div> : null}
+
+            {aiChat && !aiChatOpen ? (
+              <div className="absolute end-3 top-3 z-10">
+                <AiChatTrigger label={openAiChatLabel} onClick={openAiChat} />
+              </div>
+            ) : null}
+
+            <main
+              data-shell-collapsed={collapsed ? "" : undefined}
+              className={cn(
+                "group/shell flex min-h-0 flex-1 flex-col",
+                overlayOpen
+                  ? "overflow-hidden p-0"
+                  : cn(
+                      "overflow-auto px-6 pb-6",
+                      "[&:not(:has([data-slot=app-shell-page-header]))]:@max-lg:pt-12",
+                      collapsed &&
+                        "[&:not(:has([data-slot=app-shell-page-header]))]:@lg:pt-12",
+                    ),
+              )}
+            >
+              {aiChatOpen && aiChat ? renderedAiChat : children}
+            </main>
+          </div>
         </div>
       </div>
-    </div>
+    </AppShellNavigationContext.Provider>
   );
 }

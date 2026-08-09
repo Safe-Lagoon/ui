@@ -96,10 +96,19 @@ jobs:
             exit "$publish_status"
           fi
 
+          version=$(node -p "require('./packages/ui/package.json').version")
+          tag="v${version}"
+          published_now=false
           if echo "$publish_output" | grep -q '@safelagoon/ui@'; then
-            version=$(node -p "require('./packages/ui/package.json').version")
-            tag="v${version}"
+            published_now=true
+          fi
 
+          npm_has_version=false
+          if npm view "@safelagoon/ui@${version}" version >/dev/null 2>&1; then
+            npm_has_version=true
+          fi
+
+          if [ "$published_now" = true ] || { [ "$npm_has_version" = true ] && ! gh release view "$tag" >/dev/null 2>&1; }; then
             notes=$(awk -v ver="$version" '
               /^## / {
                 if (found) exit
