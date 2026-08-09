@@ -4,7 +4,7 @@ This document is for AI coding agents integrating Safe Lagoon UI into React fron
 
 **Canonical docs:** https://ui.safelagoon.com  
 **Source:** https://github.com/Safe-Lagoon/ui  
-**npm:** `@safelagoon/ui`
+**npm:** `@safelagoon/ui` (published on every merge to `main` when changesets are present)
 
 ---
 
@@ -71,12 +71,16 @@ If working inside the `Safe-Lagoon/ui` repo itself:
 ```bash
 pnpm install
 pnpm --filter @safelagoon/ui build   # required before consumer apps resolve dist/
-pnpm dev                              # docs at localhost:3000
+pnpm dev                              # docs at localhost:3000 (or -p 3002)
 ```
 
 In a sibling monorepo, reference via `"@safelagoon/ui": "workspace:*"` and build the ui package first.
 
----
+**Docs site (production):** https://ui.safelagoon.com — Docker container on internal port `8083`, proxied by nginx. Redeploy:
+
+```bash
+ssh ubuntu@REDACTED 'cd ~/ui && git pull && bash deploy/docs-server/deploy.sh'
+```
 
 ## Tailwind v4 setup (required)
 
@@ -200,10 +204,10 @@ import {
 import "@safelagoon/ui/styles.css";
 
 // Icons — tree-shake individual exports
-import { LogoMark, FeatureGps, ChevronRight } from "@safelagoon/ui/icons";
+import { LogoMark, FeatureGps, ChevronRight, AndroidBadge, IOSBadge } from "@safelagoon/ui/icons";
 
 // Layouts & auth blocks
-import { DashboardLayout, SignInForm, BeforeWeStart } from "@safelagoon/ui/blocks";
+import { AppShellLayout, AppShellPageHeader, DashboardLayout, SignInForm } from "@safelagoon/ui/blocks";
 
 // Charts — pulls in recharts
 import { ScreenTimeChart, CategoryDonut } from "@safelagoon/ui/charts";
@@ -264,6 +268,39 @@ import { AuthLayout, SignInForm } from "@safelagoon/ui/blocks";
 
 Also available: `SignUpForm`, `BeforeWeStart` (Android/iOS onboarding steps).
 
+### App shell (docs-style portal layout)
+
+Use `AppShellLayout` + `AppShellPageHeader` for sidebar + scrollable work area (reference: `apps/docs/components/docs-shell.tsx`).
+
+```tsx
+import { AppShellLayout, AppShellPageHeader } from "@safelagoon/ui/blocks";
+import { AiChat, NotificationsPanel } from "@safelagoon/ui";
+
+<AppShellLayout
+  logo={logo}
+  groups={navGroups}
+  profile={profile}
+  aiChat={<AiChat {...aiProps} />}
+  notifications={<NotificationsPanel {...notificationProps} />}
+>
+  <AppShellPageHeader
+    title={t("page.title")}
+    icon={<PageIcon aria-hidden />}
+    description={t("page.description")}
+    actions={toolbar}
+    showDivider
+  />
+  {children}
+</AppShellLayout>
+```
+
+**Layout rules agents must follow:**
+
+- Put page top padding on `AppShellPageHeader` (`pt-4`, `max-lg:pt-12` for mobile menu clearance) — **not** on the scroll container. The header owns `sticky top-0 bg-background` so content never shows through when scrolling.
+- Use `showDivider` for a full-width border under the header row (`-mx-6 px-6` bleed).
+- Sidebar and main scroll independently (`h-svh overflow-hidden` on shell, `overflow-auto` on `<main>`).
+- Optional slots: `aiChat` + `AiChatTrigger`, `notifications` (bell opens a dialog popup, not a sidebar item).
+
 ### Parental-control dashboard (cabinet)
 
 ```tsx
@@ -290,6 +327,9 @@ Domain components map to portal features:
 | Component | Portal feature |
 |-----------|----------------|
 | `LogCard`, `Timeline` | Activity / audit logs |
+| `KpiCard` | Dashboard KPI tiles with trend |
+| `AiChat`, `AiChatTrigger` | In-shell AI assistant panel |
+| `NotificationsPanel` | Grouped notification popup |
 | `RuleCard` | Screen time & app rules |
 | `ScheduleGrid`, `WeekdayPicker`, `TimeLimitSlider` | Schedules & limits |
 | `AppTile`, `AppReviewCard`, `CategoryIconPicker` | App management |
@@ -359,7 +399,7 @@ Brand `Input` (not the shadcn one) supports error state:
 Use responsive utilities from the design system — do not hardcode `text-[40px]` for headings:
 
 ```tsx
-<h1 className="text-h1 text-foreground">{title}</h1>
+<h1 className="text-h1 text-foreground">{title}</h1>   {/* max 22px — page titles */}
 <h1 className="text-h1-serif">{title}</h1>   {/* IBM Plex Serif */}
 <h2 className="text-h2">{subtitle}</h2>
 <p className="text-body-16 text-muted-foreground">{body}</p>
@@ -372,13 +412,16 @@ Available: `text-h1`, `text-h1-serif`, `text-h2`, `text-h3`, `text-h3-serif`, `t
 
 Prefer brand icons for product features; use `lucide-react` only for generic UI chrome inside Tier 2 primitives.
 
+Platform badges: `AndroidBadge`, `IOSBadge` — pre-rendered store-style icons; size via `className` (default `size-6` from the `Icon` wrapper).
+
 ```tsx
-import { FeatureScreenTime, ChevronRight, LogoMark } from "@safelagoon/ui/icons";
+import { FeatureScreenTime, ChevronRight, LogoMark, AndroidBadge } from "@safelagoon/ui/icons";
 
 <FeatureScreenTime className="size-6 text-brand-blue" aria-hidden />
+<AndroidBadge className="size-8" aria-hidden />
 ```
 
-All icons accept `className` and standard SVG props.
+All icons accept `className` and standard SVG props. Sizing is via Tailwind (`size-*`) — do not rely on fixed `width`/`height` attributes.
 
 ---
 
@@ -630,7 +673,11 @@ packages/ui/src/
   map/                  # Google Maps
   styles/               # theme.css, typography.css, base.css
 apps/docs/              # Documentation site (reference implementation)
+  Dockerfile            # Standalone Next.js image (port 3000 → host 8083)
+  docker-compose.yml
+deploy/                 # Production deploy scripts + nginx config
 registry.json           # shadcn registry source
+.github/workflows/ci.yml  # build/test + npm release on main
 ```
 
 **Commands:**
@@ -642,7 +689,27 @@ pnpm --filter @safelagoon/ui test
 pnpm --filter @safelagoon/docs test   # Playwright
 pnpm registry:validate
 pnpm registry:build           # outputs apps/docs/public/r/
+pnpm changeset                # add release notes before merging features
 ```
+
+**CI / release (`.github/workflows/ci.yml`):**
+
+- **PRs:** `build` job only (ui build/test, docs build, registry validate, Playwright).
+- **Push to `main`:** `build` then `release` (`needs: build`) — versions via changesets, publishes `@safelagoon/ui` to npm.
+- Requires GitHub secret **`NPMJS_TOKEN`** (npm automation token with publish access to `@safelagoon` scope).
+- Scoped package uses `"publishConfig": { "access": "public" }`.
+
+**Docs deployment:**
+
+```bash
+# On docs server (REDACTED)
+bash deploy/docs-server/deploy.sh
+
+# Load balancer nginx + certbot (REDACTED) — one-time setup
+bash deploy/load-balancer/setup-ui-nginx.sh
+```
+
+Docs container listens on **8083**; nginx proxies `ui.safelagoon.com` → `REDACTED:8083`.
 
 When adding a component to the library:
 
@@ -661,9 +728,11 @@ When adding a component to the library:
 
 **Primitives (Tier 2):** `Label`, `Textarea`, `Select`, `Switch`, `RadioGroup`, `ToggleGroup`, `Dialog`, `AlertDialog`, `Sheet`, `Popover`, `Tooltip`, `DropdownMenu`, `Tabs`, `Accordion`, `Badge`, `Separator`, `ScrollArea`, `Skeleton`, `Progress`, `Table`, `Breadcrumb`, `Pagination`, `Carousel`, `Command`, `HoverCard`, `Collapsible`, `Alert`, `Form`, `Calendar`, `InputOTP`, `Sonner`, `SearchInput`, `PasswordInput`, `PhoneInput`, `Spinner`, `BrandedPreloader`
 
-**Domain (Tier 3):** `LogCard`, `Timeline`, `StatTile`, `ProfileCard`, `ProfileCarousel`, `AppTile`, `RuleCard`, `WeekdayPicker`, `CategoryIconPicker`, `ScheduleGrid`, `TimeLimitSlider`, `AlarmCard`, `AppReviewCard`, `ChatBubble`, `GalleryGrid`, `EmptyState`, `AvatarUploader`, `Stepper`, `PricingTable`, `LanguageSwitcher`
+**Domain (Tier 3):** `LogCard`, `Timeline`, `StatTile`, `KpiCard`, `ProfileCard`, `ProfileCarousel`, `AppTile`, `RuleCard`, `WeekdayPicker`, `CategoryIconPicker`, `ScheduleGrid`, `TimeLimitSlider`, `AlarmCard`, `AppReviewCard`, `ChatBubble`, `AiChat`, `AiChatTrigger`, `NotificationsPanel`, `GalleryGrid`, `EmptyState`, `AvatarUploader`, `Stepper`, `PricingTable`, `LanguageSwitcher`, `AppSidebar`
 
-**Blocks:** `MarketingLayout`, `AuthLayout`, `DashboardLayout`, `CabinetLayout`, `SignInForm`, `SignUpForm`, `BeforeWeStart`
+**Blocks:** `MarketingLayout`, `AuthLayout`, `DashboardLayout`, `CabinetLayout`, `AppShellLayout`, `AppShellPageHeader`, `SignInForm`, `SignUpForm`, `BeforeWeStart`, `EventTimelineLayout`
+
+**Icons (platform):** `AndroidBadge`, `IOSBadge`, `LogoMark`, `LogoHeader`, `Feature*`, chevrons — see `/docs/icons`
 
 **Utils:** `cn`, `ThemeProvider`, `useTheme`
 
