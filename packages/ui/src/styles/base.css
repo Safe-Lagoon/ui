@@ -20,11 +20,20 @@ body {
 }
 
 @keyframes ai-chat-border-roll {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
   to {
-    transform: rotate(360deg);
+    transform: translate(-50%, -50%) rotate(360deg);
   }
 }
 
 .ai-chat-trigger-ring {
+  transform: translate(-50%, -50%);
+}
+
+.ai-chat-trigger:hover .ai-chat-trigger-ring,
+.ai-chat-trigger:focus-visible .ai-chat-trigger-ring {
   animation: ai-chat-border-roll 2.8s linear infinite;
 }

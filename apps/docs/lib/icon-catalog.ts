@@ -1,5 +1,8 @@
 import type { ComponentType, SVGProps } from "react";
+import { createElement } from "react";
+import { AiChatTrigger } from "@safelagoon/ui";
 import {
+  AiAssistantMark,
   Alarm,
   AndroidBadge,
   ArrowLeft,
@@ -11,10 +14,13 @@ import {
   ChevronRight,
   ChevronUp,
   Clock,
+  FeatureAiMcp,
+  FeatureAiShield,
   FeatureApps,
   FeatureCalls,
   FeatureChild,
   FeatureFree,
+  FeatureGallery,
   FeatureGps,
   FeatureMessenger,
   FeatureScreenTime,
@@ -34,7 +40,18 @@ export type IconCatalogEntry = {
   name: string;
   category: string;
   component: ComponentType<SVGProps<SVGSVGElement> & { size?: number }>;
+  /** Import path shown in “Copy import” (defaults to `@safelagoon/ui/icons`). */
+  importFrom?: string;
+  /** Render full component preview instead of a sized SVG glyph. */
+  previewMode?: "icon" | "component";
 };
+
+function AiChatTriggerPreview() {
+  return createElement(AiChatTrigger, {
+    label: "Open AI assistant",
+    onClick: () => {},
+  });
+}
 
 export const iconCatalog: IconCatalogEntry[] = [
   { name: "ChevronDown", category: "Navigation", component: ChevronDown },
@@ -52,6 +69,17 @@ export const iconCatalog: IconCatalogEntry[] = [
   { name: "FeatureMessenger", category: "Features", component: FeatureMessenger },
   { name: "FeatureScreenTime", category: "Features", component: FeatureScreenTime },
   { name: "FeatureCalls", category: "Features", component: FeatureCalls },
+  { name: "FeatureAiShield", category: "Features", component: FeatureAiShield },
+  { name: "FeatureGallery", category: "Features", component: FeatureGallery },
+  { name: "FeatureAiMcp", category: "Features", component: FeatureAiMcp },
+  { name: "AiAssistantMark", category: "App shell", component: AiAssistantMark },
+  {
+    name: "AiChatTrigger",
+    category: "App shell",
+    component: AiChatTriggerPreview as IconCatalogEntry["component"],
+    importFrom: "@safelagoon/ui",
+    previewMode: "component",
+  },
   { name: "LogoMark", category: "Brand", component: LogoMark },
   { name: "LogoHeader", category: "Brand", component: LogoHeader },
   { name: "AndroidBadge", category: "Platform", component: AndroidBadge },
@@ -69,6 +97,11 @@ export const iconCatalog: IconCatalogEntry[] = [
 
 export const iconCategories = [...new Set(iconCatalog.map((icon) => icon.category))];
 
-export function iconImportStatement(name: string) {
-  return `import { ${name} } from "@safelagoon/ui/icons";`;
+export function iconImportStatement(entry: IconCatalogEntry | string) {
+  if (typeof entry === "string") {
+    return `import { ${entry} } from "@safelagoon/ui/icons";`;
+  }
+
+  const from = entry.importFrom ?? "@safelagoon/ui/icons";
+  return `import { ${entry.name} } from "${from}";`;
 }
