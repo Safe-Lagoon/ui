@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ThemeProvider } from "@safelagoon/ui";
+import { ThemeProvider, Toaster } from "@safelagoon/ui";
 import { DocsControls } from "@/components/docs-controls";
 import { DocsPreviewProvider } from "@/components/docs-preview-context";
 
@@ -16,6 +16,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <ThemeProvider defaultTheme="light">
       <DocsPreviewProvider>
         {children}
+        <Toaster position="bottom-right" />
         <DocsControlsGate />
       </DocsPreviewProvider>
     </ThemeProvider>

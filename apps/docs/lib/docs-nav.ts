@@ -25,7 +25,10 @@ export const docsNavSections: DocsNavSection[] = [
   },
   {
     title: "Notifications",
-    items: [{ href: "/docs/components/notifications", label: "Notifications Panel" }],
+    items: [
+      { href: "/docs/components/notifications", label: "Notifications Panel" },
+      { href: "/docs/components/toast", label: "Toast" },
+    ],
   },
   {
     title: "Layout & navigation",

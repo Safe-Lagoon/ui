@@ -62,6 +62,15 @@
       "description": "cn() utility for Tailwind class merging.",
       "dependencies": ["clsx", "tailwind-merge"],
       "files": [{ "path": "packages/ui/src/lib/utils.ts", "type": "registry:lib" }]
+    },
+    {
+      "name": "sonner",
+      "type": "registry:ui",
+      "title": "Toast",
+      "description": "Ephemeral toast notifications via Sonner — mount Toaster once, call toast() anywhere.",
+      "registryDependencies": ["utils"],
+      "dependencies": ["sonner"],
+      "files": [{ "path": "packages/ui/src/components/ui/sonner.tsx", "type": "registry:ui" }]
     }
   ]
 }

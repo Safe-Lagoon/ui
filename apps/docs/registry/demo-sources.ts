@@ -34,6 +34,7 @@ import signInFormDemo from "./demos/sign-in-form-demo.tsx?raw";
 import signInFormErrorsDemo from "./demos/sign-in-form-errors-demo.tsx?raw";
 import tableDemo from "./demos/table-demo.tsx?raw";
 import tabsDemo from "./demos/tabs-demo.tsx?raw";
+import toastDemo from "./demos/toast-demo.tsx?raw";
 import toggleDemo from "./demos/toggle-demo.tsx?raw";
 
 export const demoSources: Record<DemoName, string> = {
@@ -71,5 +72,6 @@ export const demoSources: Record<DemoName, string> = {
   "sign-in-form-errors-demo": signInFormErrorsDemo,
   "table-demo": tableDemo,
   "tabs-demo": tabsDemo,
+  "toast-demo": toastDemo,
   "toggle-demo": toggleDemo,
 };
