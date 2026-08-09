@@ -30,19 +30,19 @@ SheetOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 const sheetSideVariants = {
   top: cn(
-    "inset-x-5 top-5 max-h-[calc(100svh-2.5rem)] rounded-b-[10px] border-b",
+    "inset-x-2.5 top-2.5 max-h-[calc(100svh-1.25rem)] rounded-b-[10px] border-b",
     "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
   ),
   bottom: cn(
-    "inset-x-5 bottom-5 max-h-[calc(100svh-2.5rem)] rounded-t-[10px] border-t",
+    "inset-x-2.5 bottom-2.5 max-h-[calc(100svh-1.25rem)] rounded-t-[10px] border-t",
     "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
   ),
   left: cn(
-    "start-5 top-5 bottom-5 h-auto w-full max-w-sm rounded-[10px] border-e",
+    "start-2.5 top-2.5 bottom-2.5 h-auto w-full max-w-sm rounded-[10px] border-e",
     "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left",
   ),
   right: cn(
-    "end-5 top-5 bottom-5 h-auto w-full max-w-sm rounded-[10px] border-s",
+    "end-2.5 top-2.5 bottom-2.5 h-auto w-full max-w-sm rounded-[10px] border-s",
     "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
   ),
 };
@@ -56,7 +56,6 @@ const SheetContent = React.forwardRef<
   SheetContentProps
 >(({ side = "right", className, children, ...props }, ref) => (
   <SheetPortal>
-    <SheetOverlay />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(

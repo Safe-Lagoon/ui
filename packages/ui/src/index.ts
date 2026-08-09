@@ -17,6 +17,7 @@ export { CTABlock, type CTABlockProps } from "./components/brand/cta-block";
 export { Popup, type PopupProps } from "./components/brand/popup";
 export { Avatar, AvatarImage, AvatarFallback } from "./components/brand/avatar";
 export { CookieConsent, type CookieConsentProps } from "./components/brand/cookie-consent";
+export { Title, type TitleProps } from "./components/brand/title";
 
 // shadcn UI primitives (Tier 2)
 export * from "./components/ui/label";

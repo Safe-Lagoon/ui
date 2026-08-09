@@ -34,6 +34,8 @@ export { AppShellLayout } from "./app-shell-layout";
 export type { AppShellLayoutProps } from "./app-shell-layout";
 export { AppShellPageHeader } from "./app-shell-page-header";
 export type { AppShellPageHeaderProps } from "./app-shell-page-header";
+export { Title } from "../components/brand/title";
+export type { TitleProps } from "../components/brand/title";
 export type {
   AppSidebarChildProfile,
   AppSidebarGroup,

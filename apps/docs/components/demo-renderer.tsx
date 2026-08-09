@@ -43,6 +43,7 @@ const loaders: Record<DemoName, ComponentType> = {
   "screen-mirror-demo": loadDemo(() => import("@/registry/demos/screen-mirror-demo")),
   "event-timeline-demo": loadDemo(() => import("@/registry/demos/event-timeline-demo")),
   "app-shell-demo": loadDemo(() => import("@/registry/demos/app-shell-demo")),
+  "title-demo": loadDemo(() => import("@/registry/demos/title-demo")),
   "ai-chat-demo": loadDemo(() => import("@/registry/demos/ai-chat-demo")),
   "toggle-demo": loadDemo(() => import("@/registry/demos/toggle-demo")),
   "notifications-panel-demo": loadDemo(() => import("@/registry/demos/notifications-panel-demo")),

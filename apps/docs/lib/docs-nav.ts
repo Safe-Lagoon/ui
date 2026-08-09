@@ -35,6 +35,7 @@ export const docsNavSections: DocsNavSection[] = [
     items: [
       { href: "/docs/components/layouts", label: "Layouts" },
       { href: "/docs/components/app-shell", label: "App Shell" },
+      { href: "/docs/components/title", label: "Title" },
       { href: "/docs/components/header", label: "Header" },
       { href: "/docs/components/burger-menu", label: "Burger Menu" },
       { href: "/docs/components/sidebar", label: "Sidebar" },

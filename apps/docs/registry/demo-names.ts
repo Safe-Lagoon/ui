@@ -30,6 +30,7 @@ export const demoNames = [
   "screen-mirror-demo",
   "event-timeline-demo",
   "app-shell-demo",
+  "title-demo",
   "ai-chat-demo",
   "toggle-demo",
   "notifications-panel-demo",
