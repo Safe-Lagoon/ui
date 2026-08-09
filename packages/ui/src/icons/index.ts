@@ -17,6 +17,10 @@ export { FeatureSocial } from "./feature-social";
 export { FeatureMessenger } from "./feature-messenger";
 export { FeatureScreenTime } from "./feature-screen-time";
 export { FeatureCalls } from "./feature-calls";
+export { FeatureAiShield } from "./feature-ai-shield";
+export { FeatureGallery } from "./feature-gallery";
+export { FeatureAiMcp } from "./feature-ai-mcp";
+export { AiAssistantMark } from "./ai-assistant-mark";
 
 export { LogoMark } from "./logo-mark";
 export { LogoHeader } from "./logo-header";

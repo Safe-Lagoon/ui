@@ -25,11 +25,11 @@ export function IconGallery() {
     window.setTimeout(() => setCopiedName((current) => (current === name ? null : current)), 1500);
   }
 
-  async function copyImport(name: string) {
-    await navigator.clipboard.writeText(iconImportStatement(name));
-    setCopiedName(`${name}-import`);
+  async function copyImport(icon: (typeof iconCatalog)[number]) {
+    await navigator.clipboard.writeText(iconImportStatement(icon));
+    setCopiedName(`${icon.name}-import`);
     window.setTimeout(
-      () => setCopiedName((current) => (current === `${name}-import` ? null : current)),
+      () => setCopiedName((current) => (current === `${icon.name}-import` ? null : current)),
       1500,
     );
   }
@@ -65,31 +65,55 @@ export function IconGallery() {
                 return (
                   <li key={icon.name}>
                     <div className="flex h-full flex-col overflow-hidden rounded-[10px] border border-border-soft bg-background">
-                      <button
-                        type="button"
-                        onClick={() => copyName(icon.name)}
-                        className="flex flex-1 flex-col items-center gap-3 px-3 py-4 transition-colors hover:bg-muted/40"
-                        title={`Copy ${icon.name}`}
-                      >
-                        <span className="flex size-12 items-center justify-center rounded-md bg-muted/50 text-brand-blue">
-                          {createElement(icon.component, {
-                            className: "size-6",
-                            "aria-hidden": true,
-                          })}
-                        </span>
-                        <code className="text-center text-body-14 text-foreground">{icon.name}</code>
-                        <span
-                          className={cn(
-                            "text-body-14 text-muted-foreground",
-                            isCopied ? "text-brand-blue" : "invisible",
-                          )}
+                      {icon.previewMode === "component" ? (
+                        <div className="flex flex-1 flex-col items-center gap-3 px-3 py-4">
+                          <div className="flex size-12 items-center justify-center rounded-md bg-muted/50">
+                            {createElement(icon.component)}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => copyName(icon.name)}
+                            className="text-center transition-colors hover:text-brand-blue"
+                            title={`Copy ${icon.name}`}
+                          >
+                            <code className="text-body-14 text-foreground">{icon.name}</code>
+                          </button>
+                          <span
+                            className={cn(
+                              "text-body-14 text-muted-foreground",
+                              isCopied ? "text-brand-blue" : "invisible",
+                            )}
+                          >
+                            Copied
+                          </span>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => copyName(icon.name)}
+                          className="flex flex-1 flex-col items-center gap-3 px-3 py-4 transition-colors hover:bg-muted/40"
+                          title={`Copy ${icon.name}`}
                         >
-                          Copied
-                        </span>
-                      </button>
+                          <span className="flex size-12 items-center justify-center rounded-md bg-muted/50 text-brand-blue">
+                            {createElement(icon.component, {
+                              className: "size-6",
+                              "aria-hidden": true,
+                            })}
+                          </span>
+                          <code className="text-center text-body-14 text-foreground">{icon.name}</code>
+                          <span
+                            className={cn(
+                              "text-body-14 text-muted-foreground",
+                              isCopied ? "text-brand-blue" : "invisible",
+                            )}
+                          >
+                            Copied
+                          </span>
+                        </button>
+                      )}
                       <button
                         type="button"
-                        onClick={() => copyImport(icon.name)}
+                        onClick={() => copyImport(icon)}
                         className="border-t border-border-soft px-3 py-2 text-body-14 text-brand-blue transition-colors hover:bg-muted/30"
                       >
                         {isImportCopied ? "Import copied" : "Copy import"}
