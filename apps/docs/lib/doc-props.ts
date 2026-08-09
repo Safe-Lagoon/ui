@@ -123,6 +123,13 @@ export const docPropsBySlug: Record<string, DocProp[]> = {
     { name: "onOpenChange", type: "(open: boolean) => void", description: "Called when open state changes." },
     { name: "side", type: `"top" | "right" | "bottom" | "left"`, default: "right", description: "Edge the panel slides from." },
   ],
+  title: [
+    { name: "title", type: "string", required: true, description: "Page heading text — pass from i18n." },
+    { name: "icon", type: "ReactNode", description: "Optional icon in the brand-blue square beside the title." },
+    { name: "subtitle", type: "ReactNode", description: "Optional supporting copy below the icon + title row." },
+    { name: "showDivider", type: "boolean", default: "false", description: "Show a full-width border below the title block." },
+    { name: "className", type: "string", description: "Additional classes on the root wrapper." },
+  ],
   "date-picker": [
     { name: "value", type: "Date | undefined", description: "Selected date (controlled)." },
     { name: "onChange", type: "(date: Date | undefined) => void", description: "Called when the user picks a date." },

@@ -65,9 +65,10 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPMJS_TOKEN }}
 
-      - name: Version, publish, and push
+      - name: Version, publish, and create GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPMJS_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPMJS_TOKEN }}
         run: |
@@ -89,4 +90,78 @@ jobs:
             git push origin HEAD:main
           fi
 
-          pnpm release
+          publish_output=$(pnpm exec changeset publish 2>&1 | tee /dev/stderr)
+          publish_status=${PIPESTATUS[0]}
+          if [ "$publish_status" -ne 0 ]; then
+            exit "$publish_status"
+          fi
+
+          if echo "$publish_output" | grep -q '@safelagoon/ui@'; then
+            version=$(node -p "require('./packages/ui/package.json').version")
+            tag="v${version}"
+
+            notes=$(awk -v ver="$version" '
+              /^## / {
+                if (found) exit
+                if ($2 == ver) { found=1; next }
+              }
+              found { print }
+            ' packages/ui/CHANGELOG.md)
+
+            notes=$(printf '%s' "$notes" | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}')
+            if [ -z "$notes" ]; then
+              notes="Release [@safelagoon/ui@${version}](https://www.npmjs.com/package/@safelagoon/ui/v/${version})."
+            else
+              notes="${notes}"$'\n\n'"**npm:** https://www.npmjs.com/package/@safelagoon/ui/v/${version}"
+            fi
+
+            if gh release view "$tag" >/dev/null 2>&1; then
+              gh release edit "$tag" --title "@safelagoon/ui ${version}" --notes "$notes"
+            else
+              gh release create "$tag" --title "@safelagoon/ui ${version}" --notes "$notes"
+            fi
+          fi
+
+  deploy-docs:
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.DOCS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+          target="${{ secrets.DOCS_HOST }}"
+          if [[ "$target" != *@* ]]; then
+            target="ubuntu@${target}"
+          fi
+
+          host="${target#*@}"
+          ssh-keyscan -H "$host" >> ~/.ssh/known_hosts 2>/dev/null || true
+          echo "SSH_TARGET=$target" >> "$GITHUB_ENV"
+
+      - name: Rebuild and restart docs container
+        run: |
+          ssh -i ~/.ssh/deploy_key -o BatchMode=yes "$SSH_TARGET" 'bash -s' <<'EOF'
+          set -euo pipefail
+          REPO_DIR="${REPO_DIR:-$HOME/ui}"
+          REPO_URL="${REPO_URL:-https://github.com/Safe-Lagoon/ui.git}"
+          BRANCH="${BRANCH:-main}"
+
+          if [ ! -d "$REPO_DIR/.git" ]; then
+            git clone "$REPO_URL" "$REPO_DIR"
+          fi
+
+          cd "$REPO_DIR"
+          git fetch origin "$BRANCH"
+          git checkout "$BRANCH"
+          git pull --ff-only origin "$BRANCH"
+
+          docker compose -f apps/docs/docker-compose.yml build --pull
+          docker compose -f apps/docs/docker-compose.yml up -d --remove-orphans
+          docker image prune -f
+
+          docker compose -f apps/docs/docker-compose.yml ps
+          EOF

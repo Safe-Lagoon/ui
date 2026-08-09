@@ -13,6 +13,14 @@
       "files": [{ "path": "packages/ui/src/components/brand/button.tsx", "type": "registry:component" }]
     },
     {
+      "name": "title",
+      "type": "registry:component",
+      "title": "Title",
+      "description": "Page heading with optional icon, subtitle, and bottom divider.",
+      "registryDependencies": ["utils"],
+      "files": [{ "path": "packages/ui/src/components/brand/title.tsx", "type": "registry:component" }]
+    },
+    {
       "name": "input",
       "type": "registry:component",
       "title": "Input",

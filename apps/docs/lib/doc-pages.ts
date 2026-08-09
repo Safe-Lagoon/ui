@@ -133,6 +133,20 @@ export const docPages: Record<string, DocPage> = {
   {children}
 </AppShellLayout>`,
   },
+  title: {
+    title: "Title",
+    description:
+      "Page heading block with optional icon, subtitle below the title row, and optional bottom divider. Used inside app shell work areas and via AppShellPageHeader.",
+    examples: [{ title: "Icon, subtitle & divider", preview: "title-demo" }],
+    code: `import { Title } from "@safelagoon/ui";
+
+<Title
+  title={t("dashboard.title")}
+  icon={<DashboardIcon aria-hidden />}
+  subtitle={t("dashboard.subtitle")}
+  showDivider
+/>`,
+  },
   "ai-chat": {
     title: "AI Chat",
     description:

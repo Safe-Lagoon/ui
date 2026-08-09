@@ -695,14 +695,20 @@ pnpm changeset                # add release notes before merging features
 **CI / release (`.github/workflows/ci.yml`):**
 
 - **PRs:** `build` job only (ui build/test, docs build, registry validate, Playwright).
-- **Push to `main`:** `build` then `release` (`needs: build`) — versions via changesets, publishes `@safelagoon/ui` to npm.
-- Requires GitHub secret **`NPMJS_TOKEN`** (npm automation token with publish access to `@safelagoon` scope).
+- **Push to `main`:** `build` → `release` (npm publish + GitHub Release) and `deploy-docs` (Docker rebuild on docs host), both `needs: build`.
+- **`release` job:** bumps version via changesets when `.changeset/*.md` files exist, publishes `@safelagoon/ui` to npm, then creates/updates a GitHub Release tagged `v{version}` (e.g. `v0.2.2`) with the matching section from `packages/ui/CHANGELOG.md`.
+- Requires GitHub secrets:
+  - **`NPMJS_TOKEN`** — npm automation token with publish access to `@safelagoon` scope.
+  - **`DOCS_HOST`** — SSH target for the docs server (`user@host` or hostname; defaults to `ubuntu@` when no user is set).
+  - **`DOCS_SSH_KEY`** — private key authorized on the docs host for deploy.
 - Scoped package uses `"publishConfig": { "access": "public" }`.
 
-**Docs deployment** (configure hostnames/IPs via env on your servers — do not commit them):
+**Docs deployment** (host details live in GitHub secrets — do not commit them):
+
+- **CI:** on push to `main`, `deploy-docs` SSHs to `DOCS_HOST`, pulls latest `main`, rebuilds the docs image, and restarts the container.
+- **Manual** on the docs host:
 
 ```bash
-# Docs host
 bash deploy/docs-server/deploy.sh
 
 # Load balancer (set DOCS_UPSTREAM to private host:port, e.g. 10.x.x.x:8083)

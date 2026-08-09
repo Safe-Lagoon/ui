@@ -264,6 +264,16 @@ const ToastIcon = makeIcon(() => (
   </>
 ));
 
+const Heading = makeIcon(() => (
+  <>
+    <path d="M4 12h8" />
+    <path d="M4 18V6" />
+    <path d="M12 18V6" />
+    <path d="M17 10h3" />
+    <path d="M17 6v12" />
+  </>
+));
+
 export const docPageIcons: Record<string, DocIcon> = {
   button: MousePointerClick,
   input: FormInput,
@@ -274,6 +284,7 @@ export const docPageIcons: Record<string, DocIcon> = {
   table: Table,
   layouts: LayoutGrid,
   "app-shell": LayoutPanelLeft,
+  title: Heading,
   "ai-chat": Sparkles,
   notifications: Bell,
   toast: ToastIcon,
