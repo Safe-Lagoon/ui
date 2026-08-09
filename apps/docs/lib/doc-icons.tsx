@@ -257,6 +257,13 @@ const ToggleLeft = makeIcon(() => (
   </>
 ));
 
+const ToastIcon = makeIcon(() => (
+  <>
+    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+    <path d="M10 21h4" />
+  </>
+));
+
 export const docPageIcons: Record<string, DocIcon> = {
   button: MousePointerClick,
   input: FormInput,
@@ -269,6 +276,7 @@ export const docPageIcons: Record<string, DocIcon> = {
   "app-shell": LayoutPanelLeft,
   "ai-chat": Sparkles,
   notifications: Bell,
+  toast: ToastIcon,
   header: Signpost,
   "burger-menu": Menu,
   sidebar: LayoutPanelLeft,

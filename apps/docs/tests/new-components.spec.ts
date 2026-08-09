@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 
 const newPages = [
   { path: "/docs/components/drawer", heading: "Drawer" },
+  { path: "/docs/components/toast", heading: "Toast" },
   { path: "/docs/components/sidebar", heading: "Sidebar" },
   { path: "/docs/components/date-picker", heading: "Date Picker" },
   { path: "/docs/components/layouts", heading: "Layouts" },

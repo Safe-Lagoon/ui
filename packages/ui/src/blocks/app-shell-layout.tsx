@@ -41,6 +41,7 @@ export interface AppShellLayoutProps {
   onCollapsedChange?: (collapsed: boolean) => void;
   collapseLabel?: string;
   expandLabel?: string;
+  openMenuLabel?: string;
   notificationsLabel?: string;
   profileMenuLabel?: string;
   LinkComponent?: React.ComponentType<AppSidebarLinkComponentProps>;
@@ -73,6 +74,7 @@ export function AppShellLayout({
   onCollapsedChange,
   collapseLabel = "Collapse sidebar",
   expandLabel = "Expand sidebar",
+  openMenuLabel = "Open menu",
   notificationsLabel = "Notifications",
   profileMenuLabel = "Open profile menu",
   LinkComponent,
@@ -82,6 +84,12 @@ export function AppShellLayout({
   const [internalAiChatOpen, setInternalAiChatOpen] = React.useState(defaultAiChatOpen);
   const [internalNotificationsOpen, setInternalNotificationsOpen] = React.useState(defaultNotificationsOpen);
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const shellRef = React.useRef<HTMLDivElement>(null);
+
+  const isCompactShell = React.useCallback(() => {
+    const width = shellRef.current?.getBoundingClientRect().width;
+    return (width ?? (typeof window !== "undefined" ? window.innerWidth : 1024)) < 1024;
+  }, []);
 
   const collapsed = collapsedProp ?? internalCollapsed;
   const setCollapsed = onCollapsedChange ?? setInternalCollapsed;
@@ -125,24 +133,31 @@ export function AppShellLayout({
       defaultActiveChildProfileId={defaultActiveChildProfileId}
       onChildProfileChange={onChildProfileChange}
       childProfileSwitchLabel={childProfileSwitchLabel}
-      onCollapse={() => setCollapsed(true)}
+      onCollapse={() => {
+        if (isCompactShell()) {
+          setMobileOpen(false);
+          return;
+        }
+        setCollapsed(true);
+      }}
       collapseLabel={collapseLabel}
       notificationsLabel={notificationsLabel}
       profileMenuLabel={profileMenuLabel}
       notifications={renderedNotifications}
       notificationsOpen={notificationsOpen}
       onNotificationsOpenChange={notifications ? handleNotificationsOpenChange : undefined}
+      onNavigate={() => setMobileOpen(false)}
       LinkComponent={LinkComponent}
       className="h-full border-0"
     />
   );
 
   const openNavigation = () => {
-    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+    if (isCompactShell()) {
       setMobileOpen(true);
-    } else {
-      setCollapsed(false);
+      return;
     }
+    setCollapsed(false);
   };
 
   const renderedAiChat =
@@ -158,13 +173,13 @@ export function AppShellLayout({
   const overlayOpen = aiChatOpen && aiChat;
 
   return (
-    <div className={cn("flex h-svh min-h-0 overflow-hidden bg-muted", className)}>
+    <div ref={shellRef} className={cn("@container flex h-svh min-h-0 overflow-hidden bg-muted", className)}>
       {!collapsed ? (
-        <div className="hidden h-full min-h-0 shrink-0 overflow-hidden lg:flex">{sidebar}</div>
+        <div className="hidden h-full min-h-0 shrink-0 overflow-hidden @lg:flex">{sidebar}</div>
       ) : null}
 
       {mobileOpen ? (
-        <div className="fixed inset-0 z-50 lg:hidden">
+        <div className="fixed inset-0 z-50 @lg:hidden">
           <button
             type="button"
             className="absolute inset-0 bg-black/50"
@@ -177,12 +192,13 @@ export function AppShellLayout({
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col p-0.5">
         <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[10px] border border-border-soft bg-background">
-          <div className="absolute start-3 top-3 z-10 flex items-center gap-2">
+          <div className="pointer-events-none absolute start-3 top-3 z-30 flex items-center gap-2">
             <Button
               variant="ghost"
               size="icon"
-              className={cn(!collapsed && "lg:hidden")}
-              aria-label={expandLabel}
+              className={cn("pointer-events-auto bg-background shadow-sm", !collapsed && "@lg:hidden")}
+              aria-label={openMenuLabel}
+              aria-expanded={mobileOpen}
               onClick={openNavigation}
             >
               <Menu />
@@ -204,9 +220,9 @@ export function AppShellLayout({
                 ? "overflow-hidden p-0"
                 : cn(
                     "overflow-auto px-6 pb-6",
-                    "[&:not(:has([data-slot=app-shell-page-header]))]:max-lg:pt-12",
+                    "[&:not(:has([data-slot=app-shell-page-header]))]:@max-lg:pt-12",
                     collapsed &&
-                      "[&:not(:has([data-slot=app-shell-page-header]))]:lg:pt-12",
+                      "[&:not(:has([data-slot=app-shell-page-header]))]:@lg:pt-12",
                   ),
             )}
           >

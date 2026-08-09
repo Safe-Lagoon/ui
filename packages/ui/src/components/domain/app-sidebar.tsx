@@ -71,6 +71,7 @@ export type AppSidebarLinkComponentProps = {
   className?: string;
   children: React.ReactNode;
   "aria-current"?: "page" | undefined;
+  onClick?: () => void;
 };
 
 export interface AppSidebarProps {
@@ -90,6 +91,7 @@ export interface AppSidebarProps {
   notifications?: React.ReactNode;
   notificationsOpen?: boolean;
   onNotificationsOpenChange?: (open: boolean) => void;
+  onNavigate?: () => void;
   LinkComponent?: React.ComponentType<AppSidebarLinkComponentProps>;
   className?: string;
 }
@@ -97,9 +99,11 @@ export interface AppSidebarProps {
 function NavLink({
   item,
   LinkComponent,
+  onNavigate,
 }: {
   item: AppSidebarLink;
   LinkComponent?: React.ComponentType<AppSidebarLinkComponentProps>;
+  onNavigate?: () => void;
 }) {
   const className = cn(
     "flex w-full items-center gap-3 rounded-[10px] px-3 py-2 text-body-16 transition-colors",
@@ -121,7 +125,15 @@ function NavLink({
 
   if (item.href && LinkComponent) {
     return (
-      <LinkComponent href={item.href} className={className} aria-current={item.active ? "page" : undefined}>
+      <LinkComponent
+        href={item.href}
+        className={className}
+        aria-current={item.active ? "page" : undefined}
+        onClick={() => {
+          item.onClick?.();
+          onNavigate?.();
+        }}
+      >
         {content}
       </LinkComponent>
     );
@@ -130,7 +142,21 @@ function NavLink({
   const Comp = item.href ? "a" : "button";
   return (
     <Comp
-      {...(item.href ? { href: item.href } : { type: "button" as const, onClick: item.onClick })}
+      {...(item.href
+        ? {
+            href: item.href,
+            onClick: () => {
+              item.onClick?.();
+              onNavigate?.();
+            },
+          }
+        : {
+            type: "button" as const,
+            onClick: () => {
+              item.onClick?.();
+              onNavigate?.();
+            },
+          })}
       className={className}
       aria-current={item.active ? "page" : undefined}
     >
@@ -143,10 +169,12 @@ function SidebarGroupSection({
   group,
   defaultOpen,
   LinkComponent,
+  onNavigate,
 }: {
   group: AppSidebarGroup;
   defaultOpen: boolean;
   LinkComponent?: React.ComponentType<AppSidebarLinkComponentProps>;
+  onNavigate?: () => void;
 }) {
   const [open, setOpen] = React.useState(defaultOpen);
 
@@ -171,7 +199,7 @@ function SidebarGroupSection({
       </CollapsibleTrigger>
       <CollapsibleContent className="space-y-0.5 ps-2">
         {group.items.map((item) => (
-          <NavLink key={item.id} item={item} LinkComponent={LinkComponent} />
+          <NavLink key={item.id} item={item} LinkComponent={LinkComponent} onNavigate={onNavigate} />
         ))}
       </CollapsibleContent>
     </Collapsible>
@@ -284,6 +312,7 @@ export function AppSidebar({
   notifications,
   notificationsOpen,
   onNotificationsOpenChange,
+  onNavigate,
   LinkComponent,
   className,
 }: AppSidebarProps) {
@@ -343,7 +372,7 @@ export function AppSidebar({
           {topItems.length > 0 ? (
             <nav className="space-y-0.5" aria-label="Primary">
               {topItems.map((item) => (
-                <NavLink key={item.id} item={item} LinkComponent={LinkComponent} />
+                <NavLink key={item.id} item={item} LinkComponent={LinkComponent} onNavigate={onNavigate} />
               ))}
             </nav>
           ) : null}
@@ -354,6 +383,7 @@ export function AppSidebar({
               group={group}
               defaultOpen={group.defaultOpen ?? true}
               LinkComponent={LinkComponent}
+              onNavigate={onNavigate}
             />
           ))}
         </div>

@@ -33,6 +33,7 @@ export const demoNames = [
   "ai-chat-demo",
   "toggle-demo",
   "notifications-panel-demo",
+  "toast-demo",
   "kpi-card-demo",
 ] as const;
 

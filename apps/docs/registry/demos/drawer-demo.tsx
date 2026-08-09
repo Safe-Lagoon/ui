@@ -18,7 +18,7 @@ export default function DrawerDemo() {
       <DrawerTrigger asChild>
         <Button variant="secondary-blue">Open right drawer</Button>
       </DrawerTrigger>
-      <DrawerContent side="right" className="w-full sm:max-w-md">
+      <DrawerContent side="right">
         <DrawerHeader>
           <DrawerTitle>Filter logs</DrawerTitle>
           <DrawerDescription>

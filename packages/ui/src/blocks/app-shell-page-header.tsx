@@ -28,7 +28,7 @@ export function AppShellPageHeader({
       className={cn(
         "-mx-6 mb-6 bg-background px-6",
         sticky &&
-          "sticky top-0 z-10 pt-4 max-lg:pt-12 group-data-[shell-collapsed]/shell:lg:pt-12",
+          "sticky top-0 z-10 pt-4 @max-lg:pt-12 group-data-[shell-collapsed]/shell:@lg:pt-12",
         showDivider ? "border-b border-border-soft pb-5" : "pb-0",
         className,
       )}

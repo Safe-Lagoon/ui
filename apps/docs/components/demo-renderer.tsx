@@ -46,6 +46,7 @@ const loaders: Record<DemoName, ComponentType> = {
   "ai-chat-demo": loadDemo(() => import("@/registry/demos/ai-chat-demo")),
   "toggle-demo": loadDemo(() => import("@/registry/demos/toggle-demo")),
   "notifications-panel-demo": loadDemo(() => import("@/registry/demos/notifications-panel-demo")),
+  "toast-demo": loadDemo(() => import("@/registry/demos/toast-demo")),
   "kpi-card-demo": loadDemo(() => import("@/registry/demos/kpi-card-demo")),
 };
 

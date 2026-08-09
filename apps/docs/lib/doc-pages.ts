@@ -193,6 +193,28 @@ import { AppShellLayout } from "@safelagoon/ui/blocks";
   {children}
 </AppShellLayout>`,
   },
+  toast: {
+    title: "Toast",
+    description:
+      "Ephemeral notifications that appear and auto-dismiss. Mount Toaster once in your app shell, then call toast() from anywhere.",
+    examples: [
+      { title: "Variants", preview: "toast-demo" },
+    ],
+    code: `import { ThemeProvider, Toaster, toast, Button } from "@safelagoon/ui";
+
+// app/layout.tsx — mount once
+<ThemeProvider>
+  {children}
+  <Toaster position="bottom-right" />
+</ThemeProvider>
+
+// anywhere in client code
+<Button onClick={() => toast.success(t("saved"))}>
+  {t("save")}
+</Button>
+
+toast.error(t("error.generic"), { description: t("error.retry") });`,
+  },
   header: {
     title: "Header",
     description: "Sticky site header with logo, desktop nav links, actions, and mobile burger toggle.",
