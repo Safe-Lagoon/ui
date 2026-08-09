@@ -85,8 +85,8 @@ jobs:
             fi
           fi
 
-          pnpm release
-
           if [ "$should_push" = true ]; then
             git push origin HEAD:main
           fi
+
+          pnpm release
