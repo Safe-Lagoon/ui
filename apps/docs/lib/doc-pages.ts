@@ -114,8 +114,11 @@ export const docPages: Record<string, DocPage> = {
   "app-shell": {
     title: "App Shell",
     description:
-      "Collapsible sidebar layout with child profile switcher, grouped navigation, hideable panel, and bottom parent profile menu — for portal dashboards.",
-    examples: [{ title: "Sidebar + work area", preview: "app-shell-demo" }],
+      "Three-width portal shell on canvas #e8ecef: desktop sidebar 240, tablet rail 72 (≤900), phone chrome (hamburger · child avatar · 18px name · OS badge). Breakpoints are proto: ≤430 / ≤900 / >900. No inner white work-area card. Nav is the 240px left sheet — no bottom tab bar. Home has no page title. Hubs are 28px/22px h1; drills are 13px DotCrumbs then the same h1.",
+    examples: [
+      { title: "Sidebar + work area", preview: "app-shell-demo" },
+      { title: "Home · 1280 / 820 / 390", preview: "home-shell-demo" },
+    ],
     code: `import { AppShellLayout, AppShellPageHeader } from "@safelagoon/ui/blocks";
 
 <AppShellLayout
@@ -133,10 +136,27 @@ export const docPages: Record<string, DocPage> = {
   {children}
 </AppShellLayout>`,
   },
+  portal: {
+    title: "Portal constructor",
+    description:
+      "1:1 proto.js route table inside AppShell at 1280 / 820 / 390. Home has no page title. Drills are DotCrumbs (·) then 28px/22px h1. Activity rows share one feed-list card. Place editor is name / type chips / radius 50–3000 m / lilac pin / Save / Delete. Auth is the proto card, no shell.",
+    examples: [{ title: "Home · Activity · Rules · Settings · 1280 / 820 / 390", preview: "portal-constructor-demo" }],
+    code: `import { AppShellLayout, AppShellPageHeader } from "@safelagoon/ui/blocks";
+import { DeviceModeControl, HubCard, PlaceEditor, DotCrumbs } from "@safelagoon/ui";
+
+<AppShellLayout ...>
+  {/* Home: no AppShellPageHeader title */}
+  <DeviceModeControl value={mode} onValueChange={setMode} />
+
+  {/* Drill: crumbs then title */}
+  <AppShellPageHeader title="Home" breadcrumbs={<DotCrumbs items={["Rules", "Places", "Home"]} />} />
+  <PlaceEditor name={name} type={type} radius={radius} center={center} onSave={save} onDelete={remove} />
+</AppShellLayout>`,
+  },
   title: {
     title: "Title",
     description:
-      "Page heading block with optional icon, subtitle below the title row, and optional bottom divider. Used inside app shell work areas and via AppShellPageHeader.",
+      "Marketing Title stays on the brand scale. Portal pages use AppShellPageHeader: 28px/700 desktop, 22px phone, tracking -0.02em. DotCrumbs stay 13px and sit above the h1 — they are not the title.",
     examples: [{ title: "Icon, subtitle & divider", preview: "title-demo" }],
     code: `import { Title } from "@safelagoon/ui";
 
@@ -405,6 +425,28 @@ const [date, setDate] = useState<Date>();
   sessionLabel="Screen mirror session"
   timelineLabel="Session timeline"
 />`,
+  },
+  "device-mode": {
+    title: "Device Mode",
+    description:
+      "Home hero: one mutually exclusive 3-state control. Allow (state 2, green) / Rules (state 0, lilac) / Block (state 1, red). Caption changes under the bar. Unlinked and busy disable the control — they do not hide it. Time requests stay a separate card.",
+    examples: [{ title: "Allow / rules / block · 1280 / 820 / 390", preview: "device-mode-control-demo" }],
+    code: `import { DeviceModeControl } from "@safelagoon/ui";
+
+<DeviceModeControl value={mode} onValueChange={setMode} />
+// captions: “Rules are paused” / “Your rules are on” / “Device is blocked”`,
+  },
+  "feed-stacks": {
+    title: "Feed stacks",
+    description:
+      "Activity feed primitives matching proto: ActivityDaySection wraps one 14px-radius feed-list; ActivityStack is a 64px row on a 72px 1fr auto grid (not its own card). Day headers are 12px/600 sentence case. FilterChips are 30px / 12.5px.",
+    examples: [{ title: "Kinds + days + filmstrip · 1280 / 820 / 390", preview: "feed-stacks-demo" }],
+    code: `import { ActivityStack, ActivityDaySection, FilterChips } from "@safelagoon/ui";
+
+<FilterChips items={[{ id: "all", label: "All" }, { id: "apps", label: "Apps" }]} />
+<ActivityDaySection title="Today · 6 Sep 2026" defaultExpanded>
+  <ActivityStack kind="apps" title="Played on phone" meta="14:02–15:40 · 6 apps" count={6} />
+</ActivityDaySection>`,
   },
   "event-timeline": {
     title: "Event Timeline Layout",
