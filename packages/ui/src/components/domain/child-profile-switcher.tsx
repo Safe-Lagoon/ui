@@ -11,14 +11,29 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 
+export type ChildOs = "android" | "ios";
+
 export type AppSidebarChildProfile = {
   id: string;
   name: string;
   avatarSrc?: string;
   avatarFallback?: string;
-  /** Optional branded icon when no photo is available */
   icon?: React.ReactNode;
+  /** Preferred over parsing `device`. */
+  os?: ChildOs;
+  device?: string;
+  badgeCount?: number;
+  unlinked?: boolean;
 };
+
+export function childOs(profile?: Pick<AppSidebarChildProfile, "os" | "device"> | null): ChildOs | undefined {
+  if (!profile) return undefined;
+  if (profile.os === "android" || profile.os === "ios") return profile.os;
+  const device = (profile.device ?? "").toLowerCase();
+  if (device.includes("ios") || device.includes("iphone")) return "ios";
+  if (device.includes("android")) return "android";
+  return undefined;
+}
 
 export interface ChildProfileSwitcherProps {
   profiles: AppSidebarChildProfile[];
@@ -26,6 +41,9 @@ export interface ChildProfileSwitcherProps {
   onProfileChange: (profileId: string) => void;
   switchLabel?: string;
   className?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  variant?: "default" | "chip";
 }
 
 function ProfileAvatar({
@@ -64,70 +82,62 @@ export function ChildProfileSwitcher({
   onProfileChange,
   switchLabel = "Switch child profile",
   className,
+  open,
+  onOpenChange,
+  variant = "default",
 }: ChildProfileSwitcherProps) {
   const activeProfile = profiles.find((profile) => profile.id === activeProfileId) ?? profiles[0];
 
   if (!activeProfile || profiles.length === 0) return null;
 
+  const chip = variant === "chip";
+
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
         <button
           type="button"
           className={cn(
-            "group flex w-full items-center gap-3 rounded-[10px] bg-background px-3 py-2 text-start shadow-sm transition-colors",
-            "hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-            "data-[state=open]:bg-background",
+            "group flex items-center text-start transition-colors",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+            chip
+              ? "gap-2 rounded-full border border-border-soft bg-card px-2 py-1"
+              : "w-full gap-3 rounded-[10px] bg-background px-3 py-2 shadow-sm hover:bg-background data-[state=open]:bg-background",
             className,
           )}
           aria-label={switchLabel}
         >
-          <ProfileAvatar profile={activeProfile} />
-          <span className="min-w-0 flex-1 truncate text-body-16-semibold text-foreground">
-            {activeProfile.name}
+          <span className="relative">
+            <ProfileAvatar profile={activeProfile} className={chip ? "size-7" : undefined} />
+            {activeProfile.badgeCount && activeProfile.badgeCount > 0 ? (
+              <span className="absolute -end-1 -top-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-destructive px-1 text-[9px] font-bold text-white">
+                {activeProfile.badgeCount}
+              </span>
+            ) : null}
           </span>
-          <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-background text-muted-foreground shadow-sm">
-            <ChevronDown
-              className="size-3.5 transition-transform group-data-[state=open]:rotate-180"
-              aria-hidden
-            />
+          <span className="min-w-0 flex-1">
+            <span className={cn("block truncate", chip ? "text-[13px] font-semibold" : "text-body-14-semibold")}>
+              {activeProfile.name}
+            </span>
+            {!chip && activeProfile.device ? (
+              <span className="block truncate text-[12px] text-muted-foreground">{activeProfile.device}</span>
+            ) : null}
           </span>
+          <ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="start"
-        sideOffset={4}
-        className="flex w-[var(--radix-dropdown-menu-trigger-width)] flex-col gap-1.5 rounded-[10px] border-border-soft p-1.5 shadow-lg"
-      >
-        {profiles.map((profile) => {
-          const isActive = profile.id === activeProfileId;
-
-          return (
-            <DropdownMenuItem
-              key={profile.id}
-              className={cn(
-                "cursor-pointer rounded-[8px] px-3 py-2.5 transition-colors",
-                isActive
-                  ? "bg-brand-blue-100 focus:bg-brand-blue-100 hover:bg-brand-blue-100"
-                  : "hover:bg-brand-blue-100/45 focus:bg-brand-blue-100/45",
-              )}
-              onSelect={(event) => {
-                event.preventDefault();
-                onProfileChange(profile.id);
-              }}
-            >
-              <ProfileAvatar profile={profile} />
-              <span className="min-w-0 flex-1 truncate text-body-16 text-foreground">{profile.name}</span>
-              {isActive ? (
-                <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-green text-white">
-                  <Check className="size-3" strokeWidth={3} aria-hidden />
-                </span>
-              ) : (
-                <span className="size-5 shrink-0" aria-hidden />
-              )}
-            </DropdownMenuItem>
-          );
-        })}
+      <DropdownMenuContent align="start" className="w-56">
+        {profiles.map((profile) => (
+          <DropdownMenuItem
+            key={profile.id}
+            className="flex cursor-pointer items-center gap-2"
+            onSelect={() => onProfileChange(profile.id)}
+          >
+            <ProfileAvatar profile={profile} className="size-7" />
+            <span className="min-w-0 flex-1 truncate">{profile.name}</span>
+            {profile.id === activeProfile.id ? <Check className="size-4" aria-hidden /> : null}
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );
