@@ -53,6 +53,7 @@ const loaders: Record<DemoName, ComponentType> = {
   "feed-stacks-demo": loadDemo(() => import("@/registry/demos/feed-stacks-demo")),
   "home-shell-demo": loadDemo(() => import("@/registry/demos/home-shell-demo")),
   "portal-constructor-demo": loadDemo(() => import("@/registry/demos/portal-constructor-demo")),
+  "portal-atoms-demo": loadDemo(() => import("@/registry/demos/portal-atoms-demo")),
 };
 
 function PreviewFallback() {

@@ -13,6 +13,7 @@ import deviceModeControlDemo from "./demos/device-mode-control-demo.tsx?raw";
 import feedStacksDemo from "./demos/feed-stacks-demo.tsx?raw";
 import homeShellDemo from "./demos/home-shell-demo.tsx?raw";
 import portalConstructorDemo from "./demos/portal-constructor-demo.tsx?raw";
+import portalAtomsDemo from "./demos/portal-atoms-demo.tsx?raw";
 import dialogDemo from "./demos/dialog-demo.tsx?raw";
 import drawerDemo from "./demos/drawer-demo.tsx?raw";
 import eventTimelineDemo from "./demos/event-timeline-demo.tsx?raw";
@@ -56,6 +57,7 @@ export const demoSources: Record<DemoName, string> = {
   "feed-stacks-demo": feedStacksDemo,
   "home-shell-demo": homeShellDemo,
   "portal-constructor-demo": portalConstructorDemo,
+  "portal-atoms-demo": portalAtomsDemo,
   "dialog-demo": dialogDemo,
   "drawer-demo": drawerDemo,
   "event-timeline-demo": eventTimelineDemo,
