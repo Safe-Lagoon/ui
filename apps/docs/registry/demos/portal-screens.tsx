@@ -1,1 +1,43 @@
-PLACEHOLDER_WILL_LOAD_FROM_DISK
+"use client";
+
+import * as React from "react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  ActivityDaySection,
+  ActivityStack,
+  AddonRow,
+  AlertShot,
+  Button,
+  ChatSplitLayout,
+  ChildProfileForm,
+  ChoiceRow,
+  DeviceModeControl,
+  DotCrumbs,
+  EmptyState,
+  FieldHint,
+  FilterChips,
+  FormCard,
+  LabeledField,
+  HubCard,
+  HubGrid,
+  Input,
+  PageBody,
+  PlaceEditor,
+  PlanCard,
+  SectionCard,
+  SectionTitle,
+  SessionFilmstrip,
+  StatusBanner,
+  StrokeGroup,
+  StrokeRow,
+  TimeRequestCard,
+  type ChildProfileValue,
+  type DeviceMode,
+  type PlaceCenter,
+  type PlaceTypeId,
+} from "@safelagoon/ui";
+import { cn } from "@safelagoon/ui";
+import { AppShellPageHeader, useAppShellNavigation } from "@safelagoon/ui/blocks";
