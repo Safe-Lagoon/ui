@@ -42,25 +42,25 @@
   --sidebar-w: 240px;
   --rail-w: 72px;
 
-  /* shadcn semantic aliases */
+  /* Hex aliases — var() here breaks Tailwind opacity (bg-muted/30) */
   --color-background: #ffffff;
-  --color-foreground: var(--color-fg);
-  --color-primary: var(--color-lilac);
+  --color-foreground: #333333;
+  --color-primary: #b97cff;
   --color-primary-foreground: #ffffff;
-  --color-secondary: var(--color-brand-blue-100);
-  --color-secondary-foreground: var(--color-brand-blue);
-  --color-accent: var(--color-brand-blue);
+  --color-secondary: #d9e7ff;
+  --color-secondary-foreground: #2f77ee;
+  --color-accent: #2f77ee;
   --color-accent-foreground: #ffffff;
-  --color-muted: var(--color-surface);
-  --color-muted-foreground: var(--color-muted-fg);
+  --color-muted: #eceff1;
+  --color-muted-foreground: #546e7a;
   --color-destructive: #e53935;
   --color-destructive-foreground: #ffffff;
-  --color-ring: var(--color-brand-blue);
-  --color-input: var(--color-border);
+  --color-ring: #2f77ee;
+  --color-input: #b0bec5;
   --color-card: #ffffff;
-  --color-card-foreground: var(--color-fg);
+  --color-card-foreground: #333333;
   --color-popover: #ffffff;
-  --color-popover-foreground: var(--color-fg);
+  --color-popover-foreground: #333333;
 
   --radius-sm: 6px;
   --radius-md: 10px;
