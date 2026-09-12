@@ -296,10 +296,13 @@ import { AiChat, NotificationsPanel } from "@safelagoon/ui";
 
 **Layout rules agents must follow:**
 
-- Put page top padding on `AppShellPageHeader` (`pt-4`, `max-lg:pt-12` for mobile menu clearance) — **not** on the scroll container. The header owns `sticky top-0 bg-background` so content never shows through when scrolling.
-- Use `showDivider` for a full-width border under the header row (`-mx-6 px-6` bleed).
+- Shell sits on canvas `#e8ecef`. Do not wrap the work area in an inner white card. `PageBody` owns proto padding (desktop 28/32/48, rail 24/28/40, phone 16/14/32) via `data-shell-mode`.
+- Breakpoints: `shellModeFromWidth` is ≤430 phone, ≤900 tablet/rail, else desktop.
+- Hubs: 28px/22px `h1` only. Drills: 13px `DotCrumbs` (`·`) then the same `h1`. Home: no header.
 - Sidebar and main scroll independently (`h-svh overflow-hidden` on shell, `overflow-auto` on `<main>`).
 - Optional slots: `aiChat` + `AiChatTrigger`, `notifications` (bell opens a dialog popup, not a sidebar item).
+- **Phone:** `AppPhoneChrome` is hamburger + child avatar + 18px name + OS badge. Nav is the 240px left sheet (`bg-muted`, scrim `rgba(45,44,50,0.18)`) — do not mount `AppBottomNav`.
+- **Portal constructor:** 1:1 `proto.js` routes. Activity rows share one feed-list. Billing section titles sit above the cards.
 
 ### Parental-control dashboard (cabinet)
 
