@@ -9,6 +9,10 @@ import checkboxDemo from "./demos/checkbox-demo.tsx?raw";
 import checkboxStatesDemo from "./demos/checkbox-states-demo.tsx?raw";
 import dataTableDemo from "./demos/data-table-demo.tsx?raw";
 import datePickerDemo from "./demos/date-picker-demo.tsx?raw";
+import deviceModeControlDemo from "./demos/device-mode-control-demo.tsx?raw";
+import feedStacksDemo from "./demos/feed-stacks-demo.tsx?raw";
+import homeShellDemo from "./demos/home-shell-demo.tsx?raw";
+import portalConstructorDemo from "./demos/portal-constructor-demo.tsx?raw";
 import dialogDemo from "./demos/dialog-demo.tsx?raw";
 import drawerDemo from "./demos/drawer-demo.tsx?raw";
 import eventTimelineDemo from "./demos/event-timeline-demo.tsx?raw";
@@ -48,6 +52,10 @@ export const demoSources: Record<DemoName, string> = {
   "checkbox-states-demo": checkboxStatesDemo,
   "data-table-demo": dataTableDemo,
   "date-picker-demo": datePickerDemo,
+  "device-mode-control-demo": deviceModeControlDemo,
+  "feed-stacks-demo": feedStacksDemo,
+  "home-shell-demo": homeShellDemo,
+  "portal-constructor-demo": portalConstructorDemo,
   "dialog-demo": dialogDemo,
   "drawer-demo": drawerDemo,
   "event-timeline-demo": eventTimelineDemo,

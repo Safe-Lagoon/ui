@@ -29,12 +29,12 @@ Consumer apps must import `@safelagoon/ui/styles.css` once and add a Tailwind `@
 Portal layouts use `AppShellLayout` + `AppShellPageHeader` from `@safelagoon/ui/blocks`.
 
 ```
-┌─────────────┐┌─────────────────────────────────────────┐
+┌─────────────┬──────────────────────────────────────┐
 │  AppSidebar │  AppShellPageHeader (sticky)         │
-│  (scroll)   ├────────────────────────────────────────┐
+│  (scroll)   ├──────────────────────────────────────┤
 │             │  page content (main scroll)            │
 │  profile    │                                      │
-└─────────────┴──────────────────────────────────────────┘
+└─────────────┴──────────────────────────────────────┘
          AI trigger (top-right) → full-area AiChat popup
 ```
 
