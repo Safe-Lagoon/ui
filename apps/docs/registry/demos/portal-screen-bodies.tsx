@@ -5,6 +5,11 @@ import {
   ActivityDaySection,
   ActivityStack,
   AddonRow,
+  AuthCard,
+  AuthDesc,
+  AuthPage,
+  AuthTitle,
+  BrandMark,
   Button,
   ChildProfileForm,
   ChoiceRow,
@@ -15,7 +20,12 @@ import {
   FormCard,
   LabeledField,
   Input,
+  MapStage,
+  MapToolbar,
   PageBody,
+  PanelGrid,
+  PayCard,
+  PayCardGroup,
   PlaceEditor,
   PlanCard,
   SectionCard,
@@ -23,15 +33,15 @@ import {
   StatusBanner,
   StrokeGroup,
   StrokeRow,
+  TextAction,
   TimeRequestCard,
   type ChildProfileValue,
   type DeviceMode,
   type PlaceCenter,
   type PlaceTypeId,
 } from "@safelagoon/ui";
-import { cn } from "@safelagoon/ui";
 import type { PortalScreen } from "./portal-screen-model";
-import { PageHead, PanelGrid, PayCard } from "./portal-screen-widgets";
+import { PageHead } from "./portal-screen-widgets";
 
 export function HomeBody({
   mode,
@@ -425,7 +435,7 @@ export function BillingBody({
       </FormCard>
       <SectionTitle>Payment method</SectionTitle>
       <FormCard className="space-y-3">
-        <div className="space-y-2" role="radiogroup" aria-label="Payment method">
+        <PayCardGroup>
           {free ? (
             <>
               <PayCard label="Add card · Stripe" selected={pay === "card"} onClick={() => setPay("card")} />
@@ -437,7 +447,7 @@ export function BillingBody({
               <PayCard label="Add another card" selected={pay === "other"} onClick={() => setPay("other")} />
             </>
           )}
-        </div>
+        </PayCardGroup>
         {free ? (
           <LabeledField label="Card" htmlFor="card-num">
             <Input id="card-num" inputSize="portal" placeholder="ACCT-000015" />
@@ -537,42 +547,20 @@ export function PlacesMap({ onGo }: { onGo: (screen: PortalScreen) => void }) {
   return (
     <PageBody>
       <PageHead title="Places" crumbs={["Rules", "Places"]} onGo={onGo} />
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          className={cn(
-            "h-8 rounded-full border px-3 text-[12.5px] font-semibold",
-            tool === "draw" ? "border-lilac bg-lilac text-white" : "border-border-soft bg-card",
-          )}
-          onClick={() => setTool("draw")}
-        >
-          Draw zone
-        </button>
-        <button
-          type="button"
-          className={cn(
-            "h-8 rounded-full border px-3 text-[12.5px] font-semibold",
-            tool === "pan" ? "border-lilac bg-lilac text-white" : "border-border-soft bg-card",
-          )}
-          onClick={() => setTool("pan")}
-        >
-          Move map
-        </button>
-        <span className="text-[12.5px] text-muted-foreground">
-          Click the map, drag to size the circle. Tap a circle or a row to rename or delete.
-        </span>
-      </div>
-      <div className="relative mb-4 h-[280px] overflow-hidden rounded-lg border border-border-soft bg-canvas shadow-card min-[431px]:h-[360px]">
+      <MapToolbar
+        value={tool}
+        onValueChange={setTool}
+        hint="Click the map, drag to size the circle. Tap a circle or a row to rename or delete."
+      />
+      <MapStage>
         <div className="absolute left-[28%] top-[38%] size-28 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-lilac bg-[rgba(185,124,255,0.22)]" />
         <div className="absolute left-[62%] top-[42%] size-36 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-brand-blue bg-[rgba(47,119,238,0.18)]" />
-      </div>
+      </MapStage>
       <StrokeGroup className="mt-4">
         <StrokeRow title="Home" subtitle="Home · 120 m" chevron onClick={() => onGo("/rules/places/home")} />
         <StrokeRow title="School" subtitle="School · 200 m" chevron onClick={() => onGo("/rules/places/home")} />
       </StrokeGroup>
-      <button type="button" className="mt-3.5 text-[13px] font-semibold text-brand-blue" onClick={() => onGo("/rules/places/new")}>
-        + Add place
-      </button>
+      <TextAction onClick={() => onGo("/rules/places/new")}>+ Add place</TextAction>
     </PageBody>
   );
 }
@@ -615,14 +603,11 @@ export function PlaceEditBody({
 
 export function AuthBody({ onGo }: { onGo: (screen: PortalScreen) => void }) {
   return (
-    <div className="flex min-h-full flex-col items-center justify-center bg-canvas px-4 py-6">
-      <div className="mb-4 flex items-center gap-2.5 text-[15px] font-semibold text-brand-blue">
-        <span className="grid size-7 place-items-center rounded-lg bg-brand-blue text-[14px] font-bold text-white">✦</span>
-        Safe Lagoon
-      </div>
-      <div className="w-full max-w-[420px] rounded-[20px] border border-border-soft bg-card p-8 shadow-[0_4px_24px_rgba(45,44,50,0.08)]">
-        <h1 className="text-[22px] font-bold text-ink">Sign in</h1>
-        <p className="mb-5 mt-1 text-[13px] text-muted-foreground">demo@demo / demo</p>
+    <AuthPage className="min-h-full py-6">
+      <BrandMark size="auth" className="mb-6" />
+      <AuthCard>
+        <AuthTitle>Sign in</AuthTitle>
+        <AuthDesc>demo@demo / demo</AuthDesc>
         <LabeledField label="Email" htmlFor="auth-email">
           <Input id="auth-email" inputSize="portal" defaultValue="demo@demo" />
         </LabeledField>
@@ -632,8 +617,8 @@ export function AuthBody({ onGo }: { onGo: (screen: PortalScreen) => void }) {
         <Button variant="primary" size="portal" className="w-full" onClick={() => onGo("/home")}>
           Sign in
         </Button>
-      </div>
-    </div>
+      </AuthCard>
+    </AuthPage>
   );
 }
 
