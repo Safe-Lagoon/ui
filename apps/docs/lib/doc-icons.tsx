@@ -285,6 +285,7 @@ export const docPageIcons: Record<string, DocIcon> = {
   layouts: LayoutGrid,
   "app-shell": LayoutPanelLeft,
   portal: LayoutPanelLeft,
+  "portal-atoms": BoxSquare,
   "device-mode": ToggleLeft,
   "feed-stacks": Film,
   title: Heading,

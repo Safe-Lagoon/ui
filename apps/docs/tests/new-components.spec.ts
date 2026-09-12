@@ -11,6 +11,7 @@ const newPages = [
   { path: "/docs/components/device-mode", heading: "Device Mode" },
   { path: "/docs/components/feed-stacks", heading: "Feed stacks" },
   { path: "/docs/components/portal", heading: "Portal constructor" },
+  { path: "/docs/components/portal-atoms", heading: "Portal atoms" },
 ];
 
 for (const { path, heading } of newPages) {

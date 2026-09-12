@@ -38,6 +38,7 @@
   --color-footer: #061e47;
 
   --shadow-card: 0 1px 2px rgba(45, 44, 50, 0.06), 0 4px 12px rgba(45, 44, 50, 0.04);
+  --shadow-auth: 0 4px 24px rgba(45, 44, 50, 0.08), 0 1px 3px rgba(45, 44, 50, 0.06);
   --sidebar-w: 240px;
   --rail-w: 72px;
 

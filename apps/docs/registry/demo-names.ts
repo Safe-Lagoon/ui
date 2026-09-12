@@ -40,6 +40,7 @@ export const demoNames = [
   "feed-stacks-demo",
   "home-shell-demo",
   "portal-constructor-demo",
+  "portal-atoms-demo",
 ] as const;
 
 export type DemoName = (typeof demoNames)[number];

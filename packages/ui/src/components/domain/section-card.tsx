@@ -75,7 +75,7 @@ export function SectionCard({
       <div className="flex min-w-0 items-center gap-3">
         {leading}
         <div className="min-w-0">
-          <div className="text-[26px] font-bold leading-tight tracking-[-0.02em] text-foreground">{metric}</div>
+          <div className="text-[26px] font-bold leading-tight tracking-[-0.02em] text-ink">{metric}</div>
           {caption ? <p className="mt-1 text-[12.5px] text-muted-foreground">{caption}</p> : null}
         </div>
       </div>

@@ -1,18 +1,19 @@
 "use client";
 
 import * as React from "react";
-import { Home, List, Settings, SlidersHorizontal } from "lucide-react";
 import {
+  AppNavIcon,
+  BrandMark,
   DeviceModeControl,
   EmptyState,
   MetricRing,
   PageBody,
+  PanelGrid,
   SectionCard,
   StatusBanner,
   type DeviceMode,
 } from "@safelagoon/ui";
 import { AppShellLayout } from "@safelagoon/ui/blocks";
-import { LogoHeader } from "@safelagoon/ui/icons";
 
 const WIDTHS = [
   { width: 1280, label: "Desktop · sidebar 240" },
@@ -30,7 +31,7 @@ function HomeBody({ mode, onModeChange }: { mode: DeviceMode; onModeChange: (val
         onAction={() => undefined}
       />
       <DeviceModeControl value={mode} onValueChange={onModeChange} />
-      <div className="grid gap-3.5 md:grid-cols-2 lg:grid-cols-3">
+      <PanelGrid>
         <SectionCard
           label="Screen time"
           metric="No data yet"
@@ -53,7 +54,7 @@ function HomeBody({ mode, onModeChange }: { mode: DeviceMode; onModeChange: (val
           links={[{ label: "Activity" }, { label: "Rules" }]}
           status={{ tone: "ok", label: "Active" }}
         />
-      </div>
+      </PanelGrid>
       <EmptyState
         title="No pending requests"
         description="When the child asks for extra time, the request shows as a separate card — not a fourth mode."
@@ -83,18 +84,20 @@ export default function HomeShellDemo() {
           >
             <AppShellLayout
               className="h-full"
-              logo={<LogoHeader className="h-6" />}
+              collapsible={false}
+              showProfile={false}
+              logo={<BrandMark />}
               childProfiles={[
-                { id: "alex", name: "Alex", avatarFallback: "AL", os: "android", device: "Android", badgeCount: 1 },
-                { id: "sam", name: "Sam", avatarFallback: "SA", os: "ios", device: "iOS", badgeCount: 1 },
+                { id: "alex", name: "Alex", avatarFallback: "AL", os: "android", device: "Android" },
+                { id: "sam", name: "Sam", avatarFallback: "SA", os: "ios", device: "iOS" },
               ]}
               activeChildProfileId={childId}
               onChildProfileChange={setChildId}
               topItems={[
-                { id: "home", label: "Home", icon: <Home className="size-5" />, active: true },
-                { id: "feed", label: "Activity", icon: <List className="size-5" />, badgeCount: 1 },
-                { id: "rules", label: "Rules", icon: <SlidersHorizontal className="size-5" /> },
-                { id: "settings", label: "Settings", icon: <Settings className="size-5" /> },
+                { id: "home", label: "Home", icon: <AppNavIcon kind="home" />, active: true },
+                { id: "feed", label: "Activity", icon: <AppNavIcon kind="feed" />, badgeCount: 1 },
+                { id: "rules", label: "Rules", icon: <AppNavIcon kind="rules" /> },
+                { id: "settings", label: "Settings", icon: <AppNavIcon kind="settings" /> },
               ]}
               profile={{ name: "Alexander Demo", avatarFallback: "AD" }}
             >

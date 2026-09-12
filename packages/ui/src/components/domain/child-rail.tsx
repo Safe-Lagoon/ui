@@ -31,7 +31,7 @@ export function ChildRail({
   const rail = density === "rail";
 
   return (
-    <div data-slot="child-rail" className={cn("flex flex-col gap-1.5", className)}>
+    <div data-slot="child-rail" className={cn("flex flex-col gap-1", className)}>
       {profiles.map((profile) => {
         const active = profile.id === activeProfileId;
         return (

@@ -36,6 +36,7 @@ export const docsNavSections: DocsNavSection[] = [
       { href: "/docs/components/layouts", label: "Layouts" },
       { href: "/docs/components/app-shell", label: "App Shell" },
       { href: "/docs/components/portal", label: "Portal constructor" },
+      { href: "/docs/components/portal-atoms", label: "Portal atoms" },
       { href: "/docs/components/device-mode", label: "Device Mode" },
       { href: "/docs/components/title", label: "Title" },
       { href: "/docs/components/header", label: "Header" },

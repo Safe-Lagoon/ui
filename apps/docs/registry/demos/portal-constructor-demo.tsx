@@ -1,10 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Home, List, Settings, SlidersHorizontal } from "lucide-react";
-import { FilterChips } from "@safelagoon/ui";
+import { AppNavIcon, BrandMark, FilterChips } from "@safelagoon/ui";
 import { AppShellLayout } from "@safelagoon/ui/blocks";
-import { LogoHeader } from "@safelagoon/ui/icons";
 import { navSection, PortalScreenBody, PORTAL_SCREENS, type PortalScreen } from "./portal-screens";
 
 const WIDTHS = [
@@ -47,10 +45,12 @@ export default function PortalConstructorDemo() {
               ) : (
                 <AppShellLayout
                   className="h-full"
-                  logo={<LogoHeader className="h-6" />}
+                  collapsible={false}
+                  showProfile={false}
+                  logo={<BrandMark />}
                   childProfiles={[
-                    { id: "alex", name: "Alex", avatarFallback: "AL", os: "android", device: "Android", badgeCount: 1 },
-                    { id: "sam", name: "Sam", avatarFallback: "SA", os: "ios", device: "iOS", badgeCount: 1 },
+                    { id: "alex", name: "Alex", avatarFallback: "AL", os: "android", device: "Android" },
+                    { id: "sam", name: "Sam", avatarFallback: "SA", os: "ios", device: "iOS" },
                   ]}
                   activeChildProfileId={childId}
                   onChildProfileChange={setChildId}
@@ -58,14 +58,14 @@ export default function PortalConstructorDemo() {
                     {
                       id: "home",
                       label: "Home",
-                      icon: <Home className="size-[18px]" />,
+                      icon: <AppNavIcon kind="home" />,
                       active: section === "home",
                       onClick: () => setScreen("/home"),
                     },
                     {
                       id: "feed",
                       label: "Activity",
-                      icon: <List className="size-[18px]" />,
+                      icon: <AppNavIcon kind="feed" />,
                       badgeCount: 1,
                       active: section === "feed",
                       onClick: () => setScreen("/feed"),
@@ -73,14 +73,14 @@ export default function PortalConstructorDemo() {
                     {
                       id: "rules",
                       label: "Rules",
-                      icon: <SlidersHorizontal className="size-[18px]" />,
+                      icon: <AppNavIcon kind="rules" />,
                       active: section === "rules",
                       onClick: () => setScreen("/rules"),
                     },
                     {
                       id: "settings",
                       label: "Settings",
-                      icon: <Settings className="size-[18px]" />,
+                      icon: <AppNavIcon kind="settings" />,
                       active: section === "settings",
                       onClick: () => setScreen("/settings"),
                     },

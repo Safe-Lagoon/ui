@@ -38,9 +38,9 @@ export function EmptyState({
           {icon}
         </div>
       ) : null}
-      <h3 className="text-[15px] font-semibold text-foreground">{title}</h3>
+      <h3 className="text-[15px] font-semibold text-ink">{title}</h3>
       {description ? (
-        <p className="mt-1.5 max-w-[360px] text-body-14 text-muted-foreground">{description}</p>
+        <p className="mt-1.5 max-w-[360px] text-[13px] text-muted-foreground">{description}</p>
       ) : null}
       {actionLabel && onAction ? (
         <Button variant="primary" size="portal-sm" className="mt-4 px-4" onClick={onAction}>

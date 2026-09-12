@@ -426,6 +426,44 @@ const [date, setDate] = useState<Date>();
   timelineLabel="Session timeline"
 />`,
   },
+  "portal-atoms": {
+    title: "Portal atoms",
+    description:
+      "Atomic proto controls the SPA should compose. Constructor screens are assemblies of these — do not copy one-off markup from docs demos.",
+    examples: [{ title: "Chrome · grid · feed · settings · auth", preview: "portal-atoms-demo" }],
+    code: `import {
+  AppMark,
+  AppNavIcon,
+  AuthCard,
+  AuthPage,
+  BrandMark,
+  MapToolbar,
+  PanelGrid,
+  PayCard,
+  PortalSelect,
+  TextAction,
+  ToggleRow,
+  VideoThumb,
+} from "@safelagoon/ui";
+
+<AppShellLayout logo={<BrandMark />} topItems={[{ id: "home", icon: <AppNavIcon kind="home" /> }]}>
+  <PanelGrid>
+    <SectionCard label="Internet" metric="Filter on" />
+  </PanelGrid>
+  <StrokeRow leading={<AppMark kind="tiktok" mark="♪" />} title="TikTok" />
+  <StrokeRow leading={<VideoThumb src={thumb} duration="12:04" />} title="How volcanoes work" />
+  <ToggleRow title="AI Shield" subtitle="Needs-review content" checked={on} onCheckedChange={setOn} />
+  <PortalSelect defaultValue="UTC"><option>UTC</option></PortalSelect>
+  <PayCard label="Visa •••• 4242" selected />
+  <MapToolbar value={tool} onValueChange={setTool} />
+  <TextAction onClick={add}>+ Add place</TextAction>
+</AppShellLayout>
+
+<AuthPage>
+  <BrandMark size="auth" className="mb-6" />
+  <AuthCard>...</AuthCard>
+</AuthPage>`,
+  },
   "device-mode": {
     title: "Device Mode",
     description:

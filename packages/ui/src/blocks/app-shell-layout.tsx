@@ -44,6 +44,10 @@ export interface AppShellLayoutProps {
   collapsed?: boolean;
   defaultCollapsed?: boolean;
   onCollapsedChange?: (collapsed: boolean) => void;
+  /** Desktop chevron. Proto portal chrome is false. Default true for docs/app shells. */
+  collapsible?: boolean;
+  /** Parent foot. Proto desktop Home screenshot is false. Default true. */
+  showProfile?: boolean;
   collapseLabel?: string;
   expandLabel?: string;
   openMenuLabel?: string;
@@ -83,6 +87,8 @@ export function AppShellLayout({
   collapsed: collapsedProp,
   defaultCollapsed = false,
   onCollapsedChange,
+  collapsible = true,
+  showProfile = true,
   collapseLabel = "Collapse sidebar",
   expandLabel = "Expand sidebar",
   notificationsLabel = "Notifications",
@@ -166,8 +172,13 @@ export function AppShellLayout({
       onActiveChildClick={onActiveChildClick}
       onAddChild={onAddChild}
       addChildLabel={addChildLabel}
+      hideProfile={!showProfile}
       onCollapse={
-        mode === "mobile" ? () => setMobileOpen(false) : mode === "desktop" ? () => setCollapsed(true) : undefined
+        mode === "mobile"
+          ? () => setMobileOpen(false)
+          : mode === "desktop" && collapsible
+            ? () => setCollapsed(true)
+            : undefined
       }
       collapseLabel={mode === "mobile" ? closeMenuLabel : collapseLabel}
       closeVariant={mode === "mobile" ? "close" : "collapse"}
@@ -180,7 +191,7 @@ export function AppShellLayout({
       LinkComponent={LinkComponent}
       surface="muted"
       density={mode === "tablet" ? "rail" : "full"}
-      className="h-full border-0"
+      className="h-full border-e border-border-soft"
     />
   );
 

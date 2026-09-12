@@ -103,6 +103,7 @@ export interface AppSidebarProps {
   surface?: "muted" | "background";
   className?: string;
   density?: "full" | "rail";
+  hideProfile?: boolean;
 }
 
 function NavLink({
@@ -134,7 +135,7 @@ function NavLink({
       {item.icon ? <span className="size-[18px] shrink-0 [&_svg]:size-[18px]">{item.icon}</span> : null}
       {rail ? <span className="sr-only">{item.label}</span> : <span className="truncate">{item.label}</span>}
       {!rail && item.badgeCount && item.badgeCount > 0 ? (
-        <span className="ms-auto flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-destructive px-1 text-[11px] font-bold text-white">
+        <span className="ms-auto flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-white">
           {item.badgeCount}
         </span>
       ) : null}
@@ -387,6 +388,7 @@ export function AppSidebar({
   surface = "muted",
   className,
   density = "full",
+  hideProfile = false,
 }: AppSidebarProps) {
   const [internalActiveChildProfileId, setInternalActiveChildProfileId] = React.useState(
     defaultActiveChildProfileId ?? childProfiles?.[0]?.id ?? "",
@@ -486,18 +488,20 @@ export function AppSidebar({
         </div>
       </ScrollArea>
 
-      <ProfileFooter
-        profile={profile}
-        notificationsLabel={notificationsLabel}
-        profileMenuLabel={profileMenuLabel}
-        notifications={notifications}
-        notificationsOpen={notificationsOpen}
-        onNotificationsOpenChange={onNotificationsOpenChange}
-        onNavigate={onNavigate}
-        LinkComponent={LinkComponent}
-        surface={surface}
-        density={density}
-      />
+      {hideProfile ? null : (
+        <ProfileFooter
+          profile={profile}
+          notificationsLabel={notificationsLabel}
+          profileMenuLabel={profileMenuLabel}
+          notifications={notifications}
+          notificationsOpen={notificationsOpen}
+          onNotificationsOpenChange={onNotificationsOpenChange}
+          onNavigate={onNavigate}
+          LinkComponent={LinkComponent}
+          surface={surface}
+          density={density}
+        />
+      )}
     </aside>
   );
 }

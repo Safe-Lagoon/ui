@@ -73,6 +73,14 @@ describe("ActivityStack", () => {
     );
     expect(getByText("Needs review")).toBeInTheDocument();
   });
+
+  it("uses proto internet layer colors", () => {
+    const { container } = render(<ActivityStack kind="internet" title="wikipedia.org" />);
+    const layers = container.querySelectorAll("[data-kind=internet] [aria-hidden] > span");
+    expect(layers[0]).toHaveStyle({ background: "#2F77EE99" });
+    expect(layers[1]).toHaveStyle({ background: "#2F77EE" });
+    expect(layers[2]).toHaveStyle({ background: "#1d4ed8" });
+  });
 });
 
 describe("ActivityDaySection", () => {
@@ -215,6 +223,50 @@ describe("AppShellLayout phone", () => {
       expect(drawer.className).toMatch(/w-\[var\(--sidebar-w\)\]|240px/);
       expect(getByText("Home")).toBeInTheDocument();
       expect(getByText("Activity")).toBeInTheDocument();
+    } finally {
+      Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: prev });
+      if (prevRO) vi.stubGlobal("ResizeObserver", prevRO);
+      else vi.unstubAllGlobals();
+    }
+  });
+});
+
+describe("AppShellLayout proto chrome", () => {
+  it("hides collapse, parent foot, and child badges", () => {
+    const prev = window.innerWidth;
+    Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: 1280 });
+    class FakeResizeObserver {
+      observe() {}
+      disconnect() {}
+      unobserve() {}
+    }
+    const prevRO = globalThis.ResizeObserver;
+    vi.stubGlobal("ResizeObserver", FakeResizeObserver);
+    try {
+      const { queryByLabelText, queryByText, getByText, getAllByText } = render(
+        <AppShellLayout
+          className="h-[640px]"
+          collapsible={false}
+          showProfile={false}
+          logo={<span>Safe Lagoon</span>}
+          profile={{ name: "Alexander Demo", avatarFallback: "AD" }}
+          childProfiles={[
+            { id: "alex", name: "Alex", avatarFallback: "AL", os: "android", device: "Android" },
+            { id: "sam", name: "Sam", avatarFallback: "SA", os: "ios", device: "iOS" },
+          ]}
+          activeChildProfileId="alex"
+          topItems={[
+            { id: "home", label: "Home", active: true },
+            { id: "feed", label: "Activity", badgeCount: 1 },
+          ]}
+        >
+          <p>page</p>
+        </AppShellLayout>,
+      );
+      expect(queryByLabelText("Collapse sidebar")).not.toBeInTheDocument();
+      expect(queryByText("Alexander Demo")).not.toBeInTheDocument();
+      expect(getAllByText("Alex").length).toBeGreaterThan(0);
+      expect(getByText("1")).toBeInTheDocument();
     } finally {
       Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: prev });
       if (prevRO) vi.stubGlobal("ResizeObserver", prevRO);

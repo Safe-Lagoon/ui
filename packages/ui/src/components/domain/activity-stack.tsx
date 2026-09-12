@@ -48,6 +48,9 @@ const KIND_ACCENT: Record<ActivityStackKind, string> = {
 const APPS_TONES = ["#7FC15D", "#30a46c", "#5fca89"];
 const GALLERY_TONES = ["#b97cff", "#7829d2", "#2F77EE", "#eceff1"];
 const CHAT_TONES = ["#2F77EE", "#7829d2", "#E53935"];
+const INTERNET_TONES = ["#2F77EE99", "#2F77EE", "#1d4ed8"];
+const YOUTUBE_TONES = ["#E5393599", "#E53935", "#b71c1c"];
+const AISHIELD_TONES = ["#f5c4c0", "#E5393599", "#E53935"];
 
 function StackLayers({
   kind,
@@ -61,12 +64,12 @@ function StackLayers({
   const slots = kind === "gallery" ? 4 : 3;
   const shown = previews.slice(0, slots);
   while (shown.length < slots) {
-    shown.push({ tone: accent, label: shown.length === 0 ? "·" : "" });
+    shown.push({ label: shown.length === 0 ? "·" : "" });
   }
 
   if (kind === "screentime") {
     return (
-      <span className="relative h-[52px] w-[72px] shrink-0" aria-hidden>
+      <span className="relative h-[52px] w-16 shrink-0" aria-hidden>
         {shown.map((preview, index) => (
           <span
             key={`${preview.src ?? preview.label ?? "p"}-${index}`}
@@ -106,7 +109,7 @@ function StackLayers({
 
   if (kind === "chats") {
     return (
-      <span className="relative h-[52px] w-[72px] shrink-0" aria-hidden>
+      <span className="relative h-[52px] w-16 shrink-0" aria-hidden>
         {shown.map((preview, index) => (
           <span
             key={`${preview.src ?? preview.label ?? "c"}-${index}`}
@@ -138,30 +141,34 @@ function StackLayers({
     );
   }
 
-  const cardClass =
+  const cardClass = kind === "apps" ? "size-9 rounded-[10px]" : "h-11 w-10 rounded-[8px]";
+  const step = kind === "apps" ? 12 : 8;
+  const tones =
     kind === "apps"
-      ? "size-9 rounded-[10px]"
-      : "h-11 w-10 rounded-md";
+      ? APPS_TONES
+      : kind === "internet"
+        ? INTERNET_TONES
+        : kind === "youtube"
+          ? YOUTUBE_TONES
+          : kind === "aishield"
+            ? AISHIELD_TONES
+            : [accent];
 
   return (
-    <span className="relative h-[52px] w-[72px] shrink-0" aria-hidden>
+    <span className="relative h-[52px] w-16 shrink-0" aria-hidden>
       {shown.map((preview, index) => (
         <span
           key={`${preview.src ?? preview.label ?? "s"}-${index}`}
           className={cn(
             "absolute overflow-hidden border-2 border-white shadow-[0_1px_2px_rgba(45,44,50,0.12)]",
             cardClass,
-            kind === "aishield" && index === 2 && "blur-[1px]",
+            kind === "aishield" && index === 2 && "blur-[0.6px]",
           )}
           style={{
-            insetInlineStart: `${index * 12}px`,
+            insetInlineStart: `${index * step}px`,
             top: kind === "apps" ? 8 : 4,
-            background:
-              preview.src
-                ? undefined
-                : preview.tone ??
-                  (kind === "apps" ? APPS_TONES[index] : `${accent}${index === 2 ? "" : "99"}`),
-            zIndex: index,
+            background: preview.src ? undefined : preview.tone ?? tones[index] ?? accent,
+            zIndex: index + 1,
           }}
         >
           {preview.src ? (
