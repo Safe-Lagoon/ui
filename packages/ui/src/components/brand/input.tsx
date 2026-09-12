@@ -10,6 +10,8 @@ const inputVariants = cva(
         sm: "h-12 text-body-14",
         default: "h-14 text-body-16",
         lg: "h-16 text-body-18",
+        portal:
+          "h-10 px-3 text-[14px] focus-visible:border-brand-blue focus-visible:shadow-[0_0_0_3px_rgba(47,119,238,0.18)] focus-visible:ring-0",
       },
     },
     defaultVariants: {
