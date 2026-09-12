@@ -7,21 +7,29 @@ import {
   AccordionItem,
   AccordionTrigger,
   AlertShot,
+  AppMark,
   Button,
+  ChatDayLabel,
   ChatSplitLayout,
   ChoiceRow,
   EmptyState,
+  FeedBubble,
   FieldHint,
   FormCard,
   LabeledField,
   HubCard,
   HubGrid,
   Input,
+  MapStage,
   PageBody,
+  PortalSelect,
   SectionTitle,
   SessionFilmstrip,
   StrokeGroup,
   StrokeRow,
+  TextAction,
+  ToggleRow,
+  VideoThumb,
 } from "@safelagoon/ui";
 import {
   AuthBody,
@@ -35,7 +43,7 @@ import {
   SupervisorsBody,
   TwoFactorBody,
 } from "./portal-screen-bodies";
-import { AppMark, PageHead, PortalSelect, ToggleRow, YtThumb } from "./portal-screen-widgets";
+import { PageHead } from "./portal-screen-widgets";
 import type { PortalScreen } from "./portal-screen-model";
 
 export type { PortalScreen } from "./portal-screen-model";
@@ -125,9 +133,9 @@ export function PortalScreenBody({
         <PageBody>
           <PageHead title="YouTube" crumbs={["Activity", "YouTube"]} onGo={onGo} />
           <StrokeGroup>
-            <StrokeRow title="How volcanoes work" subtitle="12 min · allowed" trailing="14:08" leading={<YtThumb src="https://picsum.photos/seed/yt-volcano/320/180" duration="12:04" />} chevron />
-            <StrokeRow title="Minecraft build" subtitle="4 min" trailing="14:20" leading={<YtThumb src="https://picsum.photos/seed/yt-mine/320/180" duration="4:12" />} chevron />
-            <StrokeRow title="Shorts mix" subtitle="2 min" trailing="14:24" leading={<YtThumb src="https://picsum.photos/seed/yt-shorts/320/180" duration="0:48" />} chevron />
+            <StrokeRow title="How volcanoes work" subtitle="12 min · allowed" trailing="14:08" leading={<VideoThumb src="https://picsum.photos/seed/yt-volcano/320/180" duration="12:04" />} chevron />
+            <StrokeRow title="Minecraft build" subtitle="4 min" trailing="14:20" leading={<VideoThumb src="https://picsum.photos/seed/yt-mine/320/180" duration="4:12" />} chevron />
+            <StrokeRow title="Shorts mix" subtitle="2 min" trailing="14:24" leading={<VideoThumb src="https://picsum.photos/seed/yt-shorts/320/180" duration="0:48" />} chevron />
           </StrokeGroup>
         </PageBody>
       );
@@ -135,9 +143,9 @@ export function PortalScreenBody({
       return (
         <PageBody>
           <PageHead title="Home" crumbs={["Activity", "Places"]} onGo={onGo} />
-          <div className="relative mb-4 h-[280px] overflow-hidden rounded-lg border border-border-soft bg-canvas shadow-card min-[431px]:h-[360px]">
+          <MapStage>
             <div className="absolute left-1/2 top-1/2 size-32 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-lilac bg-[rgba(185,124,255,0.22)]" />
-          </div>
+          </MapStage>
           <StrokeGroup className="mt-4">
             <StrokeRow title="Arrived home" subtitle="Home zone" trailing="13:42" />
             <StrokeRow title="Left school" subtitle="School zone" trailing="13:10" />
@@ -186,13 +194,13 @@ export function PortalScreenBody({
             }
             conversation={
               <div className="space-y-3 p-4">
-                <p className="text-[12px] font-semibold text-muted-foreground">Yesterday</p>
-                <div className="max-w-[85%] rounded-xl rounded-ss-sm bg-muted px-3 py-2 text-[14px]">You still at school?</div>
-                <div className="ms-auto max-w-[85%] rounded-xl rounded-se-sm bg-lilac-soft px-3 py-2 text-[14px]">On the bus</div>
-                <p className="text-[12px] font-semibold text-muted-foreground">Today</p>
-                <div className="max-w-[85%] rounded-xl rounded-ss-sm bg-muted px-3 py-2 text-[14px]">Where are you?</div>
-                <div className="ms-auto max-w-[85%] rounded-xl rounded-se-sm bg-lilac-soft px-3 py-2 text-[14px]">Home, doing homework</div>
-                <div className="max-w-[85%] rounded-xl rounded-ss-sm bg-muted px-3 py-2 text-[14px]">Ok, I'm home</div>
+                <ChatDayLabel>Yesterday</ChatDayLabel>
+                <FeedBubble>You still at school?</FeedBubble>
+                <FeedBubble variant="out">On the bus</FeedBubble>
+                <ChatDayLabel>Today</ChatDayLabel>
+                <FeedBubble>Where are you?</FeedBubble>
+                <FeedBubble variant="out">Home, doing homework</FeedBubble>
+                <FeedBubble>Ok, I'm home</FeedBubble>
               </div>
             }
           />
@@ -310,9 +318,7 @@ export function PortalScreenBody({
             <StrokeRow title="Alex" subtitle="Android · 9–12" chevron onClick={() => onGo("/settings/family/alex")} />
             <StrokeRow title="Sam" subtitle="iOS · not linked" chevron onClick={() => onGo("/settings/family/sam")} />
           </StrokeGroup>
-          <button type="button" className="mt-3.5 text-[13px] font-semibold text-brand-blue" onClick={() => onGo("/settings/family/add")}>
-            + Add child
-          </button>
+          <TextAction onClick={() => onGo("/settings/family/add")}>+ Add child</TextAction>
         </PageBody>
       );
     case "/settings/family/add":
@@ -453,12 +459,12 @@ export function PortalScreenBody({
           <PageHead title="Notifications" crumbs={["Settings", "Notifications"]} onGo={onGo} />
           <FormCard>
             <SectionTitle className="mt-0">Alerts</SectionTitle>
-            <ToggleRow title="AI Shield" sub="Needs-review content" defaultOn />
-            <ToggleRow title="Geofences" sub="Enter / leave zones" defaultOn />
-            <ToggleRow title="Time requests" sub="Extra minutes" defaultOn />
-            <ToggleRow title="Sites" sub="Blocked and allowed visits" defaultOn={false} />
-            <ToggleRow title="Apps" sub="New installs" defaultOn={false} />
-            <ToggleRow title="Push" sub="This browser" defaultOn />
+            <ToggleRow title="AI Shield" subtitle="Needs-review content" defaultChecked />
+            <ToggleRow title="Geofences" subtitle="Enter / leave zones" defaultChecked />
+            <ToggleRow title="Time requests" subtitle="Extra minutes" defaultChecked />
+            <ToggleRow title="Sites" subtitle="Blocked and allowed visits" />
+            <ToggleRow title="Apps" subtitle="New installs" />
+            <ToggleRow title="Push" subtitle="This browser" defaultChecked />
           </FormCard>
           <FormCard>
             <SectionTitle className="mt-0">Email reports</SectionTitle>
