@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Home, List, Settings, SlidersHorizontal } from "lucide-react";
 import {
   DeviceModeControl,
   EmptyState,
@@ -12,7 +11,7 @@ import {
   type DeviceMode,
 } from "@safelagoon/ui";
 import { AppShellLayout } from "@safelagoon/ui/blocks";
-import { LogoHeader } from "@safelagoon/ui/icons";
+import { ProtoBrand, ProtoNavIcon } from "./portal-chrome";
 
 const WIDTHS = [
   { width: 1280, label: "Desktop · sidebar 240" },
@@ -83,18 +82,20 @@ export default function HomeShellDemo() {
           >
             <AppShellLayout
               className="h-full"
-              logo={<LogoHeader className="h-6" />}
+              collapsible={false}
+              showProfile={false}
+              logo={<ProtoBrand />}
               childProfiles={[
-                { id: "alex", name: "Alex", avatarFallback: "AL", os: "android", device: "Android", badgeCount: 1 },
-                { id: "sam", name: "Sam", avatarFallback: "SA", os: "ios", device: "iOS", badgeCount: 1 },
+                { id: "alex", name: "Alex", avatarFallback: "AL", os: "android", device: "Android" },
+                { id: "sam", name: "Sam", avatarFallback: "SA", os: "ios", device: "iOS" },
               ]}
               activeChildProfileId={childId}
               onChildProfileChange={setChildId}
               topItems={[
-                { id: "home", label: "Home", icon: <Home className="size-5" />, active: true },
-                { id: "feed", label: "Activity", icon: <List className="size-5" />, badgeCount: 1 },
-                { id: "rules", label: "Rules", icon: <SlidersHorizontal className="size-5" /> },
-                { id: "settings", label: "Settings", icon: <Settings className="size-5" /> },
+                { id: "home", label: "Home", icon: <ProtoNavIcon kind="home" />, active: true },
+                { id: "feed", label: "Activity", icon: <ProtoNavIcon kind="feed" />, badgeCount: 1 },
+                { id: "rules", label: "Rules", icon: <ProtoNavIcon kind="rules" /> },
+                { id: "settings", label: "Settings", icon: <ProtoNavIcon kind="settings" /> },
               ]}
               profile={{ name: "Alexander Demo", avatarFallback: "AD" }}
             >
