@@ -52,6 +52,12 @@ const INTERNET_TONES = ["#2F77EE99", "#2F77EE", "#1d4ed8"];
 const YOUTUBE_TONES = ["#E5393599", "#E53935", "#b71c1c"];
 const AISHIELD_TONES = ["#f5c4c0", "#E5393599", "#E53935"];
 
+/** Proto `.stack .layer { border: 2px solid #fff; box-shadow: 0 1px 2px rgba(45,44,50,.12) }` */
+const LAYER_RING: React.CSSProperties = {
+  border: "2px solid #fff",
+  boxShadow: "0 1px 2px rgba(45, 44, 50, 0.12)",
+};
+
 function StackLayers({
   kind,
   previews = [],
@@ -73,8 +79,10 @@ function StackLayers({
         {shown.map((preview, index) => (
           <span
             key={`${preview.src ?? preview.label ?? "p"}-${index}`}
-            className="absolute top-0.5 h-12 w-7 overflow-hidden rounded-[8px] border-2 border-white shadow-[0_1px_2px_rgba(45,44,50,0.12)]"
+            data-stack-layer=""
+            className="absolute top-0.5 h-12 w-7 overflow-hidden rounded-[8px]"
             style={{
+              ...LAYER_RING,
               insetInlineStart: `${index * 14}px`,
               background: preview.src ? undefined : preview.tone ?? accent,
               zIndex: index,
@@ -113,8 +121,10 @@ function StackLayers({
         {shown.map((preview, index) => (
           <span
             key={`${preview.src ?? preview.label ?? "c"}-${index}`}
-            className="absolute top-2.5 size-8 overflow-hidden rounded-full border-2 border-white shadow-[0_1px_2px_rgba(45,44,50,0.12)]"
+            data-stack-layer=""
+            className="absolute top-2.5 size-8 overflow-hidden rounded-full"
             style={{
+              ...LAYER_RING,
               insetInlineStart: `${index * 14}px`,
               background: preview.tone ?? CHAT_TONES[index] ?? accent,
               zIndex: index,
@@ -159,12 +169,14 @@ function StackLayers({
       {shown.map((preview, index) => (
         <span
           key={`${preview.src ?? preview.label ?? "s"}-${index}`}
+          data-stack-layer=""
           className={cn(
-            "absolute overflow-hidden border-2 border-white shadow-[0_1px_2px_rgba(45,44,50,0.12)]",
+            "absolute overflow-hidden",
             cardClass,
             kind === "aishield" && index === 2 && "blur-[0.6px]",
           )}
           style={{
+            ...LAYER_RING,
             insetInlineStart: `${index * step}px`,
             top: kind === "apps" ? 8 : 4,
             background: preview.src ? undefined : preview.tone ?? tones[index] ?? accent,

@@ -3,11 +3,15 @@
 @import "@fontsource/ibm-plex-serif/500-italic.css";
 @import "@fontsource/ibm-plex-serif/600.css";
 
-*,
-*::before,
-*::after {
-  /* Proto chrome default is --border-soft. Hard --border is inputs / CTAs only. */
-  border-color: var(--color-border-soft);
+@layer base {
+  *,
+  *::before,
+  *::after {
+    /* Proto chrome default is --border-soft. Hard --border is inputs / CTAs only.
+       Must live in @layer base — unlayered * beats Tailwind utilities, so
+       border-white on Activity stacks painted gray rings instead of #fff. */
+    border-color: var(--color-border-soft);
+  }
 }
 
 body {
