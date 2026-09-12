@@ -72,6 +72,21 @@
   line-height: 1.2;
 }
 
+@utility text-body-14-semibold {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+@utility text-page-title {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
 @utility text-body-16 {
   font-family: var(--font-sans);
   font-weight: 400;
