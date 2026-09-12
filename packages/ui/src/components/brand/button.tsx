@@ -28,6 +28,8 @@ const buttonVariants = cva(
         default: "h-[52px] px-5 py-[15px] text-body-18",
         sm: "h-[48px] px-5 py-[14px] text-body-16 md:h-[48px]",
         lg: "h-[52px] px-6 py-[15px] text-body-18",
+        portal: "h-[42px] px-5 text-[14px] font-semibold",
+        "portal-sm": "h-9 px-3.5 text-[13px] font-semibold",
         icon: "size-[52px] p-0",
       },
     },

@@ -36,6 +36,10 @@ export const demoNames = [
   "notifications-panel-demo",
   "toast-demo",
   "kpi-card-demo",
+  "device-mode-control-demo",
+  "feed-stacks-demo",
+  "home-shell-demo",
+  "portal-constructor-demo",
 ] as const;
 
 export type DemoName = (typeof demoNames)[number];

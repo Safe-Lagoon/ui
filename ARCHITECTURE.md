@@ -38,7 +38,9 @@ Portal layouts use `AppShellLayout` + `AppShellPageHeader` from `@safelagoon/ui/
          AI trigger (top-right) → full-area AiChat popup
 ```
 
-**Mobile:** sidebar collapses; navigation moves into an inline burger in `AppShellPageHeader` (left of title icon). Burger opens a left `Sheet` drawer with the same nav tree. State is provided by `AppShellNavigationProvider` in `app-shell-navigation-context.tsx`.
+**Mobile:** sidebar is gone. `AppPhoneChrome` is hamburger · child avatar · **18px name** · Android/iOS badge. Account lives in the sheet footer. Burger opens an in-shell 240px left drawer (`bg-muted`, proto scrim) with the same nav tree + child switcher. **No bottom tab bar.** Home has no page header. Hubs are 28/22px `h1`; drills are 13px `DotCrumbs` then the same `h1`. Shell breakpoints are proto: ≤430 / ≤900 / >900. State is provided by `AppShellNavigationContext`.
+
+**Portal constructor** (`apps/docs` → Portal constructor) composes the accepted proto screens — Home, Activity, Rules, Places editor, Settings / family / 2FA / billing / supervisors / Help — from kit primitives at 1280 / 820 / 390.
 
 **Desktop:** sidebar + main scroll independently (`h-svh overflow-hidden` on shell, `overflow-auto` on `<main>`).
 

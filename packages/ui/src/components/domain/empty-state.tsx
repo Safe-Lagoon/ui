@@ -9,6 +9,8 @@ export interface EmptyStateProps {
   description?: string;
   actionLabel?: string;
   onAction?: () => void;
+  secondaryLabel?: string;
+  onSecondary?: () => void;
   className?: string;
 }
 
@@ -18,28 +20,41 @@ export function EmptyState({
   description,
   actionLabel,
   onAction,
+  secondaryLabel,
+  onSecondary,
   className,
 }: EmptyStateProps) {
   return (
     <div
+      data-slot="empty-state"
       className={cn(
-        "flex flex-col items-center justify-center rounded-[10px] border border-dashed border-border-soft bg-muted/20 px-6 py-16 text-center",
+        "flex flex-col items-center justify-center rounded-lg border border-border-soft bg-card px-6 py-7 text-center",
+        "shadow-card",
         className,
       )}
     >
       {icon ? (
-        <div className="mb-4 flex size-16 items-center justify-center rounded-full bg-brand-blue-100 text-brand-blue">
+        <div className="mb-3 flex size-12 items-center justify-center rounded-full bg-lilac-soft text-[22px] text-lilac [&_svg]:size-5">
           {icon}
         </div>
       ) : null}
-      <h3 className="text-h4 text-foreground">{title}</h3>
+      <h3 className="text-[15px] font-semibold text-foreground">{title}</h3>
       {description ? (
-        <p className="mt-2 max-w-md text-body-16 text-muted-foreground">{description}</p>
+        <p className="mt-1.5 max-w-[360px] text-body-14 text-muted-foreground">{description}</p>
       ) : null}
       {actionLabel && onAction ? (
-        <Button variant="primary" className="mt-6" onClick={onAction}>
+        <Button variant="primary" size="portal-sm" className="mt-4 px-4" onClick={onAction}>
           {actionLabel}
         </Button>
+      ) : null}
+      {secondaryLabel && onSecondary ? (
+        <button
+          type="button"
+          className="mt-2.5 text-body-14 font-medium text-brand-blue hover:underline"
+          onClick={onSecondary}
+        >
+          {secondaryLabel}
+        </button>
       ) : null}
     </div>
   );

@@ -30,10 +30,11 @@ export type {
   EventTimelineType,
 } from "./event-timeline-layout";
 
-export { AppShellLayout } from "./app-shell-layout";
-export type { AppShellLayoutProps } from "./app-shell-layout";
+export { AppShellLayout, shellModeFromWidth } from "./app-shell-layout";
+export type { AppShellLayoutProps, AppShellMode } from "./app-shell-layout";
 export { AppShellPageHeader } from "./app-shell-page-header";
 export type { AppShellPageHeaderProps } from "./app-shell-page-header";
+export { useAppShellNavigation } from "./app-shell-navigation-context";
 export { Title } from "../components/brand/title";
 export type { TitleProps } from "../components/brand/title";
 export type {
@@ -44,5 +45,5 @@ export type {
   AppSidebarProfile,
   AppSidebarProfileAction,
 } from "../components/domain/app-sidebar";
-export { ChildProfileSwitcher } from "../components/domain/child-profile-switcher";
-export type { ChildProfileSwitcherProps } from "../components/domain/child-profile-switcher";
+export { ChildProfileSwitcher, childOs } from "../components/domain/child-profile-switcher";
+export type { ChildProfileSwitcherProps, ChildOs } from "../components/domain/child-profile-switcher";

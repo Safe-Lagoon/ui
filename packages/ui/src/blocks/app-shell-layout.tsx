@@ -5,6 +5,7 @@ import { Menu } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Button } from "../components/brand/button";
 import { AiChatTrigger } from "../components/domain/ai-chat-trigger";
+import { AppPhoneChrome } from "../components/domain/app-phone-chrome";
 import {
   AppSidebar,
   type AppSidebarChildProfile,
@@ -13,8 +14,7 @@ import {
   type AppSidebarLinkComponentProps,
   type AppSidebarProfile,
 } from "../components/domain/app-sidebar";
-import { Sheet, SheetContent, SheetTitle } from "../components/ui/sheet";
-import { AppShellNavigationContext } from "./app-shell-navigation-context";
+import { AppShellNavigationContext, shellModeFromWidth, type AppShellMode } from "./app-shell-navigation-context";
 
 export interface AppShellLayoutProps {
   logo?: React.ReactNode;
@@ -26,6 +26,9 @@ export interface AppShellLayoutProps {
   defaultActiveChildProfileId?: string;
   onChildProfileChange?: (profileId: string) => void;
   childProfileSwitchLabel?: string;
+  onActiveChildClick?: (profileId: string) => void;
+  onAddChild?: () => void;
+  addChildLabel?: string;
   children: React.ReactNode;
   /** @deprecated Use AppShellPageHeader inside children instead */
   header?: React.ReactNode;
@@ -61,6 +64,9 @@ export function AppShellLayout({
   defaultActiveChildProfileId,
   onChildProfileChange,
   childProfileSwitchLabel,
+  onActiveChildClick,
+  onAddChild,
+  addChildLabel,
   children,
   header,
   aiChat,
@@ -89,25 +95,32 @@ export function AppShellLayout({
   const [internalNotificationsOpen, setInternalNotificationsOpen] = React.useState(defaultNotificationsOpen);
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [inlineMenuActive, setInlineMenuActive] = React.useState(false);
-  const [compactShell, setCompactShell] = React.useState(false);
+  const [shellMode, setShellMode] = React.useState<AppShellMode>(() =>
+    typeof window === "undefined" ? "desktop" : shellModeFromWidth(window.innerWidth),
+  );
   const shellRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     const node = shellRef.current;
     if (!node) return;
-
-    const updateCompactShell = () => {
-      setCompactShell(node.getBoundingClientRect().width < 1024);
+    const update = () => {
+      const fromNode = node.getBoundingClientRect().width;
+      const width = fromNode > 0 ? fromNode : window.innerWidth;
+      setShellMode(shellModeFromWidth(width));
     };
-
-    updateCompactShell();
-
-    const resizeObserver = new ResizeObserver(updateCompactShell);
+    update();
+    const resizeObserver = new ResizeObserver(update);
     resizeObserver.observe(node);
-
-    return () => resizeObserver.disconnect();
+    window.addEventListener("resize", update);
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", update);
+    };
   }, []);
 
+  const phone = shellMode === "phone";
+  const tablet = shellMode === "tablet";
+  const desktop = shellMode === "desktop";
   const collapsed = collapsedProp ?? internalCollapsed;
   const setCollapsed = onCollapsedChange ?? setInternalCollapsed;
   const aiChatOpen = aiChatOpenProp ?? internalAiChatOpen;
@@ -139,7 +152,7 @@ export function AppShellLayout({
         } as Record<string, unknown>)
       : notifications;
 
-  const renderSidebar = (mode: "desktop" | "mobile") => (
+  const renderSidebar = (mode: "desktop" | "tablet" | "mobile") => (
     <AppSidebar
       logo={logo}
       topItems={topItems}
@@ -150,13 +163,12 @@ export function AppShellLayout({
       defaultActiveChildProfileId={defaultActiveChildProfileId}
       onChildProfileChange={onChildProfileChange}
       childProfileSwitchLabel={childProfileSwitchLabel}
-      onCollapse={() => {
-        if (mode === "mobile") {
-          setMobileOpen(false);
-          return;
-        }
-        setCollapsed(true);
-      }}
+      onActiveChildClick={onActiveChildClick}
+      onAddChild={onAddChild}
+      addChildLabel={addChildLabel}
+      onCollapse={
+        mode === "mobile" ? () => setMobileOpen(false) : mode === "desktop" ? () => setCollapsed(true) : undefined
+      }
       collapseLabel={mode === "mobile" ? closeMenuLabel : collapseLabel}
       closeVariant={mode === "mobile" ? "close" : "collapse"}
       notificationsLabel={notificationsLabel}
@@ -166,28 +178,26 @@ export function AppShellLayout({
       onNotificationsOpenChange={notifications ? handleNotificationsOpenChange : undefined}
       onNavigate={() => setMobileOpen(false)}
       LinkComponent={LinkComponent}
-      surface={mode === "mobile" ? "background" : "muted"}
+      surface="muted"
+      density={mode === "tablet" ? "rail" : "full"}
       className="h-full border-0"
     />
   );
 
   const openNavigation = () => {
-    if (compactShell) {
+    if (phone) {
       setMobileOpen(true);
       return;
     }
     setCollapsed(false);
   };
 
-  const showMenuButton = (compactShell && !mobileOpen) || collapsed;
+  const showMenuButton = (phone && !mobileOpen) || (desktop && collapsed);
 
   const menuButton = (
     <Button
       variant="ghost"
-      className={cn(
-        "size-10 shrink-0 rounded-lg border border-border-soft bg-background p-0 shadow-sm hover:bg-muted [&_svg]:size-5",
-        !collapsed && "@lg:hidden",
-      )}
+      className="size-9 shrink-0 rounded-[10px] border border-border-soft bg-card p-0 hover:bg-muted [&_svg]:size-4"
       aria-label={openMenuLabel}
       aria-expanded={mobileOpen}
       onClick={openNavigation}
@@ -200,8 +210,9 @@ export function AppShellLayout({
     () => ({
       menuButton: showMenuButton ? menuButton : null,
       setInlineMenuActive,
+      shellMode,
     }),
-    [menuButton, showMenuButton],
+    [menuButton, showMenuButton, shellMode],
   );
 
   const renderedAiChat =
@@ -215,57 +226,59 @@ export function AppShellLayout({
       : aiChat;
 
   const overlayOpen = aiChatOpen && aiChat;
+  const showDesktopSidebar = desktop && !collapsed;
+  const showTabletRail = tablet;
 
   return (
     <AppShellNavigationContext.Provider value={navigationContextValue}>
-      <div ref={shellRef} className={cn("@container flex h-svh min-h-0 overflow-hidden bg-muted", className)}>
-        {!collapsed ? (
-          <div className="hidden h-full min-h-0 shrink-0 overflow-hidden @lg:flex">
-            {renderSidebar("desktop")}
+      <div ref={shellRef} className={cn("relative @container flex h-svh min-h-0 min-w-0 w-full overflow-hidden bg-canvas", className)}>
+        {showDesktopSidebar ? (
+          <div className="flex h-full min-h-0 shrink-0 overflow-hidden">{renderSidebar("desktop")}</div>
+        ) : null}
+        {showTabletRail ? (
+          <div className="flex h-full min-h-0 shrink-0 overflow-hidden">{renderSidebar("tablet")}</div>
+        ) : null}
+        {phone && mobileOpen ? (
+          <div className="absolute inset-0 z-40">
+            <button
+              type="button"
+              aria-label={closeMenuLabel}
+              className="absolute inset-0 bg-[rgba(45,44,50,0.18)]"
+              onClick={() => setMobileOpen(false)}
+            />
+            <div
+              role="dialog"
+              aria-label={openMenuLabel}
+              className="absolute inset-y-0 start-0 z-10 flex w-[var(--sidebar-w)] max-w-[min(240px,85%)] flex-col border-e border-border-soft bg-muted shadow-[4px_0_24px_rgba(45,44,50,0.08)]"
+            >
+              {renderSidebar("mobile")}
+            </div>
           </div>
         ) : null}
-
-        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-          <SheetContent
-            side="left"
-            showOverlay
-            overlayClassName="bg-foreground/5"
-            className="@lg:hidden w-[280px] max-w-[min(280px,85vw)] border-border-soft bg-background p-0 shadow-[4px_0_24px_rgba(45,44,50,0.08)]"
-          >
-            <SheetTitle className="sr-only">{openMenuLabel}</SheetTitle>
-            {renderSidebar("mobile")}
-          </SheetContent>
-        </Sheet>
-
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col p-0.5">
-          <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[10px] border border-border-soft bg-background">
-            {showMenuButton && !inlineMenuActive ? (
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+          {phone ? (
+            <AppPhoneChrome
+              menuButton={menuButton}
+              childProfiles={childProfiles}
+              activeChildProfileId={activeChildProfileId ?? defaultActiveChildProfileId}
+            />
+          ) : null}
+          <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-canvas">
+            {showMenuButton && !inlineMenuActive && !phone ? (
               <div className="pointer-events-none absolute start-3 top-3 z-30">
                 <div className="pointer-events-auto">{menuButton}</div>
               </div>
             ) : null}
-
             {header ? <div className="pointer-events-none absolute start-3 top-3 z-20">{header}</div> : null}
-
             {aiChat && !aiChatOpen ? (
               <div className="absolute end-3 top-3 z-10">
                 <AiChatTrigger label={openAiChatLabel} onClick={openAiChat} />
               </div>
             ) : null}
-
             <main
               data-shell-collapsed={collapsed ? "" : undefined}
-              className={cn(
-                "group/shell flex min-h-0 flex-1 flex-col",
-                overlayOpen
-                  ? "overflow-hidden p-0"
-                  : cn(
-                      "overflow-auto px-6 pb-6",
-                      "[&:not(:has([data-slot=app-shell-page-header]))]:@max-lg:pt-12",
-                      collapsed &&
-                        "[&:not(:has([data-slot=app-shell-page-header]))]:@lg:pt-12",
-                    ),
-              )}
+              data-shell-mode={shellMode}
+              className={cn("group/shell flex min-h-0 flex-1 flex-col", overlayOpen ? "overflow-hidden p-0" : "overflow-auto")}
             >
               {aiChatOpen && aiChat ? renderedAiChat : children}
             </main>
@@ -275,3 +288,6 @@ export function AppShellLayout({
     </AppShellNavigationContext.Provider>
   );
 }
+
+export { shellModeFromWidth };
+export type { AppShellMode };
