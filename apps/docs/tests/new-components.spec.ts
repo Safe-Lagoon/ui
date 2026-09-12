@@ -8,6 +8,9 @@ const newPages = [
   { path: "/docs/components/date-picker", heading: "Date Picker" },
   { path: "/docs/components/layouts", heading: "Layouts" },
   { path: "/docs/components/input", heading: "Input" },
+  { path: "/docs/components/device-mode", heading: "Device Mode" },
+  { path: "/docs/components/feed-stacks", heading: "Feed stacks" },
+  { path: "/docs/components/portal", heading: "Portal constructor" },
 ];
 
 for (const { path, heading } of newPages) {
