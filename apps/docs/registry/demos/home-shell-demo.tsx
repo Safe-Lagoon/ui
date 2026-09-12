@@ -2,16 +2,18 @@
 
 import * as React from "react";
 import {
+  AppNavIcon,
+  BrandMark,
   DeviceModeControl,
   EmptyState,
   MetricRing,
   PageBody,
+  PanelGrid,
   SectionCard,
   StatusBanner,
   type DeviceMode,
 } from "@safelagoon/ui";
 import { AppShellLayout } from "@safelagoon/ui/blocks";
-import { ProtoBrand, ProtoNavIcon } from "./portal-chrome";
 
 const WIDTHS = [
   { width: 1280, label: "Desktop · sidebar 240" },
@@ -29,7 +31,7 @@ function HomeBody({ mode, onModeChange }: { mode: DeviceMode; onModeChange: (val
         onAction={() => undefined}
       />
       <DeviceModeControl value={mode} onValueChange={onModeChange} />
-      <div className="grid gap-3.5 md:grid-cols-2 lg:grid-cols-3">
+      <PanelGrid>
         <SectionCard
           label="Screen time"
           metric="No data yet"
@@ -52,7 +54,7 @@ function HomeBody({ mode, onModeChange }: { mode: DeviceMode; onModeChange: (val
           links={[{ label: "Activity" }, { label: "Rules" }]}
           status={{ tone: "ok", label: "Active" }}
         />
-      </div>
+      </PanelGrid>
       <EmptyState
         title="No pending requests"
         description="When the child asks for extra time, the request shows as a separate card — not a fourth mode."
@@ -84,7 +86,7 @@ export default function HomeShellDemo() {
               className="h-full"
               collapsible={false}
               showProfile={false}
-              logo={<ProtoBrand />}
+              logo={<BrandMark />}
               childProfiles={[
                 { id: "alex", name: "Alex", avatarFallback: "AL", os: "android", device: "Android" },
                 { id: "sam", name: "Sam", avatarFallback: "SA", os: "ios", device: "iOS" },
@@ -92,10 +94,10 @@ export default function HomeShellDemo() {
               activeChildProfileId={childId}
               onChildProfileChange={setChildId}
               topItems={[
-                { id: "home", label: "Home", icon: <ProtoNavIcon kind="home" />, active: true },
-                { id: "feed", label: "Activity", icon: <ProtoNavIcon kind="feed" />, badgeCount: 1 },
-                { id: "rules", label: "Rules", icon: <ProtoNavIcon kind="rules" /> },
-                { id: "settings", label: "Settings", icon: <ProtoNavIcon kind="settings" /> },
+                { id: "home", label: "Home", icon: <AppNavIcon kind="home" />, active: true },
+                { id: "feed", label: "Activity", icon: <AppNavIcon kind="feed" />, badgeCount: 1 },
+                { id: "rules", label: "Rules", icon: <AppNavIcon kind="rules" /> },
+                { id: "settings", label: "Settings", icon: <AppNavIcon kind="settings" /> },
               ]}
               profile={{ name: "Alexander Demo", avatarFallback: "AD" }}
             >

@@ -1,9 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { FilterChips } from "@safelagoon/ui";
+import { AppNavIcon, BrandMark, FilterChips } from "@safelagoon/ui";
 import { AppShellLayout } from "@safelagoon/ui/blocks";
-import { ProtoBrand, ProtoNavIcon } from "./portal-chrome";
 import { navSection, PortalScreenBody, PORTAL_SCREENS, type PortalScreen } from "./portal-screens";
 
 const WIDTHS = [
@@ -48,7 +47,7 @@ export default function PortalConstructorDemo() {
                   className="h-full"
                   collapsible={false}
                   showProfile={false}
-                  logo={<ProtoBrand />}
+                  logo={<BrandMark />}
                   childProfiles={[
                     { id: "alex", name: "Alex", avatarFallback: "AL", os: "android", device: "Android" },
                     { id: "sam", name: "Sam", avatarFallback: "SA", os: "ios", device: "iOS" },
@@ -59,14 +58,14 @@ export default function PortalConstructorDemo() {
                     {
                       id: "home",
                       label: "Home",
-                      icon: <ProtoNavIcon kind="home" />,
+                      icon: <AppNavIcon kind="home" />,
                       active: section === "home",
                       onClick: () => setScreen("/home"),
                     },
                     {
                       id: "feed",
                       label: "Activity",
-                      icon: <ProtoNavIcon kind="feed" />,
+                      icon: <AppNavIcon kind="feed" />,
                       badgeCount: 1,
                       active: section === "feed",
                       onClick: () => setScreen("/feed"),
@@ -74,14 +73,14 @@ export default function PortalConstructorDemo() {
                     {
                       id: "rules",
                       label: "Rules",
-                      icon: <ProtoNavIcon kind="rules" />,
+                      icon: <AppNavIcon kind="rules" />,
                       active: section === "rules",
                       onClick: () => setScreen("/rules"),
                     },
                     {
                       id: "settings",
                       label: "Settings",
-                      icon: <ProtoNavIcon kind="settings" />,
+                      icon: <AppNavIcon kind="settings" />,
                       active: section === "settings",
                       onClick: () => setScreen("/settings"),
                     },
