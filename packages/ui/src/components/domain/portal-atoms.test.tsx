@@ -13,6 +13,7 @@ import { PortalSelect } from "./portal-select";
 import { TextAction } from "./text-action";
 import { ToggleRow } from "./toggle-row";
 import { VideoThumb } from "./video-thumb";
+import { Switch } from "../ui/switch";
 
 describe("PanelGrid", () => {
   it("is a 3-col proto grid", () => {
@@ -71,9 +72,33 @@ describe("ToggleRow", () => {
     expect(onCheckedChange).toHaveBeenCalledWith(false);
   });
 
+  it("pins the thumb at proto 2px inset", () => {
+    const { getByRole } = render(<ToggleRow title="Push" />);
+    const sw = getByRole("switch", { name: "Push" });
+    expect(sw.className).toMatch(/p-0/);
+    expect(sw.className).toMatch(/border-0/);
+    const thumb = sw.querySelector("span");
+    expect(thumb?.className).toMatch(/left-\[2px\]/);
+    expect(thumb?.className).toMatch(/top-\[2px\]/);
+    expect(thumb?.className).not.toMatch(/translate-x-0\.5/);
+  });
+
   it("has no a11y violations", async () => {
     const { container } = render(<ToggleRow title="Push" defaultChecked />);
     expect(await axe(container)).toHaveNoViolations();
+  });
+});
+
+describe("Switch", () => {
+  it("uses proto lilac track and 2px / 22px thumb travel", () => {
+    const { getByRole } = render(<Switch aria-label="Restricted Mode" />);
+    const track = getByRole("switch", { name: "Restricted Mode" });
+    expect(track.className).toMatch(/bg-border/);
+    expect(track.className).toMatch(/data-\[state=checked\]:bg-lilac/);
+    expect(track.className).not.toMatch(/bg-violet/);
+    const thumb = track.querySelector("span");
+    expect(thumb?.className).toMatch(/translate-x-\[2px\]/);
+    expect(thumb?.className).toMatch(/data-\[state=checked\]:translate-x-\[22px\]/);
   });
 });
 

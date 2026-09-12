@@ -52,7 +52,7 @@ export function ToggleRow({
         aria-label={title}
         disabled={disabled}
         className={cn(
-          "relative h-6 w-11 shrink-0 rounded-full",
+          "relative h-6 w-11 shrink-0 appearance-none rounded-full border-0 p-0",
           on ? "bg-lilac" : "bg-border",
           disabled && "cursor-not-allowed opacity-50",
         )}
@@ -60,8 +60,9 @@ export function ToggleRow({
       >
         <span
           className={cn(
-            "absolute top-0.5 size-5 rounded-full bg-white shadow-[0_1px_2px_rgba(45,44,50,0.2)] transition-transform",
-            on ? "translate-x-5" : "translate-x-0.5",
+            "pointer-events-none absolute top-[2px] left-[2px] size-5 rounded-full bg-white",
+            "shadow-[0_1px_2px_rgba(45,44,50,0.2)] transition-transform",
+            on && "translate-x-5",
           )}
         />
       </button>

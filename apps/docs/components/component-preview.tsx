@@ -33,7 +33,7 @@ export function ComponentPreview({ name, title }: ComponentPreviewProps) {
         style={previewWidth ? { maxWidth: previewWidth } : undefined}
       >
         <div className="overflow-hidden rounded-[10px] border border-border-soft">
-          <div className="border-b border-border-soft bg-muted/30 p-6">
+          <div className="border-b border-border-soft bg-canvas p-6">
             <DemoRenderer name={name} />
           </div>
           <CodeBlock code={code} className="rounded-none border-0" />
