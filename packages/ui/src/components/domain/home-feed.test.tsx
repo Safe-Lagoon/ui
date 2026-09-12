@@ -81,6 +81,20 @@ describe("ActivityStack", () => {
     expect(layers[1]).toHaveStyle({ background: "#2F77EE" });
     expect(layers[2]).toHaveStyle({ background: "#1d4ed8" });
   });
+
+  it("paints proto white rings on stacked layers", () => {
+    const { container } = render(<ActivityStack kind="apps" title="Played on phone" />);
+    const layers = container.querySelectorAll("[data-stack-layer]");
+    expect(layers).toHaveLength(3);
+    for (const layer of layers) {
+      expect(layer).toHaveStyle({ border: "2px solid #fff" });
+    }
+  });
+
+  it("leaves gallery tiles without a ring", () => {
+    const { container } = render(<ActivityStack kind="gallery" title="Gallery" />);
+    expect(container.querySelector("[data-stack-layer]")).toBeNull();
+  });
 });
 
 describe("ActivityDaySection", () => {
