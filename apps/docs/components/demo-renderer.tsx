@@ -49,6 +49,10 @@ const loaders: Record<DemoName, ComponentType> = {
   "notifications-panel-demo": loadDemo(() => import("@/registry/demos/notifications-panel-demo")),
   "toast-demo": loadDemo(() => import("@/registry/demos/toast-demo")),
   "kpi-card-demo": loadDemo(() => import("@/registry/demos/kpi-card-demo")),
+  "device-mode-control-demo": loadDemo(() => import("@/registry/demos/device-mode-control-demo")),
+  "feed-stacks-demo": loadDemo(() => import("@/registry/demos/feed-stacks-demo")),
+  "home-shell-demo": loadDemo(() => import("@/registry/demos/home-shell-demo")),
+  "portal-constructor-demo": loadDemo(() => import("@/registry/demos/portal-constructor-demo")),
 };
 
 function PreviewFallback() {
