@@ -697,6 +697,8 @@ pnpm changeset                # add release notes before merging features
 
 **CI / release (`.github/workflows/ci.yml`):**
 
+- **Runner:** all jobs use org self-hosted `sl-dev-runner` (`runs-on: [self-hosted, sl-dev]`). Do not switch back to `ubuntu-latest` (GitHub-hosted minutes are billing-blocked). Do not add a `concurrency` group keyed on the runner.
+- **Fork PRs:** `build` is skipped unless `github.event.pull_request.head.repo.full_name == github.repository`.
 - **PRs:** `build` job only (ui build/test, docs build, registry validate, Playwright).
 - **Push to `main`:** `build` → `release` (npm publish + GitHub Release) and `deploy-docs` (Docker rebuild on docs host), both `needs: build`.
 - **`release` job:** bumps version via changesets when `.changeset/*.md` files exist, publishes `@safelagoon/ui` to npm, then creates/updates a GitHub Release tagged `v{version}` (e.g. `v0.2.2`) with the matching section from `packages/ui/CHANGELOG.md`.

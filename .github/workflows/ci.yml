@@ -1,3 +1,9 @@
+# All jobs run on the org self-hosted runner sl-dev-runner
+# (labels: self-hosted, sl-dev). GitHub-hosted minutes are billing-blocked.
+# The runner serializes jobs; do not add a concurrency group keyed on
+# sl-dev-runner (shared groups cancel queued runs).
+# Fork PRs must never execute on this host.
+
 name: CI
 
 on:
@@ -6,18 +12,25 @@ on:
   pull_request:
     branches: [main]
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, sl-dev]
+    timeout-minutes: 45
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
 
+      # Node is not installed system-wide. setup-node writes a user-level
+      # toolchain. Actions/npm cache is disabled (persistent runner; no sudo).
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
 
       - run: pnpm install --frozen-lockfile
 
@@ -34,8 +47,15 @@ jobs:
 
       - run: pnpm --filter @safelagoon/docs test
 
+      - name: Cleanup credentials
+        if: always()
+        run: |
+          set +x
+          rm -f .npmrc "${HOME}/.npmrc"
+
   release:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, sl-dev]
+    timeout-minutes: 20
     needs: [build]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     concurrency: release
@@ -49,10 +69,11 @@ jobs:
 
       - uses: pnpm/action-setup@v4
 
+      # registry-url writes workspace .npmrc for NODE_AUTH_TOKEN. Cache off
+      # so we do not persist a root/Actions cache on ghrunner (no sudo).
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
           registry-url: https://registry.npmjs.org
 
       - run: pnpm install --frozen-lockfile
@@ -131,8 +152,15 @@ jobs:
             fi
           fi
 
+      - name: Cleanup credentials
+        if: always()
+        run: |
+          set +x
+          rm -f .npmrc "${HOME}/.npmrc"
+
   deploy-docs:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, sl-dev]
+    timeout-minutes: 20
     needs: [build]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
@@ -170,3 +198,10 @@ jobs:
 
           bash deploy/docs-server/deploy.sh
           EOF
+
+      - name: Cleanup credentials
+        if: always()
+        run: |
+          set +x
+          rm -f "${HOME}/.ssh/deploy_key"
+          rm -f .npmrc "${HOME}/.npmrc"
