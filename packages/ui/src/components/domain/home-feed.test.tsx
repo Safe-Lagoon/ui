@@ -107,6 +107,36 @@ describe("ActivityStack", () => {
     const { container } = render(<ActivityStack kind="gallery" title="Gallery" />);
     expect(container.querySelector("[data-stack-layer]")).toBeNull();
   });
+
+  it("pads empty apps layers behind a single preview", () => {
+    const { container } = render(
+      <ActivityStack kind="apps" title="Played on phone" previews={[{ src: "app.png" }]} />,
+    );
+    const layers = container.querySelectorAll("[data-stack-layer]");
+    expect(layers).toHaveLength(3);
+    expect(layers[0]?.querySelector("img")).toBeNull();
+    expect(layers[2]?.querySelector("img")).toHaveAttribute("src", "app.png");
+  });
+
+  it("pads gallery empties after the thumbs", () => {
+    const { container } = render(
+      <ActivityStack kind="gallery" title="Gallery" previews={[{ src: "shot.png" }]} />,
+    );
+    const tiles = container.querySelectorAll("[aria-hidden] > span");
+    expect(tiles).toHaveLength(4);
+    expect(tiles[0]?.querySelector("img")).toHaveAttribute("src", "shot.png");
+    expect(tiles[3]?.querySelector("img")).toBeNull();
+  });
+
+  it("fits internet icons like apps", () => {
+    const { container } = render(
+      <ActivityStack kind="internet" title="wikipedia.org" previews={[{ src: "wiki.png" }]} />,
+    );
+    const front = container.querySelectorAll("[data-stack-layer]")[2];
+    expect(front?.className).toMatch(/size-9/);
+    expect(front).toHaveStyle({ background: "#fff" });
+    expect(front?.querySelector("img")?.className).toMatch(/object-contain/);
+  });
 });
 
 describe("ActivityDaySection", () => {

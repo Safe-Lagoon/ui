@@ -15,3 +15,5 @@ Back-port the webapp-vendored 0.4.0 hand patches into `packages/ui` source.
 - `SessionFilmstrip` drops the rounded card chrome and is a `flex-1` fill wrapper.
 - `FilterChips` adds `mb-[18px]`. Idle counts are plain numbers; only the selected count is a white pill.
 - `DotCrumbs` are 16px (was 13px). Ancestor links/buttons are `cursor-pointer` with no underline.
+- `ActivityStack` pads empty layers *behind* a single preview (`unshift`, gallery still fills forward). Internet tiles use the apps `fitIcon` treatment (white `#fff` tile, `object-contain`). Stacked layers keep the vendored `LAYER_RING` (`2px solid #fff` + 1px shadow). Proto #5/#7 stand-in rings/layout are not spec.
+- `AppNavIcon` is two-tone `#2F77EE` / `#B97CFF` at `size-5`. It no longer uses 18px `currentColor` proto marks.

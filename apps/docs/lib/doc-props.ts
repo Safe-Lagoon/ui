@@ -263,7 +263,7 @@ export const docPropsBySlug: Record<string, DocProp[]> = {
   ],
   "portal-atoms": [
     { name: "BrandMark.size", type: `"sidebar" | "auth"`, default: `"sidebar"`, description: "28px sidebar mark vs 36px auth logo. hideLabel for the 72px rail." },
-    { name: "AppNavIcon.kind", type: `"home" | "feed" | "rules" | "settings"`, required: true, description: "Proto stroke icons. Pass as AppShellLayout topItems[].icon." },
+    { name: "AppNavIcon.kind", type: `"home" | "feed" | "rules" | "settings"`, required: true, description: "Two-tone #2F77EE / #B97CFF sidebar marks at size-5. Pass as AppShellLayout topItems[].icon." },
     { name: "PanelGrid", type: "children", description: "3 / 2 / 1 columns from AppShell data-shell-mode. Wrap SectionCard KPIs." },
     { name: "AppMark.kind", type: `"tiktok" | "roblox" | "minecraft" | "youtube"`, description: "40×40 proto .sr-icon fills." },
     { name: "VideoThumb", type: "src + duration", description: "96×54 YouTube row thumb with play overlay." },

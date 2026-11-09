@@ -130,6 +130,26 @@ describe("BrandMark + AppNavIcon", () => {
     expect(container.querySelector("[data-kind=home]")).toBeTruthy();
     expect(container.querySelector("[data-kind=settings] circle")).toBeTruthy();
   });
+
+  it("paints two-tone blue/lilac strokes at size-5", () => {
+    const { container } = render(
+      <>
+        <AppNavIcon kind="home" />
+        <AppNavIcon kind="feed" />
+      </>,
+    );
+    const home = container.querySelector("[data-kind=home]");
+    const feed = container.querySelector("[data-kind=feed]");
+    expect(home?.getAttribute("class")).toMatch(/size-5/);
+    expect(home?.getAttribute("stroke")).toBeNull();
+    const homePaths = home?.querySelectorAll("path") ?? [];
+    expect(homePaths[0]).toHaveAttribute("stroke", "#2F77EE");
+    expect(homePaths[1]).toHaveAttribute("stroke", "#B97CFF");
+    const feedPaths = feed?.querySelectorAll("path") ?? [];
+    expect(feedPaths[0]).toHaveAttribute("stroke", "#2F77EE");
+    expect(feedPaths[1]).toHaveAttribute("stroke", "#B97CFF");
+    expect(feedPaths[2]).toHaveAttribute("stroke", "#2F77EE");
+  });
 });
 
 describe("AuthCard", () => {
