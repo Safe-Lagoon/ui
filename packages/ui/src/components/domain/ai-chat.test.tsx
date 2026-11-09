@@ -6,6 +6,7 @@ import {
   formatAiChatDayName,
   formatAiChatDayNames,
   parseAiChatDayToken,
+  type AiChatResultBlock,
   type AiChatSendContext,
 } from "./ai-chat";
 import {
@@ -339,5 +340,216 @@ describe("AiChat streaming send", () => {
     const ctx = onSend.mock.calls[0]?.[1] as AiChatSendContext;
     expect(typeof ctx.onDelta).toBe("function");
     expect(typeof ctx.onTool).toBe("function");
+    expect(typeof ctx.onToolResult).toBe("function");
+  });
+});
+
+const resultBlocks: AiChatResultBlock[] = [
+  {
+    id: "call_1",
+    kind: "card",
+    label: "First",
+    data: { n: 1 },
+    text: "Weekdays 21:00–07:00",
+  },
+  {
+    id: "call_2",
+    kind: "card",
+    label: "Second",
+    data: { n: 2 },
+    text: "Noah · locked",
+  },
+];
+
+describe("AiChat result blocks", () => {
+  it("renders custom cards in order and falls back to markdown when the slot returns null", () => {
+    const { getByText } = renderChat({
+      messages: [
+        {
+          id: "a1",
+          role: "assistant",
+          content: "Here is the plan.",
+          resultBlocks,
+        },
+      ],
+      renderResultBlock: (block) =>
+        block.id === "call_2" ? null : <article data-slot="custom-card">{block.label}</article>,
+    });
+
+    expect(getByText("Here is the plan.")).toBeInTheDocument();
+    expect(document.querySelector('[data-slot="ai-chat-result-block"]')).toHaveTextContent("First");
+    expect(document.querySelector('[data-slot="ai-chat-result-fallback"]')?.textContent).toMatch(
+      /Noah/,
+    );
+    const slots = [...document.querySelectorAll("[data-slot='ai-chat-result-block'], [data-slot='ai-chat-result-fallback']")];
+    expect(slots.map((node) => node.getAttribute("data-slot"))).toEqual([
+      "ai-chat-result-block",
+      "ai-chat-result-fallback",
+    ]);
+  });
+
+  it("uses markdown of block.text when renderResultBlock is omitted", () => {
+    renderChat({
+      messages: [
+        {
+          id: "a1",
+          role: "assistant",
+          content: "",
+          resultBlocks: [{ id: "call_1", kind: "card", data: {}, text: "**Bedtime** set" }],
+        },
+      ],
+    });
+
+    const fallback = document.querySelector("[data-slot='ai-chat-result-fallback']");
+    expect(fallback?.innerHTML).toContain("<strong>");
+    expect(fallback?.textContent).toMatch(/Bedtime/);
+  });
+
+  it("renders the message footer slot and omits it when the slot returns null", () => {
+    const { rerender, getByText } = renderChat({
+      messages: [{ id: "a1", role: "assistant", content: "Done." }],
+      renderMessageFooter: () => <span>Source: activity log</span>,
+    });
+
+    expect(getByText("Source: activity log")).toBeInTheDocument();
+    expect(document.querySelector("[data-slot='ai-chat-message-footer']")).toBeTruthy();
+
+    rerender(
+      <AiChat
+        sessionStorageKey={false}
+        messages={[{ id: "a1", role: "assistant", content: "Done." }]}
+        renderMessageFooter={() => null}
+      />,
+    );
+    expect(document.querySelector("[data-slot='ai-chat-message-footer']")).toBeNull();
+  });
+
+  it("preserves streamed result blocks through finalize and dedupes by id", async () => {
+    const onSend = vi.fn(async (_text: string, ctx: AiChatSendContext) => {
+      ctx.onToolResult({
+        id: "call_1",
+        kind: "card",
+        data: { n: 1 },
+        text: "stale",
+      });
+      ctx.onToolResult({
+        id: "call_1",
+        kind: "card",
+        data: { n: 2 },
+        text: "updated bedtime",
+      });
+      ctx.onToolResult({
+        id: "call_2",
+        kind: "card",
+        data: {},
+        text: "second card",
+      });
+      return "Pinned.";
+    });
+
+    const { getByPlaceholderText, getByRole, getByText } = renderChat({
+      onSend,
+      renderResultBlock: (block) => <span>{block.text}</span>,
+    });
+
+    const composer = getByPlaceholderText(/Ask about screen time/);
+    fireEvent.change(composer, { target: { value: "Set bedtime" } });
+    fireEvent.submit(composer.closest("form")!);
+
+    await waitFor(() => expect(getByText("Pinned.")).toBeInTheDocument());
+    expect(getByText("updated bedtime")).toBeInTheDocument();
+    expect(getByText("second card")).toBeInTheDocument();
+    expect(document.body.textContent).not.toMatch(/stale/);
+    expect(document.querySelectorAll("[data-slot='ai-chat-result-block']")).toHaveLength(2);
+  });
+
+  it("merges returned resultBlocks with in-flight ones by id", async () => {
+    const onSend = vi.fn(async (_text: string, ctx: AiChatSendContext) => {
+      ctx.onToolResult({
+        id: "call_1",
+        kind: "card",
+        data: {},
+        text: "streamed",
+      });
+      return {
+        id: "a1",
+        role: "assistant" as const,
+        content: "Saved.",
+        resultBlocks: [
+          { id: "call_1", kind: "card", data: { ok: true }, text: "from-return" },
+          { id: "call_3", kind: "card", data: {}, text: "extra" },
+        ],
+      };
+    });
+
+    const { getByPlaceholderText, getByText, queryByText } = renderChat({
+      onSend,
+      renderResultBlock: (block) => <span>{block.text}</span>,
+    });
+
+    fireEvent.change(getByPlaceholderText(/Ask about screen time/), {
+      target: { value: "Apply it" },
+    });
+    fireEvent.submit(getByPlaceholderText(/Ask about screen time/).closest("form")!);
+
+    await waitFor(() => expect(getByText("from-return")).toBeInTheDocument());
+    expect(getByText("extra")).toBeInTheDocument();
+    expect(queryByText("streamed")).not.toBeInTheDocument();
+  });
+
+  it("copies and reports feedback using block text", async () => {
+    const writeText = vi.fn(async () => undefined);
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText },
+    });
+    const onFeedback = vi.fn();
+    const { getByRole } = renderChat({
+      onFeedback,
+      messages: [
+        { id: "u1", role: "user", content: "Set bedtime" },
+        {
+          id: "a1",
+          role: "assistant",
+          content: "Done.",
+          resultBlocks: [{ id: "call_1", kind: "card", data: {}, text: "Weekdays 21:00–07:00" }],
+        },
+      ],
+    });
+
+    fireEvent.click(getByRole("button", { name: "Copy" }));
+    await waitFor(() =>
+      expect(writeText).toHaveBeenCalledWith("Done.\n\nWeekdays 21:00–07:00"),
+    );
+
+    fireEvent.click(getByRole("button", { name: "Helpful" }));
+    expect(onFeedback).toHaveBeenCalledWith({
+      rating: "up",
+      request: "Set bedtime",
+      response: "Done.\n\nWeekdays 21:00–07:00",
+    });
+  });
+
+  it("applies scoped classNames to the thread, user bubble, and assistant card", () => {
+    renderChat({
+      classNames: {
+        thread: "thread-slot",
+        userBubble: "user-slot",
+        assistantCard: "card-slot",
+      },
+      messages: [
+        { id: "u1", role: "user", content: "Hi" },
+        {
+          id: "a1",
+          role: "assistant",
+          content: "Hello **Noah**",
+          resultBlocks: [{ id: "call_1", kind: "card", data: {}, text: "A card" }],
+        },
+      ],
+    });
+
+    expect(document.querySelector(".ai-chat-thread")).toHaveClass("thread-slot");
+    expect(document.querySelector("div.user-slot")).toHaveTextContent("Hi");
+    expect(document.querySelectorAll(".card-slot").length).toBeGreaterThanOrEqual(2);
   });
 });

@@ -86,6 +86,16 @@ export interface AiChatToolChip {
   busy?: boolean;
 }
 
+/** Serializable tool/result card. `id` is the call id; `kind` is consumer-defined. */
+export type AiChatResultBlock = {
+  id: string;
+  kind: string;
+  label?: string;
+  data: unknown;
+  /** Readable plain-text equivalent used for copy, feedback, and markdown fallback. */
+  text: string;
+};
+
 export interface AiChatMessage {
   id: string;
   role: "user" | "assistant";
@@ -94,11 +104,19 @@ export interface AiChatMessage {
   tools?: AiChatToolChip[];
   replies?: string[];
   restoreDraft?: boolean;
+  resultBlocks?: AiChatResultBlock[];
 }
 
 export type AiChatSendContext = {
   onDelta: (text: string) => void;
   onTool: (chip: AiChatToolChip) => void;
+  onToolResult: (block: AiChatResultBlock) => void;
+};
+
+export type AiChatClassNames = {
+  userBubble?: string;
+  thread?: string;
+  assistantCard?: string;
 };
 
 export type AiChatApproval = {
@@ -183,6 +201,12 @@ export interface AiChatProps {
   retryLabel?: string;
   /** Live status row (webapp copy). Replaces tool chips and the bottom “Reasoning…” spinner. */
   statusSlot?: React.ReactNode;
+  /** Render a structured result card. Return null to fall back to markdown of `block.text`. */
+  renderResultBlock?: (block: AiChatResultBlock, message: AiChatMessage) => React.ReactNode | null;
+  /** Extra footer under copy/feedback (e.g. a source capsule). Return null to omit. */
+  renderMessageFooter?: (message: AiChatMessage) => React.ReactNode | null;
+  /** Scoped class slots so the consumer can restyle bubbles without touching global Tag. */
+  classNames?: AiChatClassNames;
   className?: string;
 }
 
@@ -202,11 +226,51 @@ const MAX_TEXTAREA_HEIGHT = 200;
 const BUBBLE_CLASS =
   "ai-chat-bubble block min-w-0 max-w-full overflow-x-auto overflow-y-hidden text-body-16 text-foreground [&_p]:my-2 first:[&_p]:mt-0 last:[&_p]:mb-0 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:ps-5 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:ps-5 [&_table]:my-2.5 [&_table]:w-max [&_table]:border-collapse [&_table]:text-[13px] [&_th]:whitespace-nowrap [&_td]:whitespace-nowrap [&_th]:border [&_td]:border [&_th]:border-border-soft [&_td]:border-border-soft [&_th]:bg-background [&_th]:px-2.5 [&_th]:py-1.5 [&_th]:text-start [&_th]:font-semibold [&_td]:px-2.5 [&_td]:py-1.5 [&_pre]:w-max [&_img]:max-w-full [&_img]:rounded-xl [&_blockquote]:my-2 [&_blockquote]:border-s-2 [&_blockquote]:border-border-soft [&_blockquote]:ps-3 [&_blockquote]:text-muted-foreground";
 
+function upsertResultBlocks(
+  current: AiChatResultBlock[] | undefined,
+  incoming: AiChatResultBlock | AiChatResultBlock[] | undefined,
+): AiChatResultBlock[] | undefined {
+  const extras = incoming == null ? [] : Array.isArray(incoming) ? incoming : [incoming];
+  if (!current?.length && extras.length === 0) return current;
+
+  const merged = [...(current ?? [])];
+  const indexById = new Map(merged.map((block, index) => [block.id, index]));
+  for (const block of extras) {
+    const index = indexById.get(block.id);
+    if (index === undefined) {
+      indexById.set(block.id, merged.length);
+      merged.push(block);
+    } else {
+      merged[index] = block;
+    }
+  }
+  return merged;
+}
+
+function assistantPlainText(message: AiChatMessage) {
+  const body = parseReplies(message.content).text.replace(/\*\*/g, "").trim();
+  const blocks = (message.resultBlocks ?? []).map((block) => block.text.trim()).filter(Boolean);
+  return [body, ...blocks].filter(Boolean).join("\n\n");
+}
+
+function ResultFooter({
+  message,
+  render,
+}: {
+  message: AiChatMessage;
+  render?: (message: AiChatMessage) => React.ReactNode | null;
+}) {
+  const footer = render?.(message);
+  if (footer == null) return null;
+  return <div data-slot="ai-chat-message-footer">{footer}</div>;
+}
+
 function finalizeAssistant(
   content: string,
   extra?: Partial<AiChatMessage>,
 ): AiChatMessage {
   const parsed = parseReplies(content);
+  const resultBlocks = extra?.resultBlocks;
   return {
     id: extra?.id ?? `assistant-${Date.now()}`,
     role: "assistant",
@@ -215,6 +279,7 @@ function finalizeAssistant(
       extra?.replies ?? (parsed.replies.length ? parsed.replies : fallbackReplies(parsed.text)),
     tools: extra?.tools,
     reasoning: extra?.reasoning,
+    resultBlocks: resultBlocks?.length ? resultBlocks : undefined,
   };
 }
 
@@ -268,6 +333,9 @@ export function AiChat({
   onSessionChange,
   retryLabel,
   statusSlot = null,
+  renderResultBlock,
+  renderMessageFooter,
+  classNames,
   className,
 }: AiChatProps) {
   const retentionMs = sessionRetentionDays * 24 * 60 * 60 * 1000;
@@ -553,11 +621,21 @@ export function AiChat({
               return { ...message, tools };
             });
           },
+          onToolResult: (block) => {
+            patchMessage(assistantId, (message) => ({
+              ...message,
+              resultBlocks: upsertResultBlocks(message.resultBlocks, block),
+            }));
+          },
         });
 
         if (typeof result === "string") {
           patchMessage(assistantId, (message) =>
-            finalizeAssistant(result, { id: assistantId, tools: message.tools }),
+            finalizeAssistant(result, {
+              id: assistantId,
+              tools: message.tools,
+              resultBlocks: message.resultBlocks,
+            }),
           );
         } else if (result && typeof result === "object") {
           const restoreDraft = !!result.restoreDraft;
@@ -569,6 +647,7 @@ export function AiChat({
                     id: assistantId,
                     tools: result.tools ?? message.tools,
                     replies: restoreDraft ? [] : result.replies,
+                    resultBlocks: upsertResultBlocks(message.resultBlocks, result.resultBlocks),
                   })
                 : message,
             );
@@ -578,7 +657,11 @@ export function AiChat({
           if (restoreDraft) setInput(text);
         } else {
           patchMessage(assistantId, (message) =>
-            finalizeAssistant(message.content, { id: assistantId, tools: message.tools }),
+            finalizeAssistant(message.content, {
+              id: assistantId,
+              tools: message.tools,
+              resultBlocks: message.resultBlocks,
+            }),
           );
         }
       } finally {
@@ -637,12 +720,12 @@ export function AiChat({
         break;
       }
     }
-    return { request, response: message.content };
+    return { request, response: assistantPlainText(message) };
   };
 
-  const handleCopy = async (messageId: string, content: string) => {
-    await navigator.clipboard.writeText(parseReplies(content).text.replace(/\*\*/g, ""));
-    setCopiedId(messageId);
+  const handleCopy = async (message: AiChatMessage) => {
+    await navigator.clipboard.writeText(assistantPlainText(message));
+    setCopiedId(message.id);
     window.setTimeout(() => setCopiedId(null), 2000);
   };
 
@@ -802,13 +885,18 @@ export function AiChat({
           </div>
         </div>
       ) : (
-        <ScrollArea className="ai-chat-thread h-0 min-h-0 min-w-0 w-full flex-1">
+        <ScrollArea className={cn("ai-chat-thread h-0 min-h-0 min-w-0 w-full flex-1", classNames?.thread)}>
           <div className="flex w-full min-w-0 max-w-full flex-col px-6 pb-4 pt-4">
             <div className="flex w-full min-w-0 max-w-full flex-col gap-6 pb-4">
               {messages.map((message) =>
                 message.role === "user" ? (
                   <div key={message.id} className="flex min-w-0 justify-end">
-                    <div className="max-w-[85%] break-words rounded-xl bg-lilac px-4 py-3 text-body-16 text-white">
+                    <div
+                      className={cn(
+                        "max-w-[85%] break-words rounded-xl bg-lilac px-4 py-3 text-body-16 text-white",
+                        classNames?.userBubble,
+                      )}
+                    >
                       {message.content}
                     </div>
                   </div>
@@ -826,14 +914,33 @@ export function AiChat({
                         </CollapsibleContent>
                       </Collapsible>
                     ) : null}
-                    {!message.content && statusSlot ? statusSlot : null}
+                    {!message.content && !(message.resultBlocks?.length) && statusSlot ? statusSlot : null}
                     {message.content ? (
                       <div
-                        className={BUBBLE_CLASS}
+                        className={cn(BUBBLE_CLASS, classNames?.assistantCard)}
                         dir="auto"
                         dangerouslySetInnerHTML={{ __html: formatAssistantMarkdown(message.content) }}
                       />
                     ) : null}
+                    {(message.resultBlocks ?? []).map((block) => {
+                      const custom = renderResultBlock?.(block, message);
+                      if (custom != null) {
+                        return (
+                          <div key={block.id} data-slot="ai-chat-result-block">
+                            {custom}
+                          </div>
+                        );
+                      }
+                      return (
+                        <div
+                          key={block.id}
+                          data-slot="ai-chat-result-fallback"
+                          className={cn(BUBBLE_CLASS, classNames?.assistantCard)}
+                          dir="auto"
+                          dangerouslySetInnerHTML={{ __html: formatAssistantMarkdown(block.text) }}
+                        />
+                      );
+                    })}
                     {message.replies && message.replies.length > 0 && !isLoading ? (
                       <div className="flex flex-wrap gap-1.5">
                         {message.replies.map((reply) => (
@@ -850,14 +957,14 @@ export function AiChat({
                         ))}
                       </div>
                     ) : null}
-                    {message.content ? (
+                    {message.content || message.resultBlocks?.length ? (
                       <div className="flex items-center gap-1">
                         <Button
                           variant="ghost"
                           size="icon"
                           className="size-8"
                           aria-label={copiedId === message.id ? copiedLabel : copyLabel}
-                          onClick={() => void handleCopy(message.id, message.content)}
+                          onClick={() => void handleCopy(message)}
                         >
                           <Copy className="size-4" />
                         </Button>
@@ -881,6 +988,7 @@ export function AiChat({
                         </Button>
                       </div>
                     ) : null}
+                    <ResultFooter message={message} render={renderMessageFooter} />
                   </div>
                 ),
               )}

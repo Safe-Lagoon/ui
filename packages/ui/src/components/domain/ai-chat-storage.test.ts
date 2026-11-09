@@ -3,8 +3,10 @@ import {
   buildSessionSummary,
   createEmptySession,
   formatSessionAge,
+  loadAiChatStorage,
   normalizeStorageState,
   purgeExpiredSessions,
+  saveAiChatStorage,
 } from "./ai-chat-storage";
 
 describe("ai-chat-storage", () => {
@@ -57,5 +59,51 @@ describe("ai-chat-storage", () => {
 
     expect(normalized?.activeSessionId).toBe("fresh");
     expect(normalized?.sessions.map((session) => session.id)).toEqual(["fresh"]);
+  });
+
+  it("round-trips serializable resultBlocks through localStorage", () => {
+    const key = "ai-chat-result-blocks";
+    window.localStorage.clear();
+    const now = Date.now();
+    saveAiChatStorage(key, {
+      version: 1,
+      activeSessionId: "s1",
+      sessions: [
+        {
+          id: "s1",
+          createdAt: now,
+          updatedAt: now,
+          summary: "Set bedtime",
+          messages: [
+            { id: "u1", role: "user", content: "Set bedtime" },
+            {
+              id: "a1",
+              role: "assistant",
+              content: "Done.",
+              resultBlocks: [
+                {
+                  id: "call_1",
+                  kind: "card",
+                  label: "Schedule",
+                  data: { days: [0, 1, 2] },
+                  text: "Weekdays 21:00–07:00",
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    const loaded = loadAiChatStorage(key, Number.POSITIVE_INFINITY);
+    expect(loaded?.sessions[0]?.messages[1]?.resultBlocks).toEqual([
+      {
+        id: "call_1",
+        kind: "card",
+        label: "Schedule",
+        data: { days: [0, 1, 2] },
+        text: "Weekdays 21:00–07:00",
+      },
+    ]);
   });
 });
