@@ -296,10 +296,52 @@ export function AiChat({
       if (cancelled) return;
 
       if (loaded) {
-        const active = loaded.sessions.find((session) => session.id === loaded.activeSessionId);
-        setSessions(loaded.sessions);
-        setActiveSessionId(loaded.activeSessionId);
-        setInternalMessages(active?.messages ?? []);
+        if (storage === "remote") {
+          const kept = loaded.sessions.filter(
+            (item) => item.messages.length > 0 || item.summary,
+          );
+
+          const bootFresh = () => {
+            const session = createEmptySession();
+            setSessions([session, ...kept]);
+            setActiveSessionId(session.id);
+            setInternalMessages([]);
+            onSessionChange?.(session.id);
+          };
+
+          const match = kept.find((item) => item.id === loaded.activeSessionId);
+          if (!match) {
+            bootFresh();
+          } else if (match.messages.length === 0 && remoteStorage?.loadSession) {
+            try {
+              const detailed = await remoteStorage.loadSession(match.id);
+              if (cancelled) return;
+              if (!detailed) {
+                bootFresh();
+              } else {
+                setSessions(
+                  kept.map((item) => (item.id === match.id ? { ...detailed, id: match.id } : item)),
+                );
+                setActiveSessionId(match.id);
+                setInternalMessages(detailed.messages);
+                onSessionChange?.(match.id);
+              }
+            } catch {
+              if (cancelled) return;
+              bootFresh();
+            }
+          } else {
+            setSessions(kept);
+            setActiveSessionId(match.id);
+            setInternalMessages(match.messages);
+            onSessionChange?.(match.id);
+          }
+        } else {
+          const active = loaded.sessions.find((session) => session.id === loaded.activeSessionId);
+          setSessions(loaded.sessions);
+          setActiveSessionId(loaded.activeSessionId);
+          setInternalMessages(active?.messages ?? []);
+        }
       } else {
         const session = createEmptySession();
         setSessions([session]);
@@ -320,6 +362,8 @@ export function AiChat({
     return () => {
       cancelled = true;
     };
+    // Session bootstrap is keyed on storage identity, not the session callback.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- vendor parity
   }, [persistSessions, remoteStorage, retentionMs, storage, storageKey, writeStorage]);
 
   React.useEffect(() => {

@@ -66,6 +66,8 @@ export type AiChatRemoteStorage = {
   load: () => Promise<AiChatStorageState | null>;
   /** Persist the full session list and active session id. */
   save: (state: AiChatStorageState) => Promise<void>;
+  /** Optional: fetch one session's messages when `load` returns summaries only. */
+  loadSession?: (id: string) => Promise<StoredAiChatSession | null>;
 };
 
 export function normalizeStorageState(
