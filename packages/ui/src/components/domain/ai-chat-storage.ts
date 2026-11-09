@@ -66,6 +66,12 @@ export type AiChatRemoteStorage = {
   load: () => Promise<AiChatStorageState | null>;
   /** Persist the full session list and active session id. */
   save: (state: AiChatStorageState) => Promise<void>;
+  /** Hydrate one session's messages when the list payload is a stub. */
+  loadSession?: (sessionId: string) => Promise<StoredAiChatSession | null>;
+  /** Delete one saved session on the server. */
+  deleteSession?: (sessionId: string) => Promise<void>;
+  /** Wipe every saved session. Return `false` to keep local history unchanged. */
+  clearAll?: () => Promise<void | false>;
 };
 
 export function normalizeStorageState(
