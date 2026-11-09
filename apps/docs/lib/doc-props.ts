@@ -258,7 +258,7 @@ export const docPropsBySlug: Record<string, DocProp[]> = {
     { name: "PlaceEditor.type", type: `"HOME" | "SCHOOL" | "UNKNOWN" | "DANGER" | "YARD"`, description: "Proto chips Home / School / Place / Danger / Yard. Live GEO_PLACE_TYPES map when wiring SPA." },
     { name: "PlaceEditor.radius", type: "number", description: "50–3000 m, step 10. Same circle the child device uses." },
     { name: "ChildProfileForm", type: "name + emoji avatar + Boy/Girl + age band + Android/iOS", description: "Family editor. Pairing is a follow-on, not a form field." },
-    { name: "DotCrumbs", type: "string | { label, href }[]", description: "13px crumbs with · separators. Last item is aria-current=page. AppShellPageHeader still renders the 28/22px h1 below." },
+    { name: "DotCrumbs", type: "string | { label, href }[]", description: "16px crumbs with · separators, no underline. Last item is aria-current=page. AppShellPageHeader still renders the 28/22px h1 below." },
     { name: "PlanCard + SectionTitle", type: "Plans / Add-ons / Payment method sit above the cards", description: "Billing contract from the accepted proto." },
   ],
   "portal-atoms": [

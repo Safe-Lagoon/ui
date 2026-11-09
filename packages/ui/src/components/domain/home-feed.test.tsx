@@ -159,6 +159,22 @@ describe("FilterChips", () => {
     fireEvent.click(getByRole("button", { name: "Apps" }));
     expect(onValueChange).toHaveBeenCalledWith("apps");
   });
+
+  it("keeps idle counts as plain numbers and pills the selected count", () => {
+    const { getByRole, getByText } = render(
+      <FilterChips
+        items={[
+          { id: "all", label: "All", count: 3 },
+          { id: "apps", label: "Apps", count: 1 },
+        ]}
+        value="all"
+      />,
+    );
+    expect(getByRole("toolbar").className).toMatch(/mb-\[18px\]/);
+    expect(getByText("3").className).toMatch(/bg-white\/25/);
+    expect(getByText("1").className).not.toMatch(/bg-muted/);
+    expect(getByText("1").className).not.toMatch(/rounded-full/);
+  });
 });
 
 describe("AlertShot", () => {

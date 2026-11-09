@@ -22,7 +22,7 @@ export function DotCrumbs({ items, onNavigate, className, ...props }: DotCrumbsP
 
   return (
     <nav aria-label="Breadcrumb" data-slot="dot-crumbs" className={cn("min-w-0", className)} {...props}>
-      <ol className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1 text-[13px] text-muted-foreground">
+      <ol className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1 text-[16px] text-muted-foreground">
         {crumbs.map((crumb, index) => {
           const last = index === crumbs.length - 1;
           return (
@@ -39,7 +39,7 @@ export function DotCrumbs({ items, onNavigate, className, ...props }: DotCrumbsP
               ) : crumb.href && onNavigate ? (
                 <button
                   type="button"
-                  className="font-medium text-brand-blue underline underline-offset-2 hover:text-violet"
+                  className="cursor-pointer font-medium text-brand-blue hover:text-violet"
                   onClick={() => onNavigate(crumb.href!)}
                 >
                   {crumb.label}
@@ -47,7 +47,7 @@ export function DotCrumbs({ items, onNavigate, className, ...props }: DotCrumbsP
               ) : crumb.href ? (
                 <a
                   href={crumb.href}
-                  className="font-medium text-brand-blue underline underline-offset-2 hover:text-violet"
+                  className="cursor-pointer font-medium text-brand-blue hover:text-violet"
                 >
                   {crumb.label}
                 </a>

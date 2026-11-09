@@ -38,7 +38,7 @@ describe("ChoiceRow", () => {
 describe("DotCrumbs", () => {
   it("marks the last item current and navigates ancestors", () => {
     const onNavigate = vi.fn();
-    const { getByRole, getByText } = render(
+    const { getByRole, getByText, container } = render(
       <DotCrumbs
         items={[{ label: "Rules", href: "rules" }, { label: "Places", href: "places" }, "Home"]}
         onNavigate={onNavigate}
@@ -47,12 +47,15 @@ describe("DotCrumbs", () => {
     expect(getByText("Home")).toHaveAttribute("aria-current", "page");
     fireEvent.click(getByRole("button", { name: "Rules" }));
     expect(onNavigate).toHaveBeenCalledWith("rules");
+    expect(container.querySelector("ol")?.className).toMatch(/text-\[16px\]/);
+    expect(getByRole("button", { name: "Rules" }).className).toMatch(/cursor-pointer/);
+    expect(getByRole("button", { name: "Rules" }).className).not.toMatch(/underline/);
   });
 });
 
 describe("AppShellPageHeader crumbs plus title", () => {
-  it("keeps crumbs at 13px and still renders the page title", () => {
-    const { getByRole, getByText } = render(
+  it("keeps crumbs at 16px and still renders the page title", () => {
+    const { getByRole } = render(
       <AppShellPageHeader
         title="Places"
         breadcrumbs={<DotCrumbs items={["Rules", "Places"]} />}
@@ -60,6 +63,7 @@ describe("AppShellPageHeader crumbs plus title", () => {
     );
     expect(getByRole("heading", { level: 1, name: "Places" })).toBeInTheDocument();
     expect(document.querySelector("[aria-current=page]")).toHaveTextContent("Places");
+    expect(document.querySelector("[data-slot=dot-crumbs] ol")?.className).toMatch(/text-\[16px\]/);
   });
 });
 

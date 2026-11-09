@@ -61,7 +61,7 @@ export function ScreenMirrorViewer({
 
   React.useEffect(() => {
     const node = filmstripRef.current?.querySelector<HTMLElement>(`[data-frame-id="${currentId}"]`);
-    node?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    node?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
   }, [currentId]);
 
   if (!frames.length) {
@@ -72,86 +72,29 @@ export function ScreenMirrorViewer({
 
   const hasPrev = activeIndex > 0;
   const hasNext = activeIndex < frames.length - 1;
-  const progress = frames.length > 1 ? (activeIndex / (frames.length - 1)) * 100 : 100;
 
   return (
-    <div className={cn("flex flex-col gap-4", className)}>
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-body-14 text-muted-foreground">
+    <div
+      data-slot="screen-mirror-viewer"
+      className={cn("flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden", className)}
+    >
+      <div className="flex shrink-0 items-center justify-between gap-3 pb-3">
+        <div className="flex min-w-0 items-center gap-2 text-body-14 text-muted-foreground">
           <MonitorSmartphone className="size-4 shrink-0" aria-hidden />
-          {sessionLabel ? <span>{sessionLabel}</span> : null}
+          {sessionLabel ? <span className="truncate">{sessionLabel}</span> : null}
+          {activeFrame?.appName ? <span className="truncate">· {activeFrame.appName}</span> : null}
         </div>
-        {activeFrame ? (
-          <time className="text-body-14 text-muted-foreground">{activeFrame.timestamp}</time>
-        ) : null}
-      </div>
-
-      <div className="relative overflow-hidden rounded-[10px] border border-border-soft bg-muted/20">
-        {activeFrame ? (
-          <img
-            src={activeFrame.src}
-            alt={activeFrame.alt}
-            className="aspect-video w-full object-contain bg-ink/95"
-          />
-        ) : null}
-        {hasPrev ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute start-2 top-1/2 -translate-y-1/2 bg-background/80"
-            aria-label={previousLabel}
-            onClick={() => goTo(activeIndex - 1)}
-          >
-            <ChevronLeft />
-          </Button>
-        ) : null}
-        {hasNext ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute end-2 top-1/2 -translate-y-1/2 bg-background/80"
-            aria-label={nextLabel}
-            onClick={() => goTo(activeIndex + 1)}
-          >
-            <ChevronRight />
-          </Button>
-        ) : null}
-      </div>
-
-      {activeFrame?.appName ? (
-        <p className="text-body-14 text-muted-foreground">{activeFrame.appName}</p>
-      ) : null}
-
-      <div className="space-y-2">
-        {timelineLabel ? (
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-body-14-semibold text-foreground">{timelineLabel}</span>
-            <span className="text-body-14 text-muted-foreground">
-              {activeIndex + 1} / {frames.length}
-            </span>
-          </div>
-        ) : null}
-
-        <div className="relative h-2 rounded-full bg-muted">
-          <div
-            className="absolute inset-y-0 start-0 rounded-full bg-brand-blue transition-all"
-            style={{ width: `${progress}%` }}
-            aria-hidden
-          />
-          <input
-            type="range"
-            min={0}
-            max={Math.max(frames.length - 1, 0)}
-            value={activeIndex}
-            onChange={(event) => goTo(Number(event.target.value))}
-            className="absolute inset-0 size-full cursor-pointer opacity-0"
-            aria-label={timelineLabel ?? "Session timeline"}
-          />
+        <div className="flex shrink-0 items-center gap-3 text-body-14 text-muted-foreground">
+          {activeFrame ? <time>{activeFrame.timestamp}</time> : null}
+          <span>
+            {activeIndex + 1} / {frames.length}
+          </span>
         </div>
-
+      </div>
+      <div className="flex min-h-0 min-w-0 flex-1 gap-3 overflow-hidden">
         <div
           ref={filmstripRef}
-          className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex w-[88px] shrink-0 flex-col gap-2 overflow-y-auto pr-0.5 [-ms-overflow-style:none] [scrollbar-width:thin]"
         >
           {frames.map((frame, index) => {
             const isActive = frame.id === currentId;
@@ -162,7 +105,7 @@ export function ScreenMirrorViewer({
                 data-frame-id={frame.id}
                 onClick={() => setActive(frame.id)}
                 className={cn(
-                  "flex w-28 shrink-0 flex-col gap-1 rounded-[10px] border p-1 text-start transition-colors",
+                  "flex w-full shrink-0 flex-col gap-1 rounded-[10px] border p-1 text-start transition-colors",
                   isActive
                     ? "border-brand-blue bg-brand-blue-100/40"
                     : "border-border-soft bg-background hover:border-brand-blue-300",
@@ -171,17 +114,43 @@ export function ScreenMirrorViewer({
                 <img
                   src={frame.src}
                   alt={frame.alt}
-                  className="aspect-video w-full rounded-[6px] object-cover"
+                  className="aspect-[9/16] w-full rounded-[6px] bg-ink/80 object-cover"
                 />
-                <span className="truncate px-1 text-body-14 text-muted-foreground">
+                <span className="truncate px-0.5 text-[11px] leading-none text-muted-foreground">
                   {frame.timestamp}
                 </span>
-                <span className="sr-only">
-                  Frame {index + 1}
-                </span>
+                <span className="sr-only">Frame {index + 1}</span>
               </button>
             );
           })}
+        </div>
+        <div className="relative min-h-0 min-w-0 flex-1 overflow-hidden rounded-[10px] border border-border-soft bg-ink/95">
+          {activeFrame ? (
+            <img src={activeFrame.src} alt={activeFrame.alt} className="size-full object-contain" />
+          ) : null}
+          {hasPrev ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute start-2 top-1/2 -translate-y-1/2 bg-background/80"
+              aria-label={previousLabel}
+              onClick={() => goTo(activeIndex - 1)}
+            >
+              <ChevronLeft />
+            </Button>
+          ) : null}
+          {hasNext ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute end-2 top-1/2 -translate-y-1/2 bg-background/80"
+              aria-label={nextLabel}
+              onClick={() => goTo(activeIndex + 1)}
+            >
+              <ChevronRight />
+            </Button>
+          ) : null}
+          {timelineLabel ? <span className="sr-only">{timelineLabel}</span> : null}
         </div>
       </div>
     </div>
