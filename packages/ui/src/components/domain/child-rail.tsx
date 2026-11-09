@@ -15,6 +15,8 @@ export interface ChildRailProps {
   addChildLabel?: string;
   className?: string;
   density?: "full" | "rail";
+  loading?: boolean;
+  skeletonCount?: number;
 }
 
 export function ChildRail({
@@ -26,9 +28,39 @@ export function ChildRail({
   addChildLabel = "Add child",
   className,
   density = "full",
+  loading = false,
+  skeletonCount = 1,
 }: ChildRailProps) {
-  if (!profiles.length) return null;
   const rail = density === "rail";
+
+  if (loading) {
+    const count = profiles.length > 0 ? profiles.length : skeletonCount;
+    return (
+      <div
+        data-slot="child-rail"
+        role="status"
+        aria-busy
+        className={cn("flex flex-col gap-1", className)}
+      >
+        {Array.from({ length: count }, (_, index) => (
+          <div
+            key={index}
+            className={cn("flex w-full items-center rounded-[10px]", rail ? "justify-center p-2" : "gap-2.5 px-2.5 py-2")}
+          >
+            <span className="sl-skel size-8 shrink-0 rounded-full" />
+            {rail ? null : (
+              <span className="min-w-0 flex-1 space-y-1.5">
+                <span className="sl-skel block h-3 w-24 rounded-full" />
+                <span className="sl-skel block h-2.5 w-16 rounded-full" />
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (!profiles.length) return null;
 
   return (
     <div data-slot="child-rail" className={cn("flex flex-col gap-1", className)}>
@@ -40,14 +72,14 @@ export function ChildRail({
             type="button"
             data-active={active || undefined}
             className={cn(
-              "relative flex w-full items-center rounded-[10px] text-start transition-colors",
+              "relative flex w-full cursor-pointer items-center rounded-[10px] text-start transition-colors",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
               rail ? "justify-center p-2" : "gap-2.5 px-2.5 py-2",
               active
                 ? rail
                   ? "bg-transparent"
                   : "border border-border-soft bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
-                : "hover:bg-white/55",
+                : "hover:bg-white/55 dark:hover:bg-white/10",
               profile.unlinked && "border border-dashed border-border",
             )}
             onClick={() => {
@@ -79,7 +111,7 @@ export function ChildRail({
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-[13px] font-semibold text-ink">{profile.name}</span>
                 <span className="block truncate text-[11px] text-muted-foreground">
-                  {profile.unlinked ? "Not linked" : profile.device}
+                  {profile.unlinked ? profile.device || "Not linked" : profile.device}
                 </span>
               </span>
             )}
@@ -90,7 +122,7 @@ export function ChildRail({
         <button
           type="button"
           className={cn(
-            "flex items-center rounded-[10px] text-[13px] font-medium text-brand-blue hover:bg-white/55",
+            "flex cursor-pointer items-center rounded-[10px] text-[13px] font-medium text-brand-blue hover:bg-white/55 dark:hover:bg-white/10",
             rail ? "justify-center p-2" : "gap-2 px-2 py-2",
           )}
           onClick={onAddChild}

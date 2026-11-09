@@ -22,6 +22,7 @@ export interface AppShellLayoutProps {
   groups?: AppSidebarGroup[];
   profile: AppSidebarProfile;
   childProfiles?: AppSidebarChildProfile[];
+  childProfilesLoading?: boolean;
   activeChildProfileId?: string;
   defaultActiveChildProfileId?: string;
   onChildProfileChange?: (profileId: string) => void;
@@ -64,6 +65,7 @@ export function AppShellLayout({
   groups,
   profile,
   childProfiles,
+  childProfilesLoading,
   activeChildProfileId,
   defaultActiveChildProfileId,
   onChildProfileChange,
@@ -165,6 +167,7 @@ export function AppShellLayout({
       groups={groups}
       profile={profile}
       childProfiles={childProfiles}
+      childProfilesLoading={childProfilesLoading}
       activeChildProfileId={activeChildProfileId}
       defaultActiveChildProfileId={defaultActiveChildProfileId}
       onChildProfileChange={onChildProfileChange}

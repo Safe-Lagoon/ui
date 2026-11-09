@@ -17,9 +17,9 @@ export interface AppPhoneChromeProps {
 
 function OsBadge({ os }: { os: NonNullable<ReturnType<typeof childOs>> }) {
   if (os === "ios") {
-    return <IOSBadge className="size-[22px] shrink-0" aria-label="iOS" />;
+    return <IOSBadge className="size-5 shrink-0 text-muted-foreground" aria-label="iOS" />;
   }
-  return <AndroidBadge className="size-[22px] shrink-0" aria-label="Android" />;
+  return <AndroidBadge className="size-5 shrink-0 text-muted-foreground" aria-label="Android" />;
 }
 
 export function AppPhoneChrome({

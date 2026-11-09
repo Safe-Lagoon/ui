@@ -16,6 +16,8 @@ export interface StrokeRowProps extends Omit<React.ButtonHTMLAttributes<HTMLButt
   toggle?: boolean;
   checked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
+  toggleDisabled?: boolean;
+  toggleLabel?: string;
 }
 
 export function StrokeRow({
@@ -29,27 +31,21 @@ export function StrokeRow({
   toggle,
   checked,
   onCheckedChange,
+  toggleDisabled,
+  toggleLabel,
   className,
   type = "button",
   ...props
 }: StrokeRowProps) {
-  return (
-    <button
-      type={type}
-      data-slot="stroke-row"
-      data-selected={selected || undefined}
-      className={cn(
-        "flex w-full items-center gap-3 px-4 py-3.5 text-start transition-colors",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
-        alert
-          ? "bg-destructive-soft"
-          : selected
-            ? "bg-lilac-soft"
-            : "bg-card hover:bg-[#fafbfc]",
-        className,
-      )}
-      {...props}
-    >
+  const rowClassName = cn(
+    "flex w-full items-center gap-3 px-4 py-3.5 text-start transition-colors",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
+    alert ? "bg-destructive-soft" : selected ? "bg-lilac-soft" : "bg-card hover:bg-[#fafbfc]",
+    className,
+  );
+
+  const content = (
+    <>
       {leading}
       <span className="min-w-0 flex-1">
         <span className={cn("block text-[15px] font-semibold text-ink", alert && "text-destructive")}>{title}</span>
@@ -57,9 +53,41 @@ export function StrokeRow({
       </span>
       {trailing ? <span className="shrink-0 text-[13px] text-muted-foreground">{trailing}</span> : null}
       {toggle ? (
-        <Switch checked={checked} onCheckedChange={onCheckedChange} onClick={(e) => e.stopPropagation()} />
+        <Switch
+          checked={checked}
+          onCheckedChange={onCheckedChange}
+          disabled={toggleDisabled}
+          aria-label={toggleLabel}
+          onClick={(e) => e.stopPropagation()}
+        />
       ) : null}
       {chevron ? <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden /> : null}
+    </>
+  );
+
+  if (toggle) {
+    return (
+      <div
+        role="group"
+        data-slot="stroke-row"
+        data-selected={selected || undefined}
+        className={rowClassName}
+        {...(props as React.HTMLAttributes<HTMLDivElement>)}
+      >
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <button
+      type={type}
+      data-slot="stroke-row"
+      data-selected={selected || undefined}
+      className={rowClassName}
+      {...props}
+    >
+      {content}
     </button>
   );
 }

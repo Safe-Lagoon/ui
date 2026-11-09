@@ -102,6 +102,24 @@ describe("PlaceEditor", () => {
     );
     expect(queryByRole("button", { name: "Delete place" })).not.toBeInTheDocument();
   });
+
+  it("renders cancel and custom types", () => {
+    const onCancel = vi.fn();
+    const { getByRole } = render(
+      <PlaceEditor
+        name="Casa"
+        type="HOME"
+        radius={80}
+        center={{ lat: 47.62, lng: -122.35 }}
+        onCancel={onCancel}
+        cancelLabel="Back"
+        types={[{ id: "HOME", label: "Casa" }]}
+      />,
+    );
+    fireEvent.click(getByRole("button", { name: "Back" }));
+    expect(onCancel).toHaveBeenCalled();
+    expect(getByRole("radio", { name: "Casa" })).toBeInTheDocument();
+  });
 });
 
 describe("ChildProfileForm", () => {

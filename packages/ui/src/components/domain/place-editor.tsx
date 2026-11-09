@@ -130,14 +130,17 @@ export interface PlaceEditorProps {
   onRadiusChange?: (radius: number) => void;
   onCenterChange?: (center: PlaceCenter) => void;
   onSave?: () => void;
+  onCancel?: () => void;
   onDelete?: () => void;
   isNew?: boolean;
   nameLabel?: string;
   radiusLabel?: string;
   typeLabel?: string;
   saveLabel?: string;
+  cancelLabel?: string;
   deleteLabel?: string;
   namePlaceholder?: string;
+  types?: PlaceTypeOption[];
   map?: React.ReactNode;
   className?: string;
 }
@@ -152,28 +155,33 @@ export function PlaceEditor({
   onRadiusChange,
   onCenterChange,
   onSave,
+  onCancel,
   onDelete,
   isNew,
   nameLabel = "Name",
   radiusLabel = "Radius",
   typeLabel = "Type",
   saveLabel = "Save",
+  cancelLabel = "Cancel",
   deleteLabel = "Delete place",
   namePlaceholder = "Home, School…",
+  types = PLACE_TYPES,
   map,
   className,
 }: PlaceEditorProps) {
   return (
-    <div data-slot="place-editor" className={cn("space-y-4", className)}>
-      {map ?? (
-        <ZonePreview
-          center={center}
-          radius={radius}
-          name={name || "Place"}
-          onCenterChange={onCenterChange}
-        />
-      )}
-      <FormCard className="space-y-4">
+    <div data-slot="place-editor" className={cn("flex min-h-0 flex-1 flex-col gap-4", className)}>
+      <div className="min-h-[240px] min-w-0 flex-1">
+        {map ?? (
+          <ZonePreview
+            center={center}
+            radius={radius}
+            name={name || "Place"}
+            onCenterChange={onCenterChange}
+          />
+        )}
+      </div>
+      <FormCard className="w-full max-w-none shrink-0 space-y-4">
         <LabeledField label={nameLabel} htmlFor="place-name">
           <Input
             id="place-name"
@@ -197,14 +205,21 @@ export function PlaceEditor({
         <LabeledField label={typeLabel}>
           <ChoiceRow
             label={typeLabel}
-            items={PLACE_TYPES}
+            items={types}
             value={type}
             onValueChange={(id) => onTypeChange?.(id as PlaceTypeId)}
           />
         </LabeledField>
-        <Button variant="primary" size="portal" onClick={onSave}>
-          {saveLabel}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="primary" size="portal" onClick={onSave}>
+            {saveLabel}
+          </Button>
+          {onCancel ? (
+            <Button variant="outline" size="portal" onClick={onCancel}>
+              {cancelLabel}
+            </Button>
+          ) : null}
+        </div>
         {!isNew && onDelete ? <DangerAction onClick={onDelete}>{deleteLabel}</DangerAction> : null}
       </FormCard>
     </div>

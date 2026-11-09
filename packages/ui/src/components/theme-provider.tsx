@@ -26,30 +26,70 @@ function getSystemTheme(): "light" | "dark" {
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
+function parseTheme(value: string | null | undefined): Theme | null {
+  if (value === "light" || value === "dark" || value === "system") return value;
+  return null;
+}
+
+function readThemeCookie(name: string): Theme | null {
+  if (typeof document === "undefined") return null;
+  const prefix = `${name}=`;
+  const parts = document.cookie.split("; ");
+  for (const part of parts) {
+    if (part.startsWith(prefix)) return parseTheme(decodeURIComponent(part.slice(prefix.length)));
+  }
+  return null;
+}
+
+function writeThemeCookie(name: string, theme: Theme) {
+  if (typeof document === "undefined") return;
+  const secure = typeof location !== "undefined" && location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `${name}=${encodeURIComponent(theme)}; Path=/; Max-Age=31536000; SameSite=Lax${secure}`;
+}
+
+function applyResolvedTheme(resolved: "light" | "dark") {
+  const root = document.documentElement;
+  root.classList.remove("light", "dark");
+  root.classList.add(resolved);
+  root.style.colorScheme = resolved;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", resolved === "dark" ? "#0f1729" : "#ffffff");
+}
+
 export function ThemeProvider({
   children,
-  defaultTheme = "light",
+  defaultTheme = "system",
   dir: defaultDir = "ltr",
   storageKey = "safelagoon-ui-theme",
 }: ThemeProviderProps) {
   const [theme, setThemeState] = React.useState<Theme>(() => {
     if (typeof window === "undefined") return defaultTheme;
-    return (localStorage.getItem(storageKey) as Theme) ?? defaultTheme;
+    return readThemeCookie(storageKey) ?? defaultTheme;
   });
   const [dir, setDirState] = React.useState<"ltr" | "rtl">(defaultDir);
-
-  const resolvedTheme = theme === "system" ? getSystemTheme() : theme;
+  const [systemTheme, setSystemTheme] = React.useState(getSystemTheme);
+  const resolvedTheme = theme === "system" ? systemTheme : theme;
 
   React.useEffect(() => {
-    const root = document.documentElement;
-    root.classList.remove("light", "dark");
-    root.classList.add(resolvedTheme);
-    root.setAttribute("dir", dir);
-  }, [resolvedTheme, dir]);
+    applyResolvedTheme(resolvedTheme);
+  }, [resolvedTheme]);
+
+  React.useEffect(() => {
+    document.documentElement.setAttribute("dir", dir);
+  }, [dir]);
+
+  React.useEffect(() => {
+    if (theme !== "system") return;
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const onChange = () => setSystemTheme(media.matches ? "dark" : "light");
+    onChange();
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, [theme]);
 
   const setTheme = React.useCallback(
     (next: Theme) => {
-      localStorage.setItem(storageKey, next);
+      writeThemeCookie(storageKey, next);
       setThemeState(next);
     },
     [storageKey],

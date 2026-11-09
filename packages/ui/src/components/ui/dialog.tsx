@@ -47,7 +47,7 @@ const DialogContent = React.forwardRef<
       {children}
       <DialogPrimitive.Close className="absolute right-4 top-4 rounded-[6px] opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
         <X className="size-4" />
-        <span className="sr-only">Close</span>
+        <span className="sr-only">{dialogCloseLabel()}</span>
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </DialogPortal>
@@ -103,3 +103,17 @@ export {
   DialogTitle,
   DialogDescription,
 };
+
+function dialogCloseLabel() {
+  try {
+    const i18n = (globalThis as { i18n?: { t?: (key: string) => unknown } }).i18n;
+    if (i18n && typeof i18n.t === "function") {
+      const value = i18n.t("close");
+      if (typeof value === "string" && value.trim() && value !== "close") return value;
+    }
+    if (globalThis.document?.documentElement?.lang === "he") return "סגור";
+  } catch {
+    /* keep English fallback */
+  }
+  return "Close";
+}
