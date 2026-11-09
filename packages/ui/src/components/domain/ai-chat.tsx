@@ -36,11 +36,11 @@ import {
   parseAiChatDayToken,
 } from "./ai-chat-days";
 import {
-  inferAiChatReplies,
-  isApproveReplyChip,
-  normalizeReplyChip,
-  renderAiChatMarkdown,
-  stripAiChatReplies,
+  fallbackReplies,
+  formatAssistantMarkdown,
+  isApproveReply,
+  parseReplies,
+  replySendText,
 } from "./ai-chat-markdown";
 import {
   buildSessionSummary,
@@ -55,10 +55,16 @@ import {
   type AiChatStorageState,
   type StoredAiChatSession,
 } from "./ai-chat-storage";
-import {
-  useAiChatVoice,
-  type AiChatVoiceCopy,
-} from "./ai-chat-voice";
+import { useAiChatVoice } from "./ai-chat-voice";
+
+export {
+  fallbackReplies,
+  formatAssistantMarkdown,
+  isAllowedScreenshotUrl,
+  isApproveReply,
+  parseReplies,
+  replySendText,
+} from "./ai-chat-markdown";
 
 export interface AiChatSuggestedPrompt {
   id: string;
@@ -74,11 +80,10 @@ export interface AiChatQuickAction {
   icon?: React.ReactNode;
 }
 
-export interface AiChatTool {
+export interface AiChatToolChip {
   id: string;
-  name?: string;
-  status?: string;
-  label?: string;
+  label: string;
+  busy?: boolean;
 }
 
 export interface AiChatMessage {
@@ -86,35 +91,27 @@ export interface AiChatMessage {
   role: "user" | "assistant";
   content: string;
   reasoning?: string;
+  tools?: AiChatToolChip[];
   replies?: string[];
-  tools?: AiChatTool[];
+  restoreDraft?: boolean;
 }
 
-export interface AiChatSendOptions {
-  onDelta?: (delta: string) => void;
-  onTool?: (tool: AiChatTool) => void;
-}
+export type AiChatSendContext = {
+  onDelta: (text: string) => void;
+  onTool: (chip: AiChatToolChip) => void;
+};
 
-export type AiChatSendResult = string | (AiChatMessage & { restoreDraft?: boolean }) | void;
-
-export interface AiChatFeedback {
-  rating: "up" | "down";
-  request: string;
-  response: string;
-}
-
-export interface AiChatApproval {
+export type AiChatApproval = {
   title: string;
   body?: string;
-  /** String rows render as a bidi-safe list. React nodes (schedule cards) render in the child slot. */
-  preview?: React.ReactNode[];
+  preview?: string[];
   confirmLabel: string;
   dismissLabel?: string;
   busy?: boolean;
   confirmDisabled?: boolean;
   onConfirm: () => void;
   onDismiss?: () => void;
-}
+};
 
 export interface AiChatProps {
   placeholder?: string;
@@ -127,11 +124,15 @@ export interface AiChatProps {
   defaultMessages?: AiChatMessage[];
   onMessagesChange?: (messages: AiChatMessage[]) => void;
   isLoading?: boolean;
-  onSend?: (message: string, options: AiChatSendOptions) => void | Promise<AiChatSendResult>;
-  onApprove?: () => void;
-  onTranscribe?: (audio: Blob) => Promise<string>;
+  onSend?: (message: string, ctx: AiChatSendContext) => void | Promise<string | AiChatMessage | void>;
+  onApprove?: () => void | Promise<void>;
+  onTranscribe?: (file: Blob) => Promise<string>;
   onQuickAction?: (actionId: string) => void;
-  onFeedback?: (feedback: AiChatFeedback) => void;
+  onFeedback?: (feedback: {
+    rating: "up" | "down";
+    request: string;
+    response: string;
+  }) => void;
   approval?: AiChatApproval | null;
   onClose?: () => void;
   onExpand?: () => void;
@@ -158,7 +159,18 @@ export interface AiChatProps {
   clearAllCancelLabel?: string;
   clearAllErrorLabel?: string;
   deleteSessionLabel?: string;
-  voiceCopy?: AiChatVoiceCopy;
+  voiceCopy?: {
+    listening?: string;
+    live?: string;
+    transcribing?: string;
+    turning?: string;
+    tooShort?: string;
+    missed?: string;
+    micBlocked?: string;
+    micFailed?: string;
+    unsupported?: string;
+    transcribeFailed?: string;
+  };
   /** Where session history is persisted. `local` uses browser localStorage; `remote` uses `remoteStorage`. */
   storage?: "local" | "remote";
   /** Required when `storage="remote"`. Wire to your backend API. */
@@ -167,8 +179,9 @@ export interface AiChatProps {
   sessionStorageKey?: string | false;
   sessionRetentionDays?: number;
   onSessionChange?: (sessionId: string) => void;
+  /** When a reply chip matches this label, resend the last user prompt without adding a user row. */
   retryLabel?: string;
-  /** Status line rendered on the in-flight assistant turn (and instead of the spinner while set). */
+  /** Live status row (webapp copy). Replaces tool chips and the bottom “Reasoning…” spinner. */
   statusSlot?: React.ReactNode;
   className?: string;
 }
@@ -178,7 +191,6 @@ export type {
   AiChatStorageState,
   StoredAiChatSession,
 } from "./ai-chat-storage";
-export type { AiChatVoiceCopy } from "./ai-chat-voice";
 export {
   formatAiChatDayName,
   formatAiChatDayNames,
@@ -190,24 +202,20 @@ const MAX_TEXTAREA_HEIGHT = 200;
 const BUBBLE_CLASS =
   "ai-chat-bubble block min-w-0 max-w-full overflow-x-auto overflow-y-hidden text-body-16 text-foreground [&_p]:my-2 first:[&_p]:mt-0 last:[&_p]:mb-0 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:ps-5 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:ps-5 [&_table]:my-2.5 [&_table]:w-max [&_table]:border-collapse [&_table]:text-[13px] [&_th]:whitespace-nowrap [&_td]:whitespace-nowrap [&_th]:border [&_td]:border [&_th]:border-border-soft [&_td]:border-border-soft [&_th]:bg-background [&_th]:px-2.5 [&_th]:py-1.5 [&_th]:text-start [&_th]:font-semibold [&_td]:px-2.5 [&_td]:py-1.5 [&_pre]:w-max [&_img]:max-w-full [&_img]:rounded-xl [&_blockquote]:my-2 [&_blockquote]:border-s-2 [&_blockquote]:border-border-soft [&_blockquote]:ps-3 [&_blockquote]:text-muted-foreground";
 
-function toAssistantMessage(
+function finalizeAssistant(
   content: string,
   extra?: Partial<AiChatMessage>,
 ): AiChatMessage {
-  const parsed = stripAiChatReplies(content);
+  const parsed = parseReplies(content);
   return {
     id: extra?.id ?? `assistant-${Date.now()}`,
     role: "assistant",
     content: parsed.text,
     replies:
-      extra?.replies ?? (parsed.replies.length ? parsed.replies : inferAiChatReplies(parsed.text)),
+      extra?.replies ?? (parsed.replies.length ? parsed.replies : fallbackReplies(parsed.text)),
     tools: extra?.tools,
     reasoning: extra?.reasoning,
   };
-}
-
-function isPreviewLeaf(node: React.ReactNode): node is string | number {
-  return typeof node === "string" || typeof node === "number";
 }
 
 export function AiChat({
@@ -479,7 +487,7 @@ export function AiChat({
   }, [persistSessions, remoteStorage, retentionMs, storage, storageKey, writeStorage]);
 
   React.useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    bottomRef.current?.scrollIntoView?.({ behavior: "smooth" });
   }, [messages, isLoading, approval]);
 
   React.useEffect(() => {
@@ -549,14 +557,14 @@ export function AiChat({
 
         if (typeof result === "string") {
           patchMessage(assistantId, (message) =>
-            toAssistantMessage(result, { id: assistantId, tools: message.tools }),
+            finalizeAssistant(result, { id: assistantId, tools: message.tools }),
           );
         } else if (result && typeof result === "object") {
           const restoreDraft = !!result.restoreDraft;
           setMessages((prev) => {
             let next = prev.map((message) =>
               message.id === assistantId
-                ? toAssistantMessage(result.content, {
+                ? finalizeAssistant(result.content, {
                     ...result,
                     id: assistantId,
                     tools: result.tools ?? message.tools,
@@ -570,7 +578,7 @@ export function AiChat({
           if (restoreDraft) setInput(text);
         } else {
           patchMessage(assistantId, (message) =>
-            toAssistantMessage(message.content, { id: assistantId, tools: message.tools }),
+            finalizeAssistant(message.content, { id: assistantId, tools: message.tools }),
           );
         }
       } finally {
@@ -603,8 +611,8 @@ export function AiChat({
   };
 
   const handleReplyClick = (label: string) => {
-    if (isApproveReplyChip(label)) {
-      onApprove?.();
+    if (isApproveReply(label)) {
+      void onApprove?.();
       return;
     }
     if (retryLabel && label.trim() === String(retryLabel).trim()) {
@@ -612,7 +620,7 @@ export function AiChat({
       if (lastUser) void sendMessage(lastUser.content, { reuseAssistant: true });
       return;
     }
-    void sendMessage(normalizeReplyChip(label));
+    void sendMessage(replySendText(label));
   };
 
   const handleQuickAction = (action: AiChatQuickAction) => {
@@ -620,7 +628,7 @@ export function AiChat({
     void sendMessage(action.label);
   };
 
-  const feedbackPayload = (message: AiChatMessage): Omit<AiChatFeedback, "rating"> => {
+  const feedbackPayload = (message: AiChatMessage) => {
     const index = messages.findIndex((item) => item.id === message.id);
     let request = "";
     for (let cursor = index - 1; cursor >= 0; cursor -= 1) {
@@ -633,7 +641,7 @@ export function AiChat({
   };
 
   const handleCopy = async (messageId: string, content: string) => {
-    await navigator.clipboard.writeText(stripAiChatReplies(content).text.replace(/\*\*/g, ""));
+    await navigator.clipboard.writeText(parseReplies(content).text.replace(/\*\*/g, ""));
     setCopiedId(messageId);
     window.setTimeout(() => setCopiedId(null), 2000);
   };
@@ -735,9 +743,6 @@ export function AiChat({
     [sessions],
   );
 
-  const previewLeaves = approval?.preview?.filter(isPreviewLeaf) ?? [];
-  const previewCards = approval?.preview?.filter((item) => !isPreviewLeaf(item)) ?? [];
-
   if (!storageReady) {
     return <div className={cn("flex h-full min-h-0 flex-col", className)} />;
   }
@@ -826,7 +831,7 @@ export function AiChat({
                       <div
                         className={BUBBLE_CLASS}
                         dir="auto"
-                        dangerouslySetInnerHTML={{ __html: renderAiChatMarkdown(message.content) }}
+                        dangerouslySetInnerHTML={{ __html: formatAssistantMarkdown(message.content) }}
                       />
                     ) : null}
                     {message.replies && message.replies.length > 0 && !isLoading ? (
@@ -884,28 +889,21 @@ export function AiChat({
                   className="space-y-3 rounded-2xl border border-amber-200 bg-amber-50 p-4"
                   data-slot="chat-approval"
                 >
-                  <p className="text-body-14-semibold text-foreground" dir="auto">
+                  <p className="text-body-14-semibold text-foreground">
                     {approval.title}
                   </p>
                   {approval.body ? (
-                    <p className="text-body-14 text-muted-foreground" dir="auto">
+                    <p className="text-body-14 text-muted-foreground">
                       {approval.body}
                     </p>
                   ) : null}
-                  {previewLeaves.length > 0 ? (
+                  {approval.preview && approval.preview.length > 0 ? (
                     <ul className="list-disc space-y-1 ps-5 text-body-14 text-muted-foreground">
-                      {previewLeaves.map((item) => (
-                        <li key={String(item)} dir="auto">
-                          {item}
-                        </li>
+                      {approval.preview.map((line) => (
+                        <li key={line}>{line}</li>
                       ))}
                     </ul>
                   ) : null}
-                  {previewCards.map((card, index) => (
-                    <div key={index} data-slot="chat-schedule-card-slot">
-                      {card}
-                    </div>
-                  ))}
                   <div className="flex gap-2">
                     <Button
                       variant="primary"

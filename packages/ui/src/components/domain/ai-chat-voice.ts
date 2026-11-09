@@ -11,7 +11,7 @@ const MIME_TYPES = [
   "audio/ogg;codecs=opus",
 ];
 
-export type AiChatVoiceCopy = {
+type VoiceCopy = {
   listening?: string;
   live?: string;
   transcribing?: string;
@@ -24,7 +24,7 @@ export type AiChatVoiceCopy = {
   transcribeFailed?: string;
 };
 
-export const DEFAULT_AI_CHAT_VOICE_COPY = {
+const DEFAULT_VOICE_COPY = {
   listening: "Listening",
   live: "Speak now — I’m listening",
   transcribing: "Transcribing",
@@ -35,9 +35,9 @@ export const DEFAULT_AI_CHAT_VOICE_COPY = {
   micFailed: "Could not open the microphone.",
   unsupported: "This browser cannot record audio.",
   transcribeFailed: "Could not transcribe that audio.",
-} satisfies Required<AiChatVoiceCopy>;
+} satisfies Required<VoiceCopy>;
 
-type VoiceCopyKey = keyof typeof DEFAULT_AI_CHAT_VOICE_COPY;
+type VoiceCopyKey = keyof typeof DEFAULT_VOICE_COPY;
 
 type RecordingSession = {
   dead: boolean;
@@ -53,55 +53,67 @@ type RecordingSession = {
   startedAt: number;
 };
 
-function pickMimeType() {
+export function pickVoiceMime() {
   if (typeof MediaRecorder === "undefined" || !MediaRecorder.isTypeSupported) return "";
   return MIME_TYPES.find((type) => MediaRecorder.isTypeSupported(type)) ?? "";
 }
 
-export function canRecordAiChatVoice() {
+export function voiceSupported() {
   if (typeof window === "undefined" || typeof navigator === "undefined") return false;
   return !!(
     (window.isSecureContext || window.location.hostname === "localhost") &&
     typeof navigator.mediaDevices?.getUserMedia === "function" &&
     typeof MediaRecorder !== "undefined" &&
-    pickMimeType()
+    pickVoiceMime()
   );
 }
 
-function joinTranscript(existing: string, next: string) {
+export function voiceFilename(mime: string): string {
+  const type = (mime || "audio/webm").split(";")[0] ?? "audio/webm";
+  if (type.includes("mp4")) return "prompt.m4a";
+  if (type.includes("ogg")) return "prompt.ogg";
+  return "prompt.webm";
+}
+
+export function joinVoicePrompt(existing: string, spoken: string) {
   const left = existing.replace(/\s+$/, "");
-  const right = next.replace(/^\s+/, "");
+  const right = spoken.replace(/^\s+/, "");
   if (!right) return left;
   return left ? `${left} ${right}` : right;
 }
 
-export function formatAiChatVoiceTimer(elapsedMs: number) {
-  const total = Math.floor(elapsedMs / 1000);
+export function formatVoiceClock(ms: number) {
+  const total = Math.floor(ms / 1000);
   const minutes = Math.floor(total / 60);
   const seconds = total % 60;
   return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
 }
 
-type UseAiChatVoiceArgs = {
+export type UseAiChatVoiceOptions = {
   enabled: boolean;
   input: string;
-  onTranscribe?: (audio: Blob) => Promise<string>;
+  onTranscribe?: (file: Blob) => Promise<string>;
   onSubmit: (text: string) => void;
-  copy?: AiChatVoiceCopy;
+  copy?: {
+    listening?: string;
+    live?: string;
+    transcribing?: string;
+    turning?: string;
+    tooShort?: string;
+    missed?: string;
+    micBlocked?: string;
+    micFailed?: string;
+    unsupported?: string;
+    transcribeFailed?: string;
+  };
 };
 
-export function useAiChatVoice({
-  enabled,
-  input,
-  onTranscribe,
-  onSubmit,
-  copy,
-}: UseAiChatVoiceArgs) {
+export function useAiChatVoice({ enabled, input, onTranscribe, onSubmit, copy }: UseAiChatVoiceOptions) {
   const copyRef = React.useRef(copy);
   copyRef.current = copy;
 
   const label = React.useCallback(
-    (key: VoiceCopyKey) => copyRef.current?.[key] || DEFAULT_AI_CHAT_VOICE_COPY[key],
+    (key: VoiceCopyKey) => copyRef.current?.[key] || DEFAULT_VOICE_COPY[key],
     [],
   );
 
@@ -118,7 +130,7 @@ export function useAiChatVoice({
   inputRef.current = input;
 
   React.useEffect(() => {
-    setSupported(!!onTranscribe && canRecordAiChatVoice());
+    setSupported(!!onTranscribe && voiceSupported());
   }, [onTranscribe]);
 
   const cancel = React.useCallback((keepError = false) => {
@@ -208,7 +220,7 @@ export function useAiChatVoice({
     if (session.dead) return;
 
     const elapsed = Date.now() - session.startedAt;
-    const blob = session.chunks.length ? new Blob(session.chunks, { type: pickMimeType() }) : null;
+    const blob = session.chunks.length ? new Blob(session.chunks, { type: pickVoiceMime() }) : null;
     if (elapsed < MIN_RECORDING_MS || !blob || blob.size < 800) {
       cancel(true);
       setError(label("tooShort"));
@@ -223,7 +235,7 @@ export function useAiChatVoice({
         setError(label("missed"));
         return;
       }
-      const next = joinTranscript(inputRef.current, transcript);
+      const next = joinVoicePrompt(inputRef.current, transcript);
       cancel();
       onSubmit(next);
     } catch (caught) {
@@ -236,7 +248,7 @@ export function useAiChatVoice({
     if (!enabled || !onTranscribe || sessionRef.current) return;
     setError("");
 
-    const mimeType = pickMimeType();
+    const mimeType = pickVoiceMime();
     let stream: MediaStream;
     try {
       stream = await navigator.mediaDevices.getUserMedia({
@@ -302,7 +314,7 @@ export function useAiChatVoice({
     session.clock = window.setInterval(() => {
       if (session.dead) return;
       const elapsed = Date.now() - session.startedAt;
-      setTimer(formatAiChatVoiceTimer(elapsed));
+      setTimer(formatVoiceClock(elapsed));
       if (elapsed >= MAX_RECORDING_MS) void stopAndSubmit();
     }, 200);
     recorder.start(200);

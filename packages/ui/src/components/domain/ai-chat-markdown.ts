@@ -6,7 +6,8 @@ const REPLIES_UNCLOSED = /<replies\b[^>]*>[\s\S]*$/i;
 const IMAGE_EXT = /\.(avif|gif|jpe?g|png|webp)$/i;
 const MD_IMAGE = /^!\[[^\]]*\]\([^)]*\)$/;
 
-const GALLERY_HOSTS = [
+/** Presigned AI Shield screenshots only. Host match is exact; path must continue past prefix. */
+export const SCREENSHOT_ORIGINS = [
   { host: "safelagoon-gallery.s3.amazonaws.com", pathPrefix: "/" },
   { host: "safelagoon-gallery.s3.eu-west-1.amazonaws.com", pathPrefix: "/" },
   { host: "s3.amazonaws.com", pathPrefix: "/safelagoon-gallery/" },
@@ -24,14 +25,16 @@ function parseHttpUrl(value: string): URL | null {
   }
 }
 
-function isGalleryShot(href: string) {
+export function isAllowedScreenshotUrl(raw: unknown): boolean {
+  const href =
+    typeof raw === "string" ? raw : raw instanceof URL ? raw.href : "";
   const url = parseHttpUrl(href);
   if (!url || url.protocol !== "https:" || url.username || url.password || url.port) return false;
   if (!IMAGE_EXT.test(url.pathname)) return false;
 
   const host = url.hostname.toLowerCase();
   const path = url.pathname;
-  return GALLERY_HOSTS.some(
+  return SCREENSHOT_ORIGINS.some(
     (entry) =>
       host === entry.host.toLowerCase() &&
       path.startsWith(entry.pathPrefix) &&
@@ -100,11 +103,11 @@ function configureMarked() {
         return `<p dir="auto">${this.parser.parseInline(tokens)}</p>\n`;
       },
       image({ href, text }) {
-        return isGalleryShot(href) ? renderShot(href, text) : renderLink(href, text || "Open link");
+        return isAllowedScreenshotUrl(href) ? renderShot(href, text) : renderLink(href, text || "Open link");
       },
       link({ href, text }) {
         const label = linkLabel(text);
-        return isGalleryShot(href) ? renderShot(href, label) : renderLink(href, label);
+        return isAllowedScreenshotUrl(href) ? renderShot(href, label) : renderLink(href, label);
       },
     },
   });
@@ -115,10 +118,10 @@ function fallbackHtml(value: string) {
   return `<p dir="auto">${escapeText(value || "").replace(/\n/g, "<br>")}</p>`;
 }
 
-export function stripAiChatReplies(content: string) {
+export function parseReplies(text: string) {
   const replies: string[] = [];
   const seen = new Set<string>();
-  const source = String(content || "");
+  const source = String(text || "");
 
   source.replace(/<replies\b[^>]*>([\s\S]*?)<\/replies>/gi, (_match, body: string) => {
     String(body)
@@ -165,22 +168,22 @@ function isWhQuestion(question: string) {
   );
 }
 
-export function isReplyOkPrompt(content: string) {
-  const text = String(content || "").toLowerCase();
-  if (!text) return false;
+export function asksForOk(text: string) {
+  const source = String(text || "").toLowerCase();
+  if (!source) return false;
   if (
-    /\breply\s+ok\b/.test(text) ||
-    /\b(type|say|press|tap|send|respond(?:\s+with)?)\s+ok\b/.test(text) ||
-    /\bok\b.{0,60}\b(continue|proceed|confirm)\b/.test(text) ||
-    /\b(continue|proceed|confirm).{0,60}\bok\b/.test(text) ||
-    /\b(shall|should|can|may) i proceed\b/.test(text) ||
-    /\b(want me to|shall i|should i) (go ahead|continue|proceed)\b/.test(text) ||
-    /\bgo ahead\?/.test(text)
+    /\breply\s+ok\b/.test(source) ||
+    /\b(type|say|press|tap|send|respond(?:\s+with)?)\s+ok\b/.test(source) ||
+    /\bok\b.{0,60}\b(continue|proceed|confirm)\b/.test(source) ||
+    /\b(continue|proceed|confirm).{0,60}\bok\b/.test(source) ||
+    /\b(shall|should|can|may) i proceed\b/.test(source) ||
+    /\b(want me to|shall i|should i) (go ahead|continue|proceed)\b/.test(source) ||
+    /\bgo ahead\?/.test(source)
   ) {
     return true;
   }
 
-  const question = trailingQuestion(text).toLowerCase();
+  const question = trailingQuestion(source).toLowerCase();
   if (!question || isWhQuestion(question)) return false;
 
   return (
@@ -200,14 +203,14 @@ export function isReplyOkPrompt(content: string) {
   );
 }
 
-export function isReplyApprovePrompt(content: string) {
-  const text = String(content || "").toLowerCase();
-  if (!text) return false;
+export function asksForApprove(text: string) {
+  const source = String(text || "").toLowerCase();
+  if (!source) return false;
   return (
-    /\breply\s+approve\b/.test(text) ||
-    /\b(type|say|press|tap|send|respond(?:\s+with)?)\s+approve\b/.test(text) ||
-    /\bplease approve\b/.test(text) ||
-    /\bapprove (this|the|it)\b/.test(text)
+    /\breply\s+approve\b/.test(source) ||
+    /\b(type|say|press|tap|send|respond(?:\s+with)?)\s+approve\b/.test(source) ||
+    /\bplease approve\b/.test(source) ||
+    /\bapprove (this|the|it)\b/.test(source)
   );
 }
 
@@ -239,18 +242,10 @@ function choiceReplies(content: string) {
   return options;
 }
 
-export function inferAiChatReplies(content: string) {
-  if (isReplyApprovePrompt(content)) return ["Reply Approve"];
-  if (isReplyOkPrompt(content)) return ["Reply OK"];
-  return choiceReplies(content);
-}
-
-export function normalizeReplyChip(label: string) {
-  return /^reply ok$/i.test(label.trim()) ? "OK" : label;
-}
-
-export function isApproveReplyChip(label: string) {
-  return /^reply approve$/i.test(label.trim());
+export function fallbackReplies(text: string) {
+  if (asksForApprove(text)) return ["Reply Approve"];
+  if (asksForOk(text)) return ["Reply OK"];
+  return choiceReplies(text);
 }
 
 function prepareMarkdown(content: string) {
@@ -260,12 +255,12 @@ function prepareMarkdown(content: string) {
     .replace(/([^\n])[ \t]*\n?(?=\*\*[^*\n]{1,80}\*\*\s*[–—-])/g, "$1\n\n");
 }
 
-export function renderAiChatMarkdown(content: string) {
-  const text = prepareMarkdown(stripAiChatReplies(content).text);
-  if (typeof window === "undefined") return fallbackHtml(text);
+export function formatAssistantMarkdown(text: string) {
+  const source = prepareMarkdown(parseReplies(text).text);
+  if (typeof window === "undefined") return fallbackHtml(source);
 
   configureMarked();
-  let html = String(marked.parse(text, { async: false }));
+  let html = String(marked.parse(source, { async: false }));
   html = /<p\b/i.test(html)
     ? html.replace(/<p\b(?![^>]*\bdir=)/gi, `<p dir="auto"`)
     : `<p dir="auto">${html}</p>`;
@@ -275,4 +270,12 @@ export function renderAiChatMarkdown(content: string) {
     ADD_ATTR: ["target", "loading", "referrerpolicy", "dir"],
     FORBID_TAGS: ["style", "script"],
   });
+}
+
+export function replySendText(label: string) {
+  return /^reply ok$/i.test(label.trim()) ? "OK" : label;
+}
+
+export function isApproveReply(label: string) {
+  return /^reply approve$/i.test(label.trim());
 }

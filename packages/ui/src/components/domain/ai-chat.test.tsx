@@ -1,9 +1,31 @@
 import type { ComponentProps } from "react";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { AiChat, formatAiChatDayName, formatAiChatDayNames, parseAiChatDayToken } from "./ai-chat";
-import { inferAiChatReplies, isApproveReplyChip, renderAiChatMarkdown } from "./ai-chat-markdown";
-import { formatAiChatVoiceTimer } from "./ai-chat-voice";
+import {
+  AiChat,
+  formatAiChatDayName,
+  formatAiChatDayNames,
+  parseAiChatDayToken,
+  type AiChatSendContext,
+} from "./ai-chat";
+import {
+  SCREENSHOT_ORIGINS,
+  asksForApprove,
+  asksForOk,
+  fallbackReplies,
+  formatAssistantMarkdown,
+  isAllowedScreenshotUrl,
+  isApproveReply,
+  parseReplies,
+  replySendText,
+} from "./ai-chat-markdown";
+import {
+  formatVoiceClock,
+  joinVoicePrompt,
+  pickVoiceMime,
+  voiceFilename,
+  voiceSupported,
+} from "./ai-chat-voice";
 
 function renderChat(props: Partial<ComponentProps<typeof AiChat>> = {}) {
   return render(<AiChat sessionStorageKey={false} {...props} />);
@@ -22,24 +44,51 @@ describe("formatAiChatDayName", () => {
 
 describe("ai-chat markdown + bidi", () => {
   it("wraps paragraphs in dir=auto and keeps GFM links", () => {
-    const html = renderAiChatMarkdown("Hello **Noah**\n\n[Open](https://example.com)");
+    const html = formatAssistantMarkdown("Hello **Noah**\n\n[Open](https://example.com)");
     expect(html).toContain('dir="auto"');
     expect(html).toContain("ai-chat-md-link");
     expect(html).toContain("<strong>");
   });
 
+  it("parses <replies> chips and strips them from the body", () => {
+    const parsed = parseReplies("Ready.\n<replies>\nReply OK\nReply Approve\n</replies>");
+    expect(parsed.text).toBe("Ready.");
+    expect(parsed.replies).toEqual(["Reply OK", "Reply Approve"]);
+  });
+
   it("infers Reply Approve / Reply OK chips", () => {
-    expect(inferAiChatReplies("Please approve this change.")).toEqual(["Reply Approve"]);
-    expect(inferAiChatReplies("Shall I proceed?")).toEqual(["Reply OK"]);
-    expect(isApproveReplyChip("Reply Approve")).toBe(true);
+    expect(asksForApprove("Please approve this change.")).toBe(true);
+    expect(asksForOk("Shall I proceed?")).toBe(true);
+    expect(fallbackReplies("Please approve this change.")).toEqual(["Reply Approve"]);
+    expect(fallbackReplies("Shall I proceed?")).toEqual(["Reply OK"]);
+    expect(isApproveReply("Reply Approve")).toBe(true);
+    expect(replySendText("Reply OK")).toBe("OK");
+  });
+
+  it("allows only presigned gallery screenshot URLs", () => {
+    expect(SCREENSHOT_ORIGINS).toHaveLength(4);
+    expect(
+      isAllowedScreenshotUrl(
+        "https://safelagoon-gallery.s3.amazonaws.com/shots/emma.png",
+      ),
+    ).toBe(true);
+    expect(
+      isAllowedScreenshotUrl(
+        new URL("https://s3.eu-west-1.amazonaws.com/safelagoon-gallery/a.webp"),
+      ),
+    ).toBe(true);
+    expect(isAllowedScreenshotUrl("https://example.com/shot.png")).toBe(false);
+    expect(isAllowedScreenshotUrl("http://safelagoon-gallery.s3.amazonaws.com/a.png")).toBe(false);
+    expect(isAllowedScreenshotUrl("https://safelagoon-gallery.s3.amazonaws.com/")).toBe(false);
+    expect(isAllowedScreenshotUrl(null)).toBe(false);
   });
 });
 
 describe("AiChat approval cards", () => {
-  it("renders Hebrew detail with dir=auto, tool copy, and schedule-card child slot", () => {
+  it("renders Hebrew preview strings as a list (no dir=auto, no React-node slot)", () => {
     const onConfirm = vi.fn();
     const onDismiss = vi.fn();
-    const { getByText, getByRole } = renderChat({
+    const { getByText, getByRole, queryByText } = renderChat({
       messages: [
         { id: "u1", role: "user", content: "Bedtime for נועה" },
         { id: "a1", role: "assistant", content: "Ready." },
@@ -47,12 +96,7 @@ describe("AiChat approval cards", () => {
       approval: {
         title: "Confirm this change",
         body: "Allow update_schedule?",
-        preview: [
-          "ראשון–חמישי · 21:00–07:00",
-          <div key="card" data-slot="schedule-card">
-            נועה
-          </div>,
-        ],
+        preview: ["ראשון–חמישי · 21:00–07:00", "נועה"],
         confirmLabel: "Approve",
         dismissLabel: "Dismiss",
         onConfirm,
@@ -62,11 +106,11 @@ describe("AiChat approval cards", () => {
 
     const card = document.querySelector('[data-slot="chat-approval"]')!;
     expect(card).toBeTruthy();
-    expect(getByText("Allow update_schedule?")).toHaveAttribute("dir", "auto");
-    expect(getByText("ראשון–חמישי · 21:00–07:00")).toHaveAttribute("dir", "auto");
-    expect(document.querySelector('[data-slot="chat-schedule-card-slot"] [data-slot="schedule-card"]')).toHaveTextContent(
-      "נועה",
-    );
+    expect(getByText("Allow update_schedule?")).not.toHaveAttribute("dir");
+    expect(getByText("ראשון–חמישי · 21:00–07:00").tagName).toBe("LI");
+    expect(getByText("נועה").tagName).toBe("LI");
+    expect(document.querySelector('[data-slot="chat-schedule-card-slot"]')).toBeNull();
+    expect(queryByText("Allow update_schedule?")?.getAttribute("dir")).toBeNull();
     fireEvent.click(getByRole("button", { name: "Approve" }));
     fireEvent.click(getByRole("button", { name: "Dismiss" }));
     expect(onConfirm).toHaveBeenCalledOnce();
@@ -92,11 +136,16 @@ describe("AiChat approval cards", () => {
   });
 });
 
-describe("AiChat voice input", () => {
-  it("formats the recording timer", () => {
-    expect(formatAiChatVoiceTimer(0)).toBe("0:00");
-    expect(formatAiChatVoiceTimer(5_000)).toBe("0:05");
-    expect(formatAiChatVoiceTimer(75_000)).toBe("1:15");
+describe("AiChat voice helpers", () => {
+  it("maps mime types to prompt filenames and formats the clock", () => {
+    expect(voiceFilename("audio/webm;codecs=opus")).toBe("prompt.webm");
+    expect(voiceFilename("audio/mp4")).toBe("prompt.m4a");
+    expect(voiceFilename("audio/ogg;codecs=opus")).toBe("prompt.ogg");
+    expect(joinVoicePrompt("Lock", "Emma's phone")).toBe("Lock Emma's phone");
+    expect(joinVoicePrompt("", "Lock Emma's phone")).toBe("Lock Emma's phone");
+    expect(formatVoiceClock(0)).toBe("0:00");
+    expect(formatVoiceClock(5_000)).toBe("0:05");
+    expect(formatVoiceClock(75_000)).toBe("1:15");
   });
 
   it("shows the mic when onTranscribe is provided in a secure context", () => {
@@ -113,6 +162,9 @@ describe("AiChat voice input", () => {
         }
       },
     );
+
+    expect(pickVoiceMime()).toBeTruthy();
+    expect(voiceSupported()).toBe(true);
 
     const { getByRole } = renderChat({
       onTranscribe: async () => "Lock Emma's phone",
@@ -173,8 +225,23 @@ describe("AiChat status line and replies", () => {
     expect(queryByText("Thinking…")).not.toBeInTheDocument();
   });
 
+  it("does not render stored tool chips (statusSlot replaced them)", () => {
+    const { queryByText } = renderChat({
+      messages: [
+        {
+          id: "a1",
+          role: "assistant",
+          content: "Done.",
+          tools: [{ id: "schedules.list", label: "Checking schedules", busy: false }],
+        },
+      ],
+    });
+
+    expect(queryByText("Checking schedules")).not.toBeInTheDocument();
+  });
+
   it("sends Reply Approve to onApprove and Reply OK as OK", async () => {
-    const onApprove = vi.fn();
+    const onApprove = vi.fn(async () => undefined);
     const onSend = vi.fn(async () => "Done");
     const { getByRole } = renderChat({
       sessionStorageKey: false,
@@ -197,13 +264,37 @@ describe("AiChat status line and replies", () => {
     fireEvent.click(getByRole("button", { name: "Reply OK" }));
     await waitFor(() => expect(onSend).toHaveBeenCalledWith("OK", expect.any(Object)));
   });
+
+  it("resends the last user prompt on retryLabel without appending a user row", async () => {
+    const onSend = vi.fn(async () => "Again");
+    const { getByRole } = renderChat({
+      retryLabel: "Try again",
+      onSend,
+      messages: [
+        { id: "u1", role: "user", content: "Lock Emma's phone" },
+        { id: "a1", role: "assistant", content: "Failed.", replies: ["Try again"] },
+      ],
+    });
+
+    fireEvent.click(getByRole("button", { name: "Try again" }));
+    await waitFor(() =>
+      expect(onSend).toHaveBeenCalledWith(
+        "Lock Emma's phone",
+        expect.objectContaining({
+          onDelta: expect.any(Function),
+          onTool: expect.any(Function),
+        }),
+      ),
+    );
+    expect(document.querySelectorAll("div.bg-lilac")).toHaveLength(1);
+  });
 });
 
 describe("AiChat streaming send", () => {
   it("appends onDelta chunks onto the assistant bubble", async () => {
-    const onSend = vi.fn(async (_text, { onDelta }) => {
-      onDelta?.("Emma has ");
-      onDelta?.("**1h 42m**");
+    const onSend = vi.fn(async (_text: string, ctx: AiChatSendContext) => {
+      ctx.onDelta("Emma has ");
+      ctx.onDelta("**1h 42m**");
     });
     const { getByPlaceholderText, getByRole } = renderChat({ onSend });
 
@@ -219,5 +310,34 @@ describe("AiChat streaming send", () => {
       expect(bubble?.textContent).toMatch(/Emma has/);
       expect(bubble?.innerHTML).toContain("<strong>");
     });
+  });
+
+  it("stores onTool chips on the in-flight assistant and restoreDraft pops the user turn", async () => {
+    const onSend = vi.fn(async (_text: string, ctx: AiChatSendContext) => {
+      ctx.onTool({ id: "schedules.list", label: "Checking schedules", busy: true });
+      return {
+        id: "restored",
+        role: "assistant" as const,
+        content: "Need a child first.",
+        restoreDraft: true,
+      };
+    });
+    const { getByPlaceholderText } = renderChat({ onSend });
+
+    const composer = getByPlaceholderText(/Ask about screen time/) as HTMLTextAreaElement;
+    fireEvent.change(composer, { target: { value: "Lock Emma's phone" } });
+    fireEvent.submit(composer.closest("form")!);
+
+    await waitFor(() => expect(onSend).toHaveBeenCalled());
+    await waitFor(() => {
+      expect((getByPlaceholderText(/Ask about screen time/) as HTMLTextAreaElement).value).toBe(
+        "Lock Emma's phone",
+      );
+    });
+    expect(document.querySelector("div.bg-lilac")).toBeNull();
+
+    const ctx = onSend.mock.calls[0]?.[1] as AiChatSendContext;
+    expect(typeof ctx.onDelta).toBe("function");
+    expect(typeof ctx.onTool).toBe("function");
   });
 });
