@@ -195,6 +195,59 @@ describe("AiChat remote active-session restore", () => {
     expect(await findByRole("button", { name: /Untitled/ })).toBeInTheDocument();
     expect(await findByRole("button", { name: /Named chat/ })).toBeInTheDocument();
   });
+
+  it("drops an untitled-placeholder candidate whose hydrate fails and boots a fresh session", async () => {
+    const onSessionChange = vi.fn();
+    const loadSession = vi.fn(async () => null);
+    const remoteStorage = mockRemote(
+      remoteState("placeholder", [
+        stored("placeholder", { summary: "\u00a0" }),
+        stored("named", {
+          summary: "Named chat",
+          messages: [{ id: "u1", role: "user", content: "Named chat" }],
+        }),
+      ]),
+      { loadSession },
+    );
+
+    const { findByRole, getAllByText, queryByRole } = render(
+      <AiChat storage="remote" remoteStorage={remoteStorage} onSessionChange={onSessionChange} />,
+    );
+
+    expect(await findByRole("button", { name: "Chat sessions" })).toBeInTheDocument();
+    await waitFor(() => expect(loadSession).toHaveBeenCalledWith("placeholder"));
+    await waitFor(() => expect(onSessionChange).toHaveBeenCalled());
+    expect(onSessionChange.mock.calls.at(-1)?.[0]).not.toBe("placeholder");
+
+    fireEvent.click(await findByRole("button", { name: "Chat sessions" }));
+    expect(await findByRole("button", { name: /Named chat/ })).toBeInTheDocument();
+    // Header "New chat" + the fresh empty session row. The NBSP placeholder is gone.
+    expect(getAllByText("New chat")).toHaveLength(2);
+    expect(queryByRole("button", { name: /^\s+$/ })).toBeNull();
+  });
+
+  it("keeps a titled candidate in the list when hydrate fails", async () => {
+    const onSessionChange = vi.fn();
+    const loadSession = vi.fn(async () => {
+      throw new Error("unavailable");
+    });
+    const remoteStorage = mockRemote(
+      remoteState("titled", [stored("titled", { summary: "School night bedtime" })]),
+      { loadSession },
+    );
+
+    const { findByRole } = render(
+      <AiChat storage="remote" remoteStorage={remoteStorage} onSessionChange={onSessionChange} />,
+    );
+
+    expect(await findByRole("button", { name: "Chat sessions" })).toBeInTheDocument();
+    await waitFor(() => expect(loadSession).toHaveBeenCalledWith("titled"));
+    await waitFor(() => expect(onSessionChange).toHaveBeenCalled());
+    expect(onSessionChange.mock.calls.at(-1)?.[0]).not.toBe("titled");
+
+    fireEvent.click(await findByRole("button", { name: "Chat sessions" }));
+    expect(await findByRole("button", { name: /School night bedtime/ })).toBeInTheDocument();
+  });
 });
 
 describe("AiChat local storage", () => {

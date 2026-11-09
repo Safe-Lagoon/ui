@@ -301,9 +301,9 @@ export function AiChat({
             (item) => item.messages.length > 0 || item.summary,
           );
 
-          const bootFresh = () => {
+          const bootFresh = (nextKept = kept) => {
             const session = createEmptySession();
-            setSessions([session, ...kept]);
+            setSessions([session, ...nextKept]);
             setActiveSessionId(session.id);
             setInternalMessages([]);
             onSessionChange?.(session.id);
@@ -313,22 +313,31 @@ export function AiChat({
           if (!match) {
             bootFresh();
           } else if (match.messages.length === 0 && remoteStorage?.loadSession) {
+            let hydrateFailed = false;
+            let detailed: StoredAiChatSession | null = null;
             try {
-              const detailed = await remoteStorage.loadSession(match.id);
+              detailed = await remoteStorage.loadSession(match.id);
               if (cancelled) return;
-              if (!detailed) {
-                bootFresh();
-              } else {
-                setSessions(
-                  kept.map((item) => (item.id === match.id ? { ...detailed, id: match.id } : item)),
-                );
-                setActiveSessionId(match.id);
-                setInternalMessages(detailed.messages);
-                onSessionChange?.(match.id);
-              }
+              if (!detailed) hydrateFailed = true;
             } catch {
               if (cancelled) return;
-              bootFresh();
+              hydrateFailed = true;
+            }
+
+            if (hydrateFailed) {
+              // Drop untitled placeholders that only survived `kept` via blank/NBSP summary.
+              const listed = kept.filter(
+                (item) =>
+                  item.messages.length > 0 || item.summary.replace(/\u00a0/g, " ").trim() !== "",
+              );
+              bootFresh(listed);
+            } else {
+              setSessions(
+                kept.map((item) => (item.id === match.id ? { ...detailed!, id: match.id } : item)),
+              );
+              setActiveSessionId(match.id);
+              setInternalMessages(detailed!.messages);
+              onSessionChange?.(match.id);
             }
           } else {
             setSessions(kept);
