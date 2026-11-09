@@ -43,6 +43,41 @@ body {
   animation: ai-chat-border-roll 2.8s linear infinite;
 }
 
+a.ai-chat-md-link {
+  color: var(--color-violet);
+  text-underline-offset: 0.18em;
+  border-radius: 2px;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+}
+
+a.ai-chat-md-link:hover {
+  color: var(--color-violet-active);
+}
+
+.dark a.ai-chat-md-link {
+  color: var(--color-brand-blue-400);
+}
+
+.dark a.ai-chat-md-link:hover {
+  color: var(--color-brand-blue-300);
+}
+
+a.ai-chat-md-link:focus {
+  outline: none;
+}
+
+a.ai-chat-md-link:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+.ai-chat-thread [data-radix-scroll-area-viewport] > div {
+  width: 100%;
+  min-width: 0 !important;
+  display: block !important;
+}
+
 @keyframes sheet-slide-in-from-left {
   from {
     transform: translateX(-100%);
