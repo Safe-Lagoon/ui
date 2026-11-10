@@ -16,7 +16,7 @@ import { MetricRing, SectionCard } from "./section-card";
 import { StatusBanner } from "./status-banner";
 
 describe("shellModeFromWidth", () => {
-  it("maps proto breakpoints 430 / 431 / 900 / 901", () => {
+  it("maps proto breakpoints 430 / 431 / 900 / 901 (default phoneMaxWidth)", () => {
     expect(shellModeFromWidth(430)).toBe("phone");
     expect(shellModeFromWidth(431)).toBe("tablet");
     expect(shellModeFromWidth(900)).toBe("tablet");
@@ -24,6 +24,22 @@ describe("shellModeFromWidth", () => {
     expect(shellModeFromWidth(1280)).toBe("desktop");
     expect(shellModeFromWidth(820)).toBe("tablet");
     expect(shellModeFromWidth(390)).toBe("phone");
+  });
+
+  it("uses phoneMaxWidth 640: 640 phone, 641 tablet, 900 tablet, 901 desktop", () => {
+    expect(shellModeFromWidth(640, 640)).toBe("phone");
+    expect(shellModeFromWidth(641, 640)).toBe("tablet");
+    expect(shellModeFromWidth(900, 640)).toBe("tablet");
+    expect(shellModeFromWidth(901, 640)).toBe("desktop");
+  });
+
+  it("clamps phoneMaxWidth ≥ 900 so the tablet band stays non-empty", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    expect(shellModeFromWidth(899, 900)).toBe("phone");
+    expect(shellModeFromWidth(900, 900)).toBe("tablet");
+    expect(shellModeFromWidth(901, 1000)).toBe("desktop");
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
   });
 });
 
@@ -300,6 +316,50 @@ describe("AppPhoneChrome", () => {
     );
     expect(getByText("Sam")).toBeInTheDocument();
     expect(getByLabelText("iOS")).toBeInTheDocument();
+  });
+});
+
+describe("AppShellLayout phoneMaxWidth", () => {
+  it("treats 640 as phone and 641 as tablet when phoneMaxWidth is 640", () => {
+    const prev = window.innerWidth;
+    class FakeResizeObserver {
+      observe() {}
+      disconnect() {}
+      unobserve() {}
+    }
+    const prevRO = globalThis.ResizeObserver;
+    vi.stubGlobal("ResizeObserver", FakeResizeObserver);
+    try {
+      Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: 640 });
+      const phone = render(
+        <AppShellLayout
+          className="h-[640px]"
+          phoneMaxWidth={640}
+          profile={{ name: "Alexander Demo", avatarFallback: "AD" }}
+        >
+          <p>page</p>
+        </AppShellLayout>,
+      );
+      expect(phone.container.querySelector("[data-shell-mode]")).toHaveAttribute("data-shell-mode", "phone");
+      phone.unmount();
+
+      Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: 641 });
+      const tablet = render(
+        <AppShellLayout
+          className="h-[640px]"
+          phoneMaxWidth={640}
+          profile={{ name: "Alexander Demo", avatarFallback: "AD" }}
+        >
+          <p>page</p>
+        </AppShellLayout>,
+      );
+      expect(tablet.container.querySelector("[data-shell-mode]")).toHaveAttribute("data-shell-mode", "tablet");
+      tablet.unmount();
+    } finally {
+      Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: prev });
+      if (prevRO) vi.stubGlobal("ResizeObserver", prevRO);
+      else vi.unstubAllGlobals();
+    }
   });
 });
 

@@ -77,6 +77,7 @@ export const docPropsBySlug: Record<string, DocProp[]> = {
     { name: "collapsed", type: "boolean", description: "Controlled sidebar collapsed state." },
     { name: "onCollapsedChange", type: "(collapsed: boolean) => void", description: "Called when sidebar is collapsed or expanded." },
     { name: "LinkComponent", type: "Component", description: "Custom link component (e.g. Next.js Link)." },
+    { name: "phoneMaxWidth", type: "number", default: "430", description: "Inclusive max width (px) treated as phone. Tablet stays ≤900. Must be < 900 (values ≥900 are clamped so the tablet band cannot be empty)." },
     { name: "title", type: "string", description: "AppShellPageHeader — page heading inside the work area." },
     { name: "icon", type: "ReactNode", description: "AppShellPageHeader — icon shown in the colored square before the title." },
     { name: "showDivider", type: "boolean", default: "false", description: "AppShellPageHeader — full-width divider below the header row." },

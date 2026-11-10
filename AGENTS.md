@@ -297,7 +297,7 @@ import { AiChat, NotificationsPanel } from "@safelagoon/ui";
 **Layout rules agents must follow:**
 
 - Shell sits on canvas `#e8ecef`. Do not wrap the work area in an inner white card. `PageBody` owns proto padding (desktop 28/32/48, rail 24/28/40, phone 16/14/32) via `data-shell-mode`.
-- Breakpoints: `shellModeFromWidth` is ≤430 phone, ≤900 tablet/rail, else desktop.
+- Breakpoints: `shellModeFromWidth` is ≤`phoneMaxWidth` phone (default 430), ≤900 tablet/rail, else desktop. `AppShellLayout` takes optional `phoneMaxWidth`; values ≥900 are clamped so the tablet band stays non-empty.
 - Hubs: 28px/22px `h1` only. Drills: 13px `DotCrumbs` (`·`) then the same `h1`. Home: no header.
 - Sidebar and main scroll independently (`h-svh overflow-hidden` on shell, `overflow-auto` on `<main>`).
 - Optional slots: `aiChat` + `AiChatTrigger`, `notifications` (bell opens a dialog popup, not a sidebar item).

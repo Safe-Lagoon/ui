@@ -14,7 +14,12 @@ import {
   type AppSidebarLinkComponentProps,
   type AppSidebarProfile,
 } from "../components/domain/app-sidebar";
-import { AppShellNavigationContext, shellModeFromWidth, type AppShellMode } from "./app-shell-navigation-context";
+import {
+  AppShellNavigationContext,
+  DEFAULT_PHONE_MAX_WIDTH,
+  shellModeFromWidth,
+  type AppShellMode,
+} from "./app-shell-navigation-context";
 
 export interface AppShellLayoutProps {
   logo?: React.ReactNode;
@@ -56,6 +61,11 @@ export interface AppShellLayoutProps {
   notificationsLabel?: string;
   profileMenuLabel?: string;
   LinkComponent?: React.ComponentType<AppSidebarLinkComponentProps>;
+  /**
+   * Inclusive max width (px) treated as phone. Default 430 (proto). Tablet remains ≤900.
+   * Must be < 900 so the tablet band cannot be empty; values ≥900 are clamped with a console warning.
+   */
+  phoneMaxWidth?: number;
   className?: string;
 }
 
@@ -96,6 +106,7 @@ export function AppShellLayout({
   notificationsLabel = "Notifications",
   profileMenuLabel = "Open profile menu",
   LinkComponent,
+  phoneMaxWidth = DEFAULT_PHONE_MAX_WIDTH,
   className,
 }: AppShellLayoutProps) {
   const [internalCollapsed, setInternalCollapsed] = React.useState(defaultCollapsed);
@@ -104,7 +115,7 @@ export function AppShellLayout({
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [inlineMenuActive, setInlineMenuActive] = React.useState(false);
   const [shellMode, setShellMode] = React.useState<AppShellMode>(() =>
-    typeof window === "undefined" ? "desktop" : shellModeFromWidth(window.innerWidth),
+    typeof window === "undefined" ? "desktop" : shellModeFromWidth(window.innerWidth, phoneMaxWidth),
   );
   const shellRef = React.useRef<HTMLDivElement>(null);
 
@@ -114,7 +125,7 @@ export function AppShellLayout({
     const update = () => {
       const fromNode = node.getBoundingClientRect().width;
       const width = fromNode > 0 ? fromNode : window.innerWidth;
-      setShellMode(shellModeFromWidth(width));
+      setShellMode(shellModeFromWidth(width, phoneMaxWidth));
     };
     update();
     const resizeObserver = new ResizeObserver(update);
@@ -124,7 +135,7 @@ export function AppShellLayout({
       resizeObserver.disconnect();
       window.removeEventListener("resize", update);
     };
-  }, []);
+  }, [phoneMaxWidth]);
 
   const phone = shellMode === "phone";
   const tablet = shellMode === "tablet";
@@ -303,5 +314,5 @@ export function AppShellLayout({
   );
 }
 
-export { shellModeFromWidth };
+export { DEFAULT_PHONE_MAX_WIDTH, TABLET_MAX_WIDTH, shellModeFromWidth } from "./app-shell-navigation-context";
 export type { AppShellMode };

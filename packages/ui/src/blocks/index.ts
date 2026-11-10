@@ -30,7 +30,12 @@ export type {
   EventTimelineType,
 } from "./event-timeline-layout";
 
-export { AppShellLayout, shellModeFromWidth } from "./app-shell-layout";
+export {
+  AppShellLayout,
+  DEFAULT_PHONE_MAX_WIDTH,
+  TABLET_MAX_WIDTH,
+  shellModeFromWidth,
+} from "./app-shell-layout";
 export type { AppShellLayoutProps, AppShellMode } from "./app-shell-layout";
 export { AppShellPageHeader } from "./app-shell-page-header";
 export type { AppShellPageHeaderProps } from "./app-shell-page-header";

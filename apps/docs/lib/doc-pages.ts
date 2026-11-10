@@ -114,7 +114,7 @@ export const docPages: Record<string, DocPage> = {
   "app-shell": {
     title: "App Shell",
     description:
-      "Three-width portal shell on canvas #e8ecef: desktop sidebar 240, tablet rail 72 (≤900), phone chrome (hamburger · child avatar · 18px name · OS badge). Breakpoints are proto: ≤430 / ≤900 / >900. No inner white work-area card. Nav is the 240px left sheet — no bottom tab bar. Home has no page title. Hubs are 28px/22px h1; drills are 16px DotCrumbs then the same h1.",
+      "Three-width portal shell on canvas #e8ecef: desktop sidebar 240, tablet rail 72 (≤900), phone chrome (hamburger · child avatar · 18px name · OS badge). Breakpoints are proto: ≤phoneMaxWidth (default 430) / ≤900 / >900. Pass phoneMaxWidth to move the phone/tablet cut (must be < 900). No inner white work-area card. Nav is the 240px left sheet — no bottom tab bar. Home has no page title. Hubs are 28px/22px h1; drills are 16px DotCrumbs then the same h1.",
     examples: [
       { title: "Sidebar + work area", preview: "app-shell-demo" },
       { title: "Home · 1280 / 820 / 390", preview: "home-shell-demo" },
