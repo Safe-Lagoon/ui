@@ -16,10 +16,13 @@ export interface SessionFilmstripProps extends ScreenMirrorViewerProps {
 
 export function SessionFilmstrip({ className, sessionLabel = "Session", ...props }: SessionFilmstripProps) {
   return (
-    <div data-slot="session-filmstrip">
+    <div
+      data-slot="session-filmstrip"
+      className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
+    >
       <ScreenMirrorViewer
         sessionLabel={sessionLabel}
-        className={cn("rounded-[14px] border border-border-soft bg-card p-3", className)}
+        className={cn("min-h-0 flex-1", className)}
         {...props}
       />
     </div>

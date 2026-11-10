@@ -12,22 +12,25 @@ export type SectionCardLink = {
 export interface MetricRingProps {
   ratio?: number;
   empty?: boolean;
+  color?: string;
   className?: string;
 }
 
-export function MetricRing({ ratio = 0, empty, className }: MetricRingProps) {
+export function MetricRing({ ratio = 0, empty, color, className }: MetricRingProps) {
   const clamped = Math.max(0, Math.min(1, ratio));
   const deg = empty || clamped <= 0 ? 0 : Math.round(clamped * 360);
+  const fill = color ?? "var(--color-lilac)";
 
   return (
     <span
       aria-hidden
+      data-slot="metric-ring"
       className={cn("size-[52px] shrink-0 rounded-full", className)}
       style={{
         background:
           empty || deg === 0
             ? "conic-gradient(var(--color-border-soft) 0deg 360deg)"
-            : `conic-gradient(var(--color-lilac) 0deg ${deg}deg, var(--color-border-soft) ${deg}deg 360deg)`,
+            : `conic-gradient(${fill} 0deg ${deg}deg, var(--color-border-soft) ${deg}deg 360deg)`,
       }}
     >
       <span className="block size-full rounded-full border-[5px] border-transparent bg-card [background-clip:padding-box]" />

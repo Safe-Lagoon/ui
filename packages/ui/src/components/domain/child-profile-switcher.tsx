@@ -98,7 +98,7 @@ export function ChildProfileSwitcher({
         <button
           type="button"
           className={cn(
-            "group flex items-center text-start transition-colors",
+            "group flex cursor-pointer items-center text-start transition-colors",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             chip
               ? "gap-2 rounded-full border border-border-soft bg-card px-2 py-1"

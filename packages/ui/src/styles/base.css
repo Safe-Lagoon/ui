@@ -126,3 +126,43 @@ body {
 .sheet-overlay[data-state="closed"] {
   animation: sheet-overlay-fade-out 100ms ease-in both;
 }
+
+@keyframes sl-skel {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.sl-skel {
+  background-color: var(--color-border-soft);
+  background-image: linear-gradient(
+    90deg,
+    var(--color-border-soft) 0%,
+    color-mix(in oklab, var(--color-muted) 80%, white) 50%,
+    var(--color-border-soft) 100%
+  );
+  background-size: 200% 100%;
+  animation: sl-skel 1.2s ease-in-out infinite;
+}
+
+@keyframes sl-mode-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.sl-mode-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.35), transparent);
+  animation: sl-mode-shimmer 1s linear infinite;
+  pointer-events: none;
+}

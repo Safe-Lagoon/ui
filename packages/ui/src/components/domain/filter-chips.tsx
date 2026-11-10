@@ -32,7 +32,7 @@ export function FilterChips({
       role="toolbar"
       aria-label="Filters"
       data-slot="filter-chips"
-      className={cn("flex flex-wrap gap-2", className)}
+      className={cn("mb-[18px] flex flex-wrap gap-2", className)}
       {...props}
     >
       {items.map((item) => {
@@ -58,8 +58,8 @@ export function FilterChips({
             {item.count != null ? (
               <span
                 className={cn(
-                  "rounded-full px-1.5 text-[11px] font-bold",
-                  on ? "bg-white/25 text-white" : "bg-muted text-muted-foreground",
+                  "text-[11px] font-bold opacity-90",
+                  on && "rounded-full bg-white/25 px-1.5 py-px text-white opacity-100",
                 )}
               >
                 {item.count}

@@ -9,11 +9,11 @@ export interface ChatSplitLayoutProps {
 
 export function ChatSplitLayout({ threads, conversation, className }: ChatSplitLayoutProps) {
   return (
-    <div data-slot="chat-split-layout" className={cn("flex min-h-0 flex-1 gap-3", className)}>
-      <aside className="flex w-[260px] shrink-0 flex-col overflow-hidden rounded-[10px] border border-border-soft bg-background">
+    <div data-slot="chat-split-layout" className={cn("flex h-full min-h-0 w-full flex-1 gap-3", className)}>
+      <aside className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-[10px] border border-border-soft bg-background">
         {threads}
       </aside>
-      <section className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-[10px] border border-border-soft bg-background">
+      <section className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-[10px] border border-border-soft bg-background">
         {conversation}
       </section>
     </div>

@@ -15,6 +15,7 @@ export interface GalleryItem {
   src: string;
   alt: string;
   thumbnailSrc?: string;
+  kind?: "image" | "video";
 }
 
 export interface GalleryGridProps {
@@ -93,14 +94,23 @@ export function MediaLightbox({
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl border-none bg-transparent p-0 shadow-none">
+      <DialogContent className="max-w-4xl border-none bg-transparent p-0 shadow-none [&>button:last-child]:hidden">
         <DialogTitle className="sr-only">{item.alt}</DialogTitle>
         <div className="relative flex items-center justify-center">
-          <img
-            src={item.src}
-            alt={item.alt}
-            className="max-h-[85vh] w-full rounded-[10px] object-contain"
-          />
+          {item.kind === "video" ? (
+            <video
+              src={item.src}
+              controls
+              playsInline
+              className="max-h-[85vh] w-full rounded-[10px] bg-black"
+            />
+          ) : (
+            <img
+              src={item.src}
+              alt={item.alt}
+              className="max-h-[85vh] w-full rounded-[10px] object-contain"
+            />
+          )}
           <Button
             variant="ghost"
             size="icon"

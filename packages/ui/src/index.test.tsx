@@ -9,6 +9,11 @@ describe("Button", () => {
     expect(getByRole("button", { name: "Click me" })).toBeInTheDocument();
   });
 
+  it("keeps cursor-pointer on the brand button", () => {
+    const { getByRole } = render(<Button>Click me</Button>);
+    expect(getByRole("button", { name: "Click me" }).className).toMatch(/cursor-pointer/);
+  });
+
   it("has no a11y violations", async () => {
     const { container } = render(<Button>Accessible</Button>);
     expect(await axe(container)).toHaveNoViolations();

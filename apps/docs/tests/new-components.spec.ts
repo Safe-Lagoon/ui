@@ -7,6 +7,7 @@ const newPages = [
   { path: "/docs/components/sidebar", heading: "Sidebar" },
   { path: "/docs/components/date-picker", heading: "Date Picker" },
   { path: "/docs/components/layouts", heading: "Layouts" },
+  { path: "/docs/components/app-shell", heading: "App Shell" },
   { path: "/docs/components/input", heading: "Input" },
   { path: "/docs/components/device-mode", heading: "Device Mode" },
   { path: "/docs/components/feed-stacks", heading: "Feed stacks" },
@@ -22,3 +23,10 @@ for (const { path, heading } of newPages) {
     await expect(page.getByText(/Demo not found|Application error/i)).toHaveCount(0);
   });
 }
+
+test("App Shell documents phoneMaxWidth", async ({ page }) => {
+  await page.goto("/docs/components/app-shell");
+  await expect(page.getByRole("heading", { name: "App Shell", level: 1 })).toBeVisible();
+  await expect(page.getByText("phoneMaxWidth", { exact: true })).toBeVisible();
+  await expect(page.getByText("430").first()).toBeVisible();
+});

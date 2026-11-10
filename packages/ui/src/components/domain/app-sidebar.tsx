@@ -83,6 +83,7 @@ export interface AppSidebarProps {
   groups?: AppSidebarGroup[];
   profile: AppSidebarProfile;
   childProfiles?: AppSidebarChildProfile[];
+  childProfilesLoading?: boolean;
   activeChildProfileId?: string;
   defaultActiveChildProfileId?: string;
   onChildProfileChange?: (profileId: string) => void;
@@ -127,7 +128,7 @@ function NavLink({
       ? rail
         ? "bg-lilac-soft text-violet"
         : "bg-card text-brand-blue shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
-      : "text-fg hover:bg-white/55",
+      : "text-fg hover:bg-white/55 dark:hover:bg-white/10",
   );
 
   const content = (
@@ -261,9 +262,9 @@ function ProfileFooter({
 }) {
   const rail = density === "rail";
   const profileClassName = cn(
-    "flex min-w-0 items-center rounded-[10px] text-start transition-colors",
+    "flex min-w-0 cursor-pointer items-center rounded-[10px] text-start transition-colors",
     "hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-    rail ? "justify-center p-1" : "flex-1 gap-3 px-2 py-2",
+    rail ? "w-full justify-center p-1" : "flex-1 gap-3 px-2 py-2",
   );
   const profileInner = (
     <>
@@ -330,7 +331,7 @@ function ProfileFooter({
   return (
     <div
       className={cn(
-        rail ? "px-1 py-2" : "mt-auto border-t border-border-soft p-2.5",
+        rail ? "mt-auto shrink-0 px-1 py-2" : "mt-auto shrink-0 border-t border-border-soft p-2.5",
         surface === "background" ? "bg-background" : "bg-muted",
       )}
     >
@@ -368,6 +369,7 @@ export function AppSidebar({
   groups = [],
   profile,
   childProfiles,
+  childProfilesLoading = false,
   activeChildProfileId: activeChildProfileIdProp,
   defaultActiveChildProfileId,
   onChildProfileChange,
@@ -433,24 +435,27 @@ export function AppSidebar({
           ) : null}
         </div>
 
-        {childProfiles && childProfiles.length > 0 ? (
+        {childProfilesLoading || (childProfiles && childProfiles.length > 0) ? (
           <div className="mt-3">
             <ChildRail
-              profiles={childProfiles}
+              profiles={childProfiles ?? []}
               activeProfileId={activeChildProfileId}
+              loading={childProfilesLoading}
               onProfileChange={handleChildProfileChange}
               onActiveProfileClick={onActiveChildClick}
-              onAddChild={onAddChild}
+              onAddChild={childProfilesLoading ? undefined : onAddChild}
               addChildLabel={addChildLabel}
               density={density}
             />
-            <ChildProfileSwitcher
-              profiles={childProfiles}
-              activeProfileId={activeChildProfileId}
-              onProfileChange={handleChildProfileChange}
-              switchLabel={childProfileSwitchLabel}
-              className="sr-only"
-            />
+            {childProfilesLoading ? null : (
+              <ChildProfileSwitcher
+                profiles={childProfiles ?? []}
+                activeProfileId={activeChildProfileId}
+                onProfileChange={handleChildProfileChange}
+                switchLabel={childProfileSwitchLabel}
+                className="sr-only"
+              />
+            )}
           </div>
         ) : null}
       </div>

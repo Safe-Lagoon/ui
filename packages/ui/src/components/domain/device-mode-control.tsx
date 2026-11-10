@@ -12,7 +12,7 @@ export type DeviceModeOption = {
 
 const DEFAULT_OPTIONS: DeviceModeOption[] = [
   { value: "allow", label: "Allow" },
-  { value: "rules", label: "By rules" },
+  { value: "rules", label: "Apply Rules" },
   { value: "block", label: "Block" },
 ];
 
@@ -30,6 +30,7 @@ export interface DeviceModeControlProps extends Omit<React.HTMLAttributes<HTMLDi
   caption?: React.ReactNode;
   disabled?: boolean;
   busy?: boolean;
+  pendingValue?: DeviceMode;
 }
 
 const segmentClass: Record<DeviceMode, { idle: string; on: string }> = {
@@ -47,6 +48,10 @@ const segmentClass: Record<DeviceMode, { idle: string; on: string }> = {
   },
 };
 
+function ModeShimmer() {
+  return <span className="sl-mode-shimmer" aria-hidden />;
+}
+
 export function DeviceModeControl({
   value,
   onValueChange,
@@ -55,11 +60,13 @@ export function DeviceModeControl({
   caption,
   disabled = false,
   busy = false,
+  pendingValue,
   className,
   ...props
 }: DeviceModeControlProps) {
   const locked = disabled || busy;
-  const resolvedCaption = caption ?? captions?.[value] ?? DEFAULT_CAPTIONS[value];
+  const shown = pendingValue ?? value;
+  const resolvedCaption = caption ?? captions?.[shown] ?? DEFAULT_CAPTIONS[shown];
 
   return (
     <div data-slot="device-mode-control" className={cn("mb-5 flex flex-col", className)} {...props}>
@@ -67,13 +74,15 @@ export function DeviceModeControl({
         role="radiogroup"
         aria-label="Device mode"
         aria-disabled={locked || undefined}
+        aria-busy={busy || undefined}
         className={cn(
           "grid grid-cols-3 gap-1 rounded-lg border border-border-soft bg-card p-1 shadow-card",
-          locked && "pointer-events-none opacity-60",
+          locked && "pointer-events-none",
         )}
       >
         {options.map((option) => {
-          const selected = option.value === value;
+          const selected = option.value === shown;
+          const pending = busy && option.value === pendingValue;
           const look = segmentClass[option.value];
           return (
             <button
@@ -84,8 +93,9 @@ export function DeviceModeControl({
               disabled={locked}
               data-state={selected ? "on" : "off"}
               data-mode={option.value}
+              data-pending={pending || undefined}
               className={cn(
-                "inline-flex h-12 min-h-[48px] items-center justify-center rounded-[10px] px-2 text-[14px] font-semibold",
+                "relative isolate inline-flex h-12 min-h-[48px] items-center justify-center overflow-hidden rounded-[10px] px-2 text-[14px] font-semibold",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 "disabled:pointer-events-none",
                 selected ? look.on : look.idle,
@@ -94,7 +104,8 @@ export function DeviceModeControl({
                 if (!locked && option.value !== value) onValueChange?.(option.value);
               }}
             >
-              <span className="truncate">{option.label}</span>
+              {pending ? <ModeShimmer /> : null}
+              <span className="relative z-[1] truncate">{option.label}</span>
             </button>
           );
         })}

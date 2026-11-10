@@ -70,7 +70,13 @@ function StackLayers({
   const slots = kind === "gallery" ? 4 : 3;
   const shown = previews.slice(0, slots);
   while (shown.length < slots) {
-    shown.push({ label: shown.length === 0 ? "·" : "" });
+    // Last slot is the front layer (highest z-index). Pad behind so a
+    // single screenshot/icon is not buried under empty cards.
+    if (kind === "gallery") {
+      shown.push({ label: shown.length === 0 ? "·" : "" });
+    } else {
+      shown.unshift({ label: "" });
+    }
   }
 
   if (kind === "screentime") {
@@ -151,8 +157,9 @@ function StackLayers({
     );
   }
 
-  const cardClass = kind === "apps" ? "size-9 rounded-[10px]" : "h-11 w-10 rounded-[8px]";
-  const step = kind === "apps" ? 12 : 8;
+  const fitIcon = kind === "apps" || kind === "internet";
+  const cardClass = fitIcon ? "size-9 rounded-[10px]" : "h-11 w-10 rounded-[8px]";
+  const step = fitIcon ? 12 : 8;
   const tones =
     kind === "apps"
       ? APPS_TONES
@@ -171,24 +178,28 @@ function StackLayers({
           key={`${preview.src ?? preview.label ?? "s"}-${index}`}
           data-stack-layer=""
           className={cn(
-            "absolute overflow-hidden",
+            "absolute box-border isolate overflow-hidden",
             cardClass,
             kind === "aishield" && index === 2 && "blur-[0.6px]",
           )}
           style={{
             ...LAYER_RING,
             insetInlineStart: `${index * step}px`,
-            top: kind === "apps" ? 8 : 4,
-            background: preview.src ? undefined : preview.tone ?? tones[index] ?? accent,
+            top: fitIcon ? 8 : 4,
+            background: preview.src
+              ? (fitIcon ? "#fff" : undefined)
+              : preview.tone ?? tones[index] ?? accent,
             zIndex: index + 1,
           }}
         >
           {preview.src ? (
-            <img
-              src={preview.src}
-              alt=""
-              className={cn("size-full object-cover", kind === "aishield" && "opacity-80")}
-            />
+            <span className={cn("block size-full overflow-hidden isolate", fitIcon ? "rounded-[8px]" : "rounded-[6px]")}>
+              <img
+                src={preview.src}
+                alt=""
+                className={cn("size-full", fitIcon ? "object-contain p-1" : "object-cover", kind === "aishield" && "opacity-80")}
+              />
+            </span>
           ) : preview.label ? (
             <span className="flex size-full items-center justify-center text-[10px] font-bold text-white">
               {preview.label.slice(0, 2)}
